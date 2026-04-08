@@ -45,7 +45,7 @@ const Header = () => {
               ))}
           </ul>
           <Link className='bg-primary text-lg uppercase text-white font-semibold
-                rounded-full px-7 py-4 hover:bg-secondary transition-all duration-300' href={"https://healthuaustralia.snapforms.com.au/form/referral--request-of-services-form"}>Referral</Link>
+                rounded-full px-7 py-4 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
           <button onClick={()=>setIsActive(!isActive)} className='text-secondary text-4xl px-4 cursor-pointer lg:hidden '>
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
