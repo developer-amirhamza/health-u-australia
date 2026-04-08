@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
-
+import Nav from 'app/utils/Nav';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -17,6 +17,7 @@ const Header = () => {
     setActiveIndex(index);
     setIsOpen(!isOpen);
   }
+
 
   return (
     <header className='w-full flex items-center justify-center sticky bg-white top-0 z-50 '>
@@ -29,7 +30,7 @@ const Header = () => {
           <ul className=" w-full items-center justify-end hidden  transition-all duration-500 lg:flex ">
             {nav_items.map((item, index)=>(
                 <li key={index} className=' py-3 px-4 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
-                  {item?.path ? <Link className='font-medium' href={item?.path}>{item.label} </Link> : <span className='font-medium'>{item.label}</span> }
+                  <Nav path={item?.path} label={item?.label} />
                   {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
                     {item?.options.map((itm, idx)=>(
@@ -44,7 +45,7 @@ const Header = () => {
               ))}
           </ul>
           <Link className='bg-primary text-lg uppercase text-white font-semibold
-                rounded-full px-7 py-4 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
+                rounded-full px-7 py-4 hover:bg-secondary transition-all duration-300' href={"https://healthuaustralia.snapforms.com.au/form/referral--request-of-services-form"}>Referral</Link>
           <button onClick={()=>setIsActive(!isActive)} className='text-secondary text-4xl px-4 cursor-pointer lg:hidden '>
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>

@@ -5,6 +5,7 @@ import Hero from "app/components/Hero"
 import NewsLetter from "app/components/NewsLetter"
 import Service from "app/components/Service"
 import Testimonials from "app/components/Testimonials"
+import ScrollToTopBtn from "utils/ScrollToTopBtn"
 
 
 const Home = () => {
@@ -17,6 +18,7 @@ const Home = () => {
       <Choose/>
       <Testimonials/>
       <NewsLetter/>
+     
   </main>
   )
 }

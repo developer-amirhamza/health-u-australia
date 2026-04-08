@@ -710,4 +710,4 @@ export const gardening_house_yard = [
             { text: "While providing home maintenance services, we ensure the safety of participants and avoid structural modifications" },
         ]
     },
-]
+];

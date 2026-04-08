@@ -58,9 +58,9 @@ const Choose = () => {
             <div className={`bg-secondary absolute min-h-80 w-full p-3 py-10 h-full ${[0,2,4].includes(index) ? "rounded-tr-[4rem]" : "rounded-tl-[4rem]" }  grid gap-5`} >
               <Image src={item.logo} alt='' className={`absolute top-0 ${[0,2,4].includes(index) ? "left-0" : "right-0" }`} />
               <Image src={item.icon} alt='' className={`absolute top-3 object-scale-down ${[0,2,4].includes(index) ? "right-3" : "left-3" }`} />
-              <div className="absolute lg:top-1/2 md:top-1/3 sm:top-1/2 md:py-5 lg:py-0 px-5   mb-10 grid gap-4">
-                <h1 className="lg:text-[1.3rem] md:text-[1.3rem] sm:text-2xl font-bold   ">{item.title} </h1>
-                <p className="text-lg font-medium   ">{item.paragraph} </p>
+              <div className="absolute lg:top-1/2 md:top-1/3 top-1/2  md:py-5 lg:py-0 px-5   mb-10 grid gap-3">
+                <h1 className="lg:text-[1.3rem] md:text-[1.3rem] sm:text-2xl font-bold  text-3xl ">{item.title} </h1>
+                <p className="text-lg font-medium lg:text-base  ">{item.paragraph} </p>
               </div>
             </div>
           </motion.div>

@@ -1,3 +1,5 @@
+
+import SnapForm from 'app/components/SnapForm';
 import Referral from 'app/pages/Referral'
 import { Metadata } from 'next'
 import React from 'react'
@@ -8,7 +10,8 @@ export const metadata : Metadata = {
 };
 const page = () => {
   return (
-    <Referral/>
+    // <Referral/>
+    <SnapForm/>
   )
 }
 

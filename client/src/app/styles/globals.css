@@ -43,6 +43,29 @@
 }
 
 
+.container_form {
+  width: 100%;
+  padding:0px;
+  margin: 0 auto;
+}
+
+/* For tablets and medium screens */
+@media (min-width: 768px) {
+  .container_form {
+    padding:0 40px;
+    margin: 0 auto;
+  }
+}
+
+/* For desktops and large screens */
+@media (min-width: 1200px) {
+  .container_form {
+    padding:0 80px;
+    margin: 0 auto;
+  }
+}
+
+
 
 body {
   background: var(--background);
@@ -57,7 +80,13 @@ body {
   height: 100%;
 }
 
-
+body, main {
+  overflow-x: hidden;
+  overflow-y: auto; /* normal page scroll */
+}
+iframe {
+  overflow: hidden;
+}
 
 
 

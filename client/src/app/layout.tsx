@@ -1,7 +1,9 @@
 "use client"
+import ScrollToTopBtn from "utils/ScrollToTopBtn";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import "./styles/globals.css"
+import ScrollToTop from "utils/ScrollToTop";
 export default function RootLayout({
   children,
 }: {
@@ -16,6 +18,8 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <ScrollToTop  />
+         <ScrollToTopBtn/>
       </body>
     </html>
   )
