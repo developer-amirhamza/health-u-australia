@@ -222,7 +222,7 @@ const SilHouse = () => {
                 <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
                     <iframe
                         className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d53042.820254363636!2d151.07279133749608!3d-33.80776405171564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sHealth%20U%20Australia%20Ryde!5e0!3m2!1sen!2sbd!4v1768531763664!5m2!1sen!2sbd"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18674.576669866256!2d151.11174077427498!3d-33.80809343537377!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12a5be90fc1aad%3A0x5017d681632c9f0!2sRyde%20NSW%202112%2C%20Australia!5e1!3m2!1sen!2sbd!4v1775793398565!5m2!1sen!2sbd"
                         width={400}
                         height={400}
                         style={{ border: 0 }}

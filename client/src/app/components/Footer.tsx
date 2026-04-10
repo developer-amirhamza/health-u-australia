@@ -34,11 +34,11 @@ const Footer = () => {
           </li>
           <li className="flex items-center text-center gap-2 text-white ">
             <PiMapPinAreaFill size={30} />
-            <address> 92 Bowden street ryde NSW 2112</address>
+            <address>Bowden street ryde NSW 2112</address>
           </li>
           <li className="flex items-center text-center gap-2 text-white ">
             <PiMapPinAreaFill size={30} />
-            <address>102 Denman Parade, Normanhurst NSW 2076</address>
+            <address>Denman Parade, Normanhurst NSW 2076</address>
           </li>
         </ul>
         <ul className='flex flex-wrap gap-10 items-center justify-center  ' >

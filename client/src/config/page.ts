@@ -28,7 +28,9 @@ import {
     ndis1,
     ndis2,
     ndis3,
-    ndis4
+    ndis4,
+    service9,
+    service10
 } from "assets"
 
 
@@ -105,6 +107,11 @@ export const service_items = [
         title: "Non NIDS Free Services",
         image: service8,
         path: "/non-ndis"
+    },
+    {
+        title: "NDIS Support Independent Living",
+        image: service10,
+        path: "/support-independent-living"
     },
 
 ]
@@ -641,7 +648,7 @@ export const contact_details = [
         title2:"Office:",
         phone:"0480 045 558",
         email:"info@healthuau.com",
-        address:"92 Bowden Street, Ryde, NSW 2112",
+        address:"Bowden Street, Ryde, NSW 2112",
         time:"8:00 am – 6:00 pm",
     },
     {
@@ -649,7 +656,7 @@ export const contact_details = [
         title2:"Office:",
         phone:"0435 680 807",
         email:"info@healthuau.com",
-        address:"102 Denman Parade, Normanhurst NSW 2076",
+        address:"Denman Parade, Normanhurst NSW 2076",
         time:"8:00 am – 6:00 pm",
     },
 

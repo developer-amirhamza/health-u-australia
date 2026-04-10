@@ -11,6 +11,7 @@ import 'swiper/css/navigation';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import {motion} from "framer-motion";
 import service_bg from "assets/images/services-pattan-img01.png"
+import Link from 'next/link';
 
 const Service = () => {
 
@@ -99,15 +100,15 @@ const Service = () => {
           }}>
           {service_items.map((item, index) => (
             <SwiperSlide>
-              <div className="flex flex-col  min-h-98 w-full max-w-70  items-center justify-self-center  rounded-2xl relative
+              <div key={index} className="flex flex-col  min-h-98 w-full max-w-70  items-center justify-self-center  rounded-2xl relative
              bg-white ">
                 <Image src={item.image} alt={item.title}
                   className=' flex w-full h-full max-h-64 object-scale-cover absolute top-0 rounded-t-3xl rounded-b-full ' />
                 <h1 className="absolute top-70 p-3 w-full flex text-center justify-center text-xl font-bold items-center">{item.title}</h1>
-                <button className=" py-3 px-5 hover:bg-secondary z-50 cursor-pointer transition-colors duration-300 rounded-full
+                <Link href={item.path} className=" py-3 px-5 hover:bg-secondary z-50 cursor-pointer transition-colors duration-300 rounded-full
               absolute -bottom-6 font-bold text-base uppercase bg-primary text-white  items-center justify-self-center  flex ">
                   View Details
-                </button>
+                </Link >
               </div>
             </SwiperSlide>
           ))}

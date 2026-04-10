@@ -7,6 +7,9 @@ import service5 from "assets/images/services/services-img05.jpg"
 import service6 from "assets/images/services/services-img06.jpg"
 import service7 from "assets/images/services/services-img07.jpg"
 import service8 from "assets/images/services/services-img08.jpg"
+import service9 from "assets/images/services/service_support1.png"
+import service10 from "assets/images/services/service_support2.png"
+import service11 from "assets/images/services/service_support3.png"
 import aryan from "assets/images/reviews/Aryan.png"
 import brain from "assets/images/reviews/brain.png"
 import evelyn from "assets/images/reviews/evelyn.png"
@@ -101,5 +104,5 @@ export {
     property_img15,property_img16,property_img17,property_img18,property_img19,property_img20,property_img21,
     property_img22,gallery_img01,gallery_img02,gallery_img03,gallery_img04,gallery_img05,gallery_img06,
     home_modification_img01,gardening_house_yard_img01,gardening_house_yard_img02,gardening_house_yard_img03,
-    gardening_house_yard_img04,icon1,icon2,icon3,logo1,icon4,logo2,ndis1,ndis2,ndis3,ndis4,
-}
+    gardening_house_yard_img04,icon1,icon2,icon3,logo1,icon4,logo2,ndis1,ndis2,ndis3,ndis4,service9,service10,service11,
+};

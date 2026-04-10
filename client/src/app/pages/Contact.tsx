@@ -82,7 +82,7 @@ const Contact = () => {
                                     </div>
                                     <div className="grid gap-3">
                                         <h1 className="text-2xl font-semibold">Address</h1>
-                                        <address className=' text-secondary-text font-semibold '>{item.address} </address>
+                                        <address className=' text-secondary-text font-semibold '>{item?.address} </address>
                                     </div>
                                 </li>
                                 <li className="flex items-center p-5 gap-3">
@@ -91,7 +91,7 @@ const Contact = () => {
                                     </div>
                                     <div className="grid gap-3">
                                         <h1 className="text-2xl font-semibold">Working Hour</h1>
-                                        <span className=' text-secondary-text font-semibold '>{item.time}</span>
+                                        <span className=' text-secondary-text font-semibold '>{item?.time}</span>
                                     </div>
                                 </li>
                             </ul>
