@@ -19,18 +19,11 @@ import {
     gardening_house_yard_img02,
     gardening_house_yard_img03,
     gardening_house_yard_img04,
-    logo1,
-    icon1,
-    logo2,
-    icon2,
-    icon3,
-    icon4,
-    ndis1,
-    ndis2,
-    ndis3,
-    ndis4,
+    logo1,icon1,logo2,icon2,icon3,icon4,ndis1,
+    ndis2,ndis3,ndis4,
     service9,
-    service10
+    service10,
+    service11,
 } from "assets"
 
 
@@ -53,7 +46,13 @@ export const nav_items = [
             { label: "Gardening/House And Yard", path: "/gardening-house-yard" },
         ]
     },
-    { label: "Sil house", path: "/sil-house" },
+    { label: "SIL House",
+        options:[
+            {label:"Belmore street, Ryde", path:"belmore-sil-house"},
+            {label:"Bowden Street, Ryde,",path:"bowden-sil-house"},
+            {label:"Normanhurst",path:"normanhurst-sil-house"},
+        ],
+    },
     { label: "Compassion in Action", path: "/compassion-in-action" },
     {
         label: "Events And News",

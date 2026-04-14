@@ -34,7 +34,6 @@ const CurrentEvents = () => {
                             <PiMapPinAreaFill size={30} className='text-primary' />
                             <p className=" text-secondary-text font-semibold text-sm ">Community Park</p>
                         </div>
-
                     </div>
 
                 </motion.div>
