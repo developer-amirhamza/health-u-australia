@@ -46,13 +46,7 @@ export const nav_items = [
             { label: "Gardening/House And Yard", path: "/gardening-house-yard" },
         ]
     },
-    { label: "SIL House",
-        options:[
-            {label:"Belmore street, Ryde", path:"belmore-sil-house"},
-            {label:"Bowden Street, Ryde,",path:"bowden-sil-house"},
-            {label:"Normanhurst",path:"normanhurst-sil-house"},
-        ],
-    },
+    { label: "SIL House", path:"/sil-house"},
     { label: "Compassion in Action", path: "/compassion-in-action" },
     {
         label: "Events And News",
@@ -242,8 +236,8 @@ export const choose_items = [
 export const sil_house = [
     {
         image: sil_image1,
-        title1: "Live an Independent & Fulfilling Life with Our",
-        title2: "Supported Independent Living Program",
+        title1: "Live an Independent & Fulfilling Life with ",
+        title2: "Our Supported Independent Living Program",
         paragraph1: "We at Health U Support Services are on a mission to empower participants with our exceptional care and support. Whether you want support to live comfortably in your own home or want to move to another place for a change in scenario, our specialised supported independent living program will foster an environment where you can thrive.",
         paragraph2: "From supporting you with your everyday activities to building your skills, our service will cover everything to help you live an independent and fulfilling life. Whether you want our support staff to attend to you 24/7 or just a few hours in a day, we will plan our assistance depending on your needs and circumstances.",
     },
@@ -256,8 +250,8 @@ export const sil_house = [
     },
     {
         image: sil_image3,
-        title1: "Live an Independent & Fulfilling Life with Our",
-        title2: "Supported Independent Living Program",
+        title1: "Who is Eligible for",
+        title2: "Supported Independent Living (SIL)?",
         paragraph1: "It should come to your attention that to opt for SIL assistance, you need to be eligible for the program. To confirm your",
         paragraph2: "If you are this type of individual, we are ready to take our professional SIL assistance to your doorstep and arrange a shared living facility for you to provide you with the support you need to ensure a future of continued independence.",
         bullet_title: "eligibility, you must meet the following criteria:",

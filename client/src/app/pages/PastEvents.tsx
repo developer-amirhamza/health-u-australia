@@ -15,7 +15,7 @@ import { FaMapLocationDot } from 'react-icons/fa6';
 const PastEvents = () => {
     return (
         <div className="grid w-full h-full gap-10 ">
-            <PageBanner title='Current Events' path='/current-events' />
+            <PageBanner title='Past Events' path='/past-events' />
             <div className="container mx-auto items-start w-full justify-center my-10 rounded border-neutral-300  gap-12 border text-secondary-text p-10 flex flex-col md:flex-row ">
                 <motion.div  className="flex flex-col items-start text-lg w-full "
                 initial="hidden" whileInView={"show"} variants={fadeIn('left',0.3)} viewport={{once:false,amount:0.2}}>

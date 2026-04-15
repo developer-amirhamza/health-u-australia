@@ -41,14 +41,14 @@ const Footer = () => {
             <address>Denman Parade, Normanhurst NSW 2076</address>
           </li>
         </ul>
-        <ul className='flex flex-wrap gap-10 items-center justify-center  ' >
-          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-white transition-colors duration-300">
+        <ul className='flex flex-wrap gap-10 items-center justify-center text-white ' >
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#E1306C] transition-colors duration-300">
             <Link href={"https://www.instagram.com/healthu_au/"}><FaInstagramSquare size={30} /> </Link>
           </li>
-          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-white transition-colors duration-300">
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#1877F2] transition-colors duration-300">
             <Link href={"https://www.facebook.com/healthuau/"}><FaFacebookF size={30} /> </Link>
           </li>
-          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-white transition-colors duration-300">
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#0A66C2] transition-colors duration-300">
             <Link href={"https://www.linkedin.com/company/health-u-australia/"}><FaLinkedinIn size={30} /> </Link>
           </li>
         </ul>

@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://healthuau.com.au
+
+# Sitemaps
+Sitemap: https://healthuau.com.au/sitemap.xml

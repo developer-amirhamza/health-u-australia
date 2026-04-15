@@ -5,13 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "export" :"next export"
+    "postbuild": "next-sitemap",
+    "start": "next start"
+    
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",
     "framer-motion": "^12.34.0",
     "next": "16.1.1",
+    "next-seo": "^7.2.0",
+    "next-sitemap": "^4.2.3",
     "next-video": "^2.6.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
