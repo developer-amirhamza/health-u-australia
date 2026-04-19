@@ -6,13 +6,14 @@ import icon1 from "assets/images/2026/10/icon.png"
 import icon2 from "assets/images/2026/10/icon2.png"
 import icon3 from "assets/images/2026/10/icon4.png"
 import { TiTick } from 'react-icons/ti';
-import { sil_house, sil_house_details, sil_house_gallery } from 'config/page'
+import { sil_house, sil_house_details, sil_house_gallery, sil_houses } from 'config/page'
 import Button from 'app/utils/Button'
 import Title from 'app/utils/Title'
 import { FaPlus } from 'react-icons/fa'
 import SlideModal from 'app/components/SlideModal'
 import { motion } from 'framer-motion'
 import { fadeIn } from 'app/variants';
+import Link from 'next/link'
 
 
 const SilHouse = () => {
@@ -21,8 +22,37 @@ const SilHouse = () => {
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-full ">
-            <PageBanner title='SIL House' path='/sil-house' />
+            {/* <PageBanner title='SIL House' path='/sil-house' /> */}
+
+
+
             <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
+                <div className="flex flex-col items-center justify-center gap-10 py-12">
+                    <h1 className="text-primary text-4xl font-bold uppercase ">Our SIL House Properties </h1>
+                    <div className="flex">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {sil_houses.map((item,index)=>(
+                                <Link href={item.path} key={index} className="flex flex-col border-[0.5px] cursor-pointer hover:scale-105 duration-300 transition-all border-secondary-text overflow-hidden rounded shadow-2xl border-dotted  ">
+                                    <Image src={item.image} alt='sil-house' className=' '/>
+                                    <div className="flex flex-col items-center p-4 justify-center">
+                                        <div className="flex flex-col items-center justify-center gap-1 ">
+                                            <h1 className="text-2xl font-semibold text-secondary-text">SIL House at {item.address} </h1>
+                                    {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
+                                        </div>
+                                        <div className="flex items-center justify-center gap-3  w-full h-full">
+                                            {item.features.map((itm,idx)=>(
+                                                <div key={idx} className="flex flex-col justify-center items-center gap-2">
+                                                    <Image src={itm.icon} alt='icon'/>
+                                                <h3 className="text-sm">{itm.label} </h3>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
                 {sil_house.map((item: any, index: number) => (
                     <div key={index} className={`flex flex-col my-10 gap-x-10 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
                         <motion.div className="flex w-full h-full"
@@ -80,6 +110,7 @@ const SilHouse = () => {
                 ))}
                 {/* blogs section ends */}
 
+
                 {/* blogs footer ends */}
                 <motion.div className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10"
                 initial={"hidden"} whileInView={"show"} variants={fadeIn("up",0.5)}
@@ -97,7 +128,7 @@ const SilHouse = () => {
                 {/* page footer ends */}
 
 
-                <div className=" grid grid-cols-1 md:grid-cols-2 place-content-start py-10 ">
+                {/* <div className=" grid grid-cols-1 md:grid-cols-2 place-content-start py-10 ">
                     <motion.div className="grid place-content-start w-full gap-5"
                     initial={"hidden"} whileInView={"show"} variants={fadeIn("left" , 0.2)} >
                         <Title title1='Convenient Ryde Home SIL, MTA, Respite –' title2='AVAILABLE NOW' />
@@ -122,7 +153,7 @@ const SilHouse = () => {
                         <p className="text-secondary-text text-medium text-lg">Beautiful shared home close to Top Ryde Shopping Center and hospital.</p>
                         <Button path='sil-sta-respite-initial-inquiry' label='sil enquiry' />
                     </motion.div>
-                </div>
+                </div> */}
 
                 <motion.div className="flex flex-col w-full justify-center gap-4 mt-8"
                 initial="hidden" whileInView={"show"} variants={fadeIn("up",0.5)} viewport={{once:false, amount:0.3}} >

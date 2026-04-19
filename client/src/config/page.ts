@@ -24,8 +24,14 @@ import {
     service9,
     service10,
     service11,
+    sil_house1,
+    sil_house2,
+    sil_house3,
 } from "assets"
 
+import bed from "assets/images/2026/10/icon.png"
+import bathroom from "assets/images/2026/10/icon2.png"
+import car from "assets/images/2026/10/icon4.png"
 
 export const nav_items = [
     {
@@ -533,6 +539,35 @@ export const support_coordination = [
     },
 ]
 
+export const sil_houses = [
+    {
+        label:"Health U Australia",
+        path:"/bowden_street",
+        image:sil_house1,
+        address:"Ryde, NSW 2112",
+        features:[
+            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        ]
+    },
+    {
+        label:"Health U Australia ",
+        path:"/belmore_street",
+        image:sil_house2,
+        address:"Ryde, NSW 2112",
+        features:[
+            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        ]
+    },
+    {
+        label:"Health U Australia ",
+        path:"/normanhust",
+        image:sil_house3,
+        address:"Normanhurst NSW 2076",
+        features:[
+            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        ]
+    },
+]
 
 export const assist_in_self_care = [
     {

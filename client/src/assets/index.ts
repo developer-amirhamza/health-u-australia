@@ -21,6 +21,9 @@ import sil_image1 from "assets/images/sil-images/sil-img01.jpg"
 import sil_image2 from "assets/images/sil-images/sil-img02.jpg"
 import sil_image3 from "assets/images/sil-images/sil-img03.jpg"
 import sil_image4 from "assets/images/sil-images/sil-img04.jpg"
+import sil_house1 from "assets/images/sil-houses/belmore.png"
+import sil_house2 from "assets/images/sil-houses/bowden.png"
+import sil_house3 from "assets/images/sil-houses/normanhurst.png"
 import community_participation1 from "assets/images/community/community-participation-img01.jpg"
 import community_participation2 from "assets/images/community/community-participation-img02.jpg"
 import community_participation3 from "assets/images/community/community-participation-img03.jpg"
@@ -105,4 +108,5 @@ export {
     property_img22,gallery_img01,gallery_img02,gallery_img03,gallery_img04,gallery_img05,gallery_img06,
     home_modification_img01,gardening_house_yard_img01,gardening_house_yard_img02,gardening_house_yard_img03,
     gardening_house_yard_img04,icon1,icon2,icon3,logo1,icon4,logo2,ndis1,ndis2,ndis3,ndis4,service9,service10,service11,
+    sil_house1,sil_house2,sil_house3,
 };

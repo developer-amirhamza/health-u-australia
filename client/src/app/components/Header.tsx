@@ -7,6 +7,7 @@ import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 import Nav from 'app/utils/Nav';
+import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -16,11 +17,37 @@ const Header = () => {
   const handleToggle = (index:number)=>{
     setActiveIndex(index);
     setIsOpen(!isOpen);
-  }
-
+  };
 
   return (
-    <header className='w-full flex items-center justify-center sticky bg-white top-0 z-50 '>
+    <header className='w-full flex flex-col items-center justify-center sticky bg-white top-0 z-50 '>
+      <div className="flex w-full bg-secondary max-h-14 items-center justify-center h-full">
+        <div className="container flex items-center justify-between text-white  ">
+          {/* contact list */}
+          {/* search bar */}
+          <div className="flex items-center w-full relative">
+            <input type="text" name="search" id="search"
+            className='outline-none border border-white px-5 py-1.5 w-full flex rounded-full '
+            />
+            <div className=" absolute right-0 border-l px-2.5 py-2 ">
+              <FaSearch size={22} />
+            </div>
+          </div>
+          {/* social icons */}
+          <ul className='flex flex-wrap w-full gap-10 items-center justify-center text-white py-1.5 ' >
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#E1306C] transition-colors duration-300">
+            <Link href={"https://www.instagram.com/healthu_au/"}><FaInstagramSquare size={18} /> </Link>
+          </li>
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#1877F2] transition-colors duration-300">
+            <Link href={"https://www.facebook.com/healthuau/"}><FaFacebookF size={18} /> </Link>
+          </li>
+          <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#0A66C2] transition-colors duration-300">
+            <Link href={"https://www.linkedin.com/company/health-u-australia/"}><FaLinkedinIn size={18} /> </Link>
+          </li>
+        </ul>
+        </div>
+
+      </div>
       <div className=" flex w-full items-center relative justify-between md:px-10  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
             <Image src={logo} alt='Health U logo' className='h-24 w-44'  />
@@ -50,7 +77,6 @@ const Header = () => {
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
         </nav>
-
         </div>
         {/* mobile  menu */}
         <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-100 transition-all ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
