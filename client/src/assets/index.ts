@@ -95,6 +95,22 @@ import ndis1 from "assets/images/about/ndis-img01.jpg"
 import ndis2 from "assets/images/about/ndis-img02.jpg"
 import ndis3 from "assets/images/about/ndis-img03.jpg"
 import ndis4 from "assets/images/about/ndis-img04.jpg"
+import belmore1 from "assets/images/sil-images/belmore_street/belmore1.png"
+import belmore2 from "assets/images/sil-images/belmore_street/belmore2.png"
+import belmore3 from "assets/images/sil-images/belmore_street/belmore3.png"
+import belmore4 from "assets/images/sil-images/belmore_street/belmore4.png"
+import belmore5 from "assets/images/sil-images/belmore_street/belmore5.png"
+import belmore6 from "assets/images/sil-images/belmore_street/belmore6.png"
+import belmore7 from "assets/images/sil-images/belmore_street/belmore7.png"
+import belmore8 from "assets/images/sil-images/belmore_street/belmore8.png"
+import belmore9 from "assets/images/sil-images/belmore_street/belmore9.png"
+import belmore10 from "assets/images/sil-images/belmore_street/belmore10.png"
+import belmore11 from "assets/images/sil-images/belmore_street/belmore11.png"
+import belmore12 from "assets/images/sil-images/belmore_street/belmore12.png"
+import belmore13 from "assets/images/sil-images/belmore_street/belmore13.png"
+import belmore14 from "assets/images/sil-images/belmore_street/belmore14.png"
+import belmore15 from "assets/images/sil-images/belmore_street/belmore15.png"
+
 export {
     service1, service2, service3, service4,service5,service6,service7,service8,aryan, brain, evelyn,jose,
     email_icon,clack_icon,call_icon,sil_image1,sil_image2,sil_image3,sil_image4,community_participation1,
@@ -108,5 +124,6 @@ export {
     property_img22,gallery_img01,gallery_img02,gallery_img03,gallery_img04,gallery_img05,gallery_img06,
     home_modification_img01,gardening_house_yard_img01,gardening_house_yard_img02,gardening_house_yard_img03,
     gardening_house_yard_img04,icon1,icon2,icon3,logo1,icon4,logo2,ndis1,ndis2,ndis3,ndis4,service9,service10,service11,
-    sil_house1,sil_house2,sil_house3,
+    sil_house1,sil_house2,sil_house3,belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,belmore8,belmore9,
+    belmore10,belmore11,belmore12,belmore13,belmore14,belmore15,
 };

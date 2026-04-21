@@ -1,4 +1,3 @@
-
 import {
     aryan, assist_self1, assist_self2, assist_self3, assist_transport1, assist_transport2, assist_transport3,
     assist_transport4, assist_transport5, brain, capacity1, capacity2, capacity3, community_participation1,
@@ -19,14 +18,16 @@ import {
     gardening_house_yard_img02,
     gardening_house_yard_img03,
     gardening_house_yard_img04,
-    logo1,icon1,logo2,icon2,icon3,icon4,ndis1,
-    ndis2,ndis3,ndis4,
+    logo1, icon1, logo2, icon2, icon3, icon4, ndis1,
+    ndis2, ndis3, ndis4,
     service9,
     service10,
     service11,
     sil_house1,
     sil_house2,
     sil_house3,
+    belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,
+    belmore8,belmore9,belmore10,belmore11,belmore12,
 } from "assets"
 
 import bed from "assets/images/2026/10/icon.png"
@@ -47,12 +48,12 @@ export const nav_items = [
             { label: "Support Coordination", path: "/support-coordination" },
             { label: "Assist In Self-care", path: "/assist-in-self-care" },
             { label: "Assist In Transport", path: "/assist-in-transport" },
-            { label: "Home Modification", path: "/home-modification"},
+            { label: "Home Modification", path: "/home-modification" },
             { label: "Non NDIS Free Service", path: "/compassion-in-action" },
             { label: "Gardening/House And Yard", path: "/gardening-house-yard" },
         ]
     },
-    { label: "SIL House", path:"/sil-house"},
+    { label: "SIL House", path: "/sil-house" },
     { label: "Compassion in Action", path: "/compassion-in-action" },
     {
         label: "Events And News",
@@ -65,6 +66,120 @@ export const nav_items = [
     { label: "Contact Us", path: "/contact-us" },
     { label: "Referral", path: "/referral" },
 ]
+
+export const belmore_slides = [
+    {
+        "id": 1,
+        "image": belmore1,
+        "heading": "NDIS Housing in Ryde NSW – Urgent Placement Available",
+        "description": "Affordable SIL, STA & respite home in Ryde with immediate availability. Ideal for hospital discharge and fast NDIS participant placement.",
+        "cta": {
+            "primary": "Apply Now",
+            "secondary": "Refer a Participant"
+        }
+    },
+    {
+        "id": 2,
+        "image": belmore12,
+        "heading": "NDIS Property Near Hospitals & Transport in Ryde",
+        "description": "Located close to Ryde Hospital, transport, and shopping centres for easy access and convenience.",
+        "cta": {
+            "primary": "Check Location",
+            "secondary": "Enquire Now"
+        }
+    },
+    {
+        "id": 3,
+        "image": belmore2,
+        "heading": "Secure Backyard & Outdoor Living for NDIS Residents",
+        "description": "Spacious and secure outdoor area with garden and seating, promoting wellbeing, relaxation, and safe daily activities.",
+        "cta": {
+            "primary": "Book Inspection",
+            "secondary": "View Features"
+        }
+    },
+    {
+        "id": 4,
+        "image": belmore3,
+        "heading": "Dual Dwelling NDIS Accommodation in Ryde",
+        "description": "Flexible dual living setup offering privacy and independence for SIL participants and shared support arrangements.",
+        "cta": {
+            "primary": "Check Availability",
+            "secondary": "Contact Us"
+        }
+    },
+    {
+        "id": 5,
+        "image": belmore4,
+        "heading": "Comfortable Shared Living Spaces for NDIS Participants",
+        "description": "Bright, modern living areas designed for accessibility, comfort, and a supportive home environment.",
+        "cta": {
+            "primary": "Explore Home",
+            "secondary": "Book Tour"
+        }
+    },
+    {
+        "id": 6,
+        "image": belmore5,
+        "heading": "Modern Dining Area for Supported Independent Living",
+        "description": "Stylish and accessible dining space encouraging social interaction and daily routine support.",
+        "cta": {
+            "primary": "View Details",
+            "secondary": "Enquire Now"
+        }
+    },
+    {
+        "id": 7,
+        "image": belmore6,
+        "heading": "Fully Equipped Accessible Kitchen for NDIS Living",
+        "description": "Functional kitchen with modern appliances supporting independent or assisted daily living needs.",
+        "cta": {
+            "primary": "See Kitchen",
+            "secondary": "Get Info"
+        }
+    },
+    {
+        "id": 8,
+        "image": belmore7,
+        "heading": "Private Bedrooms with Built-in Storage & Natural Light",
+        "description": "Comfortable bedrooms designed for privacy, safety, and peaceful recovery for NDIS residents.",
+        "cta": {
+            "primary": "View Rooms",
+            "secondary": "Apply Today"
+        }
+    },
+    {
+        "id": 9,
+        "image": belmore8,
+        "heading": "Accessible Bedrooms Designed for Independence",
+        "description": "Well-designed personal spaces supporting participant independence and everyday comfort.",
+        "cta": {
+            "primary": "Check Rooms",
+            "secondary": "Contact Team"
+        }
+    },
+    {
+        "id": 10,
+        "image": belmore9,
+        "heading": "Safe & Practical Interior Spaces for Daily Living",
+        "description": "Clean, accessible interiors designed to ensure safety, mobility, and ease of use for all residents.",
+        "cta": {
+            "primary": "Explore Interior",
+            "secondary": "Learn More"
+        }
+    },
+    {
+        "id": 11,
+        "image": belmore10,
+        "heading": "Modern Accessible Bathroom for NDIS Participants",
+        "description": "Functional bathroom spaces designed for safety, accessibility, and comfort in daily use.",
+        "cta": {
+            "primary": "View Facilities",
+            "secondary": "Book Visit"
+        }
+    },
+
+];
 
 export const service_items = [
     {
@@ -214,28 +329,28 @@ export const about = [
 
 export const choose_items = [
     {
-        logo:logo1,
-        icon:icon1,
-        title:"Trust and Reliability",
-        paragraph:"Our service quality makes us one of the most reliable NDIS providers around",
+        logo: logo1,
+        icon: icon1,
+        title: "Trust and Reliability",
+        paragraph: "Our service quality makes us one of the most reliable NDIS providers around",
     },
     {
-        logo:logo2,
-        icon:icon2,
-        title:"Tailored Support",
-        paragraph:"We provide care according to participant’s requirements and enrich their lives",
+        logo: logo2,
+        icon: icon2,
+        title: "Tailored Support",
+        paragraph: "We provide care according to participant’s requirements and enrich their lives",
     },
     {
-        logo:logo1,
-        icon:icon3,
-        title:"Experienced Team",
-        paragraph:"Our experienced team of support workers will help you reach your goals",
+        logo: logo1,
+        icon: icon3,
+        title: "Experienced Team",
+        paragraph: "Our experienced team of support workers will help you reach your goals",
     },
     {
-        logo:logo2,
-        icon:icon4,
-        title:"Empowering Participants",
-        paragraph:"We empower participants to develop essential life skills and live an independent life",
+        logo: logo2,
+        icon: icon4,
+        title: "Empowering Participants",
+        paragraph: "We empower participants to develop essential life skills and live an independent life",
     },
 ]
 
@@ -284,7 +399,7 @@ export const sil_house = [
     },
 ]
 
-export const sil_house_gallery = [gallery_img01,gallery_img02,gallery_img03,gallery_img04,gallery_img05,gallery_img06];
+export const sil_house_gallery = [gallery_img01, gallery_img02, gallery_img03, gallery_img04, gallery_img05, gallery_img06];
 
 
 export const sil_house_details = [
@@ -541,30 +656,30 @@ export const support_coordination = [
 
 export const sil_houses = [
     {
-        label:"Health U Australia",
-        path:"/bowden_street",
-        image:sil_house1,
-        address:"Ryde, NSW 2112",
-        features:[
-            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        label: "Health U Australia",
+        path: "/belmore_street",
+        image: sil_house1,
+        address: "Belmore Street, Ryde, NSW 2112",
+        features: [
+            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
         ]
     },
     {
-        label:"Health U Australia ",
-        path:"/belmore_street",
-        image:sil_house2,
-        address:"Ryde, NSW 2112",
-        features:[
-            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        label: "Health U Australia ",
+        path: "/bowden_street",
+        image: sil_house2,
+        address: "Bowden Street, Ryde, NSW 2112",
+        features: [
+            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
         ]
     },
     {
-        label:"Health U Australia ",
-        path:"/normanhust",
-        image:sil_house3,
-        address:"Normanhurst NSW 2076",
-        features:[
-            {label:"4 Bedrooms", icon:bed}, {label:"4 Bathrooms", icon:bathroom},{label:"3 Parking Spaces", icon:car},
+        label: "Health U Australia ",
+        path: "/normanhurst",
+        image: sil_house3,
+        address: "Normanhurst NSW 2076",
+        features: [
+            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
         ]
     },
 ]
@@ -664,28 +779,29 @@ export const sil_property = [property_img01, property_img02, property_img03, pro
     property_img22,]
 
 export const contact_details = [
-    {   title1:"Top Ryde",
-        title2:"Office:",
-        phone:"0481 707 758 / 0431 377 132",
-        email:"info@healthuau.com",
-        address:"Top Ryde City Shopping Centre Shop MM20, Level 2, 109-129 Blaxland Road, Ryde NSW 2112",
-        time:"8:00 am – 6:00 pm",
+    {
+        title1: "Top Ryde",
+        title2: "Office:",
+        phone: "0481 707 758 / 0431 377 132",
+        email: "info@healthuau.com",
+        address: "Top Ryde City Shopping Centre Shop MM20, Level 2, 109-129 Blaxland Road, Ryde NSW 2112",
+        time: "8:00 am – 6:00 pm",
     },
     {
-        title1:"Ryde",
-        title2:"Office:",
-        phone:"0480 045 558",
-        email:"info@healthuau.com",
-        address:"Bowden Street, Ryde, NSW 2112",
-        time:"8:00 am – 6:00 pm",
+        title1: "Ryde",
+        title2: "Office:",
+        phone: "0480 045 558",
+        email: "info@healthuau.com",
+        address: "Bowden Street, Ryde, NSW 2112",
+        time: "8:00 am – 6:00 pm",
     },
     {
-        title1:"Normanhurst",
-        title2:"Office:",
-        phone:"0435 680 807",
-        email:"info@healthuau.com",
-        address:"Denman Parade, Normanhurst NSW 2076",
-        time:"8:00 am – 6:00 pm",
+        title1: "Normanhurst",
+        title2: "Office:",
+        phone: "0435 680 807",
+        email: "info@healthuau.com",
+        address: "Denman Parade, Normanhurst NSW 2076",
+        time: "8:00 am – 6:00 pm",
     },
 
 ]

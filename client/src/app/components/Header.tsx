@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import logo from "assets/logo.png"
 import Link from 'next/link';
@@ -8,24 +8,51 @@ import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 import Nav from 'app/utils/Nav';
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
+import { FcCustomerSupport } from 'react-icons/fc';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isOpen,setIsOpen] = useState(false)
+  const [isOpen,setIsOpen] = useState(false);
+  const [showTopBar, setShoTopBar]= useState(true);
 
   const handleToggle = (index:number)=>{
     setActiveIndex(index);
     setIsOpen(!isOpen);
   };
 
+  useEffect(()=>{
+    const handleScroll = ()=>{
+      if(window.scrollY === 0){
+        setShoTopBar(true);
+      }else{setShoTopBar(false)}
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return ()=>{
+      window.removeEventListener("scroll",handleScroll);
+    };
+  },[]);
+
   return (
     <header className='w-full flex flex-col items-center justify-center sticky bg-white top-0 z-50 '>
-      <div className="flex w-full bg-secondary max-h-14 items-center justify-center h-full">
-        <div className="container flex items-center justify-between text-white  ">
+       {/* top bar */}
+      {showTopBar && <div className="flex w-full bg-secondary max-h-13 items-center justify-center h-full">
+        <div className="container w-full  hidden   sm:flex items-center justify-between text-white  ">
           {/* contact list */}
+          <div className="flex w-full items-center justify-start h-full gap-2">
+            <FcCustomerSupport size={40} />
+            <div className="grid w-full text-sm font-semibold">
+            <a href="mailto:info@healthuau.com">info@healthuau.com</a>
+            <div className="flex items-center gap-0.5  ">
+              <a href="tel:+0481 707 758">0481 707 758 </a> /
+              <a href="tel:+0481 707 758">0431 377 132</a>
+            </div>
+            </div>
+
+          </div>
           {/* search bar */}
-          <div className="flex items-center w-full relative">
+          <div className="flex items-center justify-center w-full relative">
             <input type="text" name="search" id="search"
             className='outline-none border border-white px-5 py-1.5 w-full flex rounded-full '
             />
@@ -34,7 +61,7 @@ const Header = () => {
             </div>
           </div>
           {/* social icons */}
-          <ul className='flex flex-wrap w-full gap-10 items-center justify-center text-white py-1.5 ' >
+          <ul className='flex flex-wrap w-full gap-10 items-center justify-end text-white py-1.5 ' >
           <li className=" border-2 p-1.5 rounded-full hover:bg-foreground hover:text-[#E1306C] transition-colors duration-300">
             <Link href={"https://www.instagram.com/healthu_au/"}><FaInstagramSquare size={18} /> </Link>
           </li>
@@ -46,8 +73,9 @@ const Header = () => {
           </li>
         </ul>
         </div>
-
       </div>
+      }
+      {/* navbar */}
       <div className=" flex w-full items-center relative justify-between md:px-10  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
             <Image src={logo} alt='Health U logo' className='h-24 w-44'  />
@@ -56,7 +84,7 @@ const Header = () => {
         <nav className='w-full flex justify-end'>
           <ul className=" w-full items-center justify-end hidden  transition-all duration-500 lg:flex ">
             {nav_items.map((item, index)=>(
-                <li key={index} className=' py-3 px-4 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
+                <li key={index} className=' py-2 px-4 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
                   <Nav path={item?.path} label={item?.label} />
                   {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
