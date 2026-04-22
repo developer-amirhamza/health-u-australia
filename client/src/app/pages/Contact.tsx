@@ -106,7 +106,6 @@ const Contact = () => {
                 </div>
                 <main className="bg-white text-gray-800">
 
-
                     {/* hero image */}
                     <section className="flex w-full max-w-4xl items-center justify-center mx-auto">
                         <Image src={career} alt='career' />
@@ -114,7 +113,7 @@ const Contact = () => {
                     {/* HERO */}
                     <section className="bg-linear-150 from-secondary/15 to-primary/15 text-black py-16 px-6 text-center">
                         <h1 className="text-4xl md:text-5xl text-secondary font-bold mb-4">
-                           <span className='text-black'> Apply for a</span> Position
+                        <span className='text-black'> Apply for a</span> Position
                         </h1>
                         <p className="max-w-2xl mx-auto text-lg">
                             Join Health U Australia and build a career that truly makes a

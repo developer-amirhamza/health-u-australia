@@ -26,8 +26,24 @@ import {
     sil_house1,
     sil_house2,
     sil_house3,
-    belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,
-    belmore8,belmore9,belmore10,belmore11,belmore12,
+    belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7,
+    belmore8, belmore9, belmore10, belmore11, belmore12,
+    normanhurst1,
+    normanhurst2,
+    normanhurst3,
+    normanhurst4,
+    normanhurst5,
+    normanhurst6,
+    normanhurst7,
+    normanhurst8,
+    normanhurst9,
+    granny_flat1,
+    granny_flat2,
+    granny_flat3,
+    granny_flat4,
+    granny_flat5,
+    granny_flat6,
+    granny_flat7,
 } from "assets"
 
 import bed from "assets/images/2026/10/icon.png"
@@ -179,6 +195,120 @@ export const belmore_slides = [
         }
     },
 
+];
+
+export const granny_flat = [
+    {
+        "id": 1,
+        "image": granny_flat1,
+        "heading": "NDIS Housing in Ryde NSW – Urgent Placement Available",
+        "description": "Affordable SIL, STA & respite home in Ryde with immediate availability. Ideal for hospital discharge and fast NDIS participant placement.",
+        "cta": {
+            "primary": "Apply Now",
+            "secondary": "Refer a Participant"
+        }
+    },
+    {
+        "id": 3,
+        "image": granny_flat2,
+        "heading": "Secure Backyard & Outdoor Living for NDIS Residents",
+        "description": "Spacious and secure outdoor area with garden and seating, promoting wellbeing, relaxation, and safe daily activities.",
+        "cta": {
+            "primary": "Book Inspection",
+            "secondary": "View Features"
+        }
+    },
+    {
+        "id": 6,
+        "image":granny_flat4,
+        "heading": "Modern Dining Area for Supported Independent Living",
+        "description": "Stylish and accessible dining space encouraging social interaction and daily routine support.",
+        "cta": {
+            "primary": "View Details",
+            "secondary": "Enquire Now"
+        }
+    },
+    {
+        "id": 7,
+        "image": granny_flat6,
+        "heading": "Fully Equipped Accessible Kitchen for NDIS Living",
+        "description": "Functional kitchen with modern appliances supporting independent or assisted daily living needs.",
+        "cta": {
+            "primary": "See Kitchen",
+            "secondary": "Get Info"
+        }
+    },
+    {
+        "id": 8,
+        "image": granny_flat5,
+        "heading": "Private Bedrooms with Built-in Storage & Natural Light",
+        "description": "Comfortable bedrooms designed for privacy, safety, and peaceful recovery for NDIS residents.",
+        "cta": {
+            "primary": "View Rooms",
+            "secondary": "Apply Today"
+        }
+    },
+
+    {
+        "id": 11,
+        "image": granny_flat7,
+        "heading": "Modern Accessible Bathroom for NDIS Participants",
+        "description": "Functional bathroom spaces designed for safety, accessibility, and comfort in daily use.",
+        "cta": {
+            "primary": "View Facilities",
+            "secondary": "Book Visit"
+        }
+    },
+
+];
+
+
+export const normanhurst_slides = [
+    {
+        "image": normanhurst1,
+        "heading": "Accessible NDIS Housing in Normanhurst",
+        "description": "Fully wheelchair accessible home with flexible support options."
+    },
+    {
+        "image":  normanhurst2,
+        "heading": "Outdoor Deck for Relaxation",
+        "description": "Spacious and secure outdoor area for comfort and wellbeing."
+    },
+    {
+        "image": normanhurst3,
+        "heading": "Secure Garden Space",
+        "description": "Private backyard designed for safety and independence."
+    },
+    {
+        "image":  normanhurst4,
+        "heading": "Bright Living Areas",
+        "description": "Open, sunlit spaces for daily living and relaxation."
+    },
+    {
+        "image": normanhurst5,
+        "heading": "Comfortable Bedrooms",
+        "description": "Spacious rooms with built-in wardrobes."
+    },
+    {
+        "image":  normanhurst6,
+        "heading": "Cozy Shared Living",
+        "description": "Warm and inviting shared living environment."
+    },
+    {
+        "image":  normanhurst7,
+        "heading": "Open-Plan Living",
+        "description": "Functional layout supporting independence."
+    },
+    {
+        "image":  normanhurst8,
+        "heading": "Modern Kitchen",
+        "description": "Clean and accessible kitchen for everyday use."
+    },
+    {
+        "image":  normanhurst9,
+        "heading": "Accessible Bathroom",
+        "description": "Safe and easy-to-use bathroom facilities."
+    }
 ];
 
 export const service_items = [
@@ -659,29 +789,40 @@ export const sil_houses = [
         label: "Health U Australia",
         path: "/belmore_street",
         image: sil_house1,
-        address: "Belmore Street, Ryde, NSW 2112",
+        address: "Belmore Street Ryde NSW 2112",
         features: [
-            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
+            { label: "3 Bedrooms", icon: bed }, { label: "3 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
         ]
     },
+
     {
         label: "Health U Australia ",
         path: "/bowden_street",
         image: sil_house2,
-        address: "Bowden Street, Ryde, NSW 2112",
+        address: "Bowden Street Ryde NSW 2112",
         features: [
-            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
+            { label: "3 Bedrooms", icon: bed }, { label: "3 Bathrooms", icon: bathroom }, { label: "2 Parking Spaces", icon: car },
         ]
     },
     {
         label: "Health U Australia ",
         path: "/normanhurst",
         image: sil_house3,
-        address: "Normanhurst NSW 2076",
+        address: "Denman Parade Normanhurst NSW 2076",
         features: [
-            { label: "4 Bedrooms", icon: bed }, { label: "4 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
+            { label: "4 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
         ]
     },
+    {
+        label: "Health U Australia",
+        path: "/granny-flat",
+        image: granny_flat1,
+        address: "Belmore Street Ryde NSW 2112 (Granny Flat) ",
+        features: [
+            { label: "2 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "2 Parking Spaces", icon: car },
+        ]
+    },
+
 ]
 
 export const assist_in_self_care = [

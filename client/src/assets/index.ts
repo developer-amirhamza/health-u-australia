@@ -110,7 +110,23 @@ import belmore12 from "assets/images/sil-images/belmore_street/belmore12.png"
 import belmore13 from "assets/images/sil-images/belmore_street/belmore13.png"
 import belmore14 from "assets/images/sil-images/belmore_street/belmore14.png"
 import belmore15 from "assets/images/sil-images/belmore_street/belmore15.png"
-
+import normanhurst1 from "assets/images/sil-houses/Normanhurst/Normanhurst1.png"
+import normanhurst2 from "assets/images/sil-houses/Normanhurst/Normanhurst2.png"
+import normanhurst3 from "assets/images/sil-houses/Normanhurst/Normanhurst3.png"
+import normanhurst4 from "assets/images/sil-houses/Normanhurst/Normanhurst4.png"
+import normanhurst5 from "assets/images/sil-houses/Normanhurst/Normanhurst5.png"
+import normanhurst6 from "assets/images/sil-houses/Normanhurst/Normanhurst6.png"
+import normanhurst7 from "assets/images/sil-houses/Normanhurst/Normanhurst7.png"
+import normanhurst8 from "assets/images/sil-houses/Normanhurst/Normanhurst8.png"
+import normanhurst9 from "assets/images/sil-houses/Normanhurst/Normanhurst9.png"
+import normanhurst10 from "assets/images/sil-houses/Normanhurst/Normanhurst10.png"
+import granny_flat1 from "assets/images/sil-images/granny_flat/granny_flat1.png"
+import granny_flat2 from "assets/images/sil-images/granny_flat/granny_flat2.png"
+import granny_flat3 from "assets/images/sil-images/granny_flat/granny_flat3.png"
+import granny_flat4 from "assets/images/sil-images/granny_flat/granny_flat4.png"
+import granny_flat5 from "assets/images/sil-images/granny_flat/granny_flat5.png"
+import granny_flat6 from "assets/images/sil-images/granny_flat/granny_flat6.png"
+import granny_flat7 from "assets/images/sil-images/granny_flat/granny_flat7.png"
 export {
     service1, service2, service3, service4,service5,service6,service7,service8,aryan, brain, evelyn,jose,
     email_icon,clack_icon,call_icon,sil_image1,sil_image2,sil_image3,sil_image4,community_participation1,
@@ -125,5 +141,7 @@ export {
     home_modification_img01,gardening_house_yard_img01,gardening_house_yard_img02,gardening_house_yard_img03,
     gardening_house_yard_img04,icon1,icon2,icon3,logo1,icon4,logo2,ndis1,ndis2,ndis3,ndis4,service9,service10,service11,
     sil_house1,sil_house2,sil_house3,belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,belmore8,belmore9,
-    belmore10,belmore11,belmore12,belmore13,belmore14,belmore15,
+    belmore10,belmore11,belmore12,belmore13,belmore14,belmore15,normanhurst1,normanhurst2,normanhurst10,normanhurst3,normanhurst4,
+    normanhurst5, normanhurst6,normanhurst7,normanhurst8,normanhurst9,granny_flat1,granny_flat2,granny_flat3,granny_flat4,
+    granny_flat5,granny_flat6,granny_flat7,
 };

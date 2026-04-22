@@ -14,9 +14,9 @@ import wheelchair from "assets/images/sil-houses/wheelchiar.png"
 export const propertyData = {
   title: "NDIS SIL & Respite Housing in Ryde NSW 2112",
   location: "Ryde NSW 2112",
-  beds: 6,
-  baths: 4,
-  parking: 5,
+  beds: 3,
+  baths: 3,
+  parking: 3,
   provider: "Health U Australia",
 };
 const page = () => {
@@ -43,7 +43,7 @@ const page = () => {
           console.log(slide.cta.primary)
           return (
             <div key={index}>
-              <Image src={slide.image} className={`absolute bg-amber-300 transition-opacity duration-1000 top-0 h-full  w-full  left-0  ${index === currentSlide ? "opacity-100" : "opacity-0"}
+              <Image src={slide.image} className={`absolute  transition-opacity duration-1000 top-0 h-full  w-full  left-0  ${index === currentSlide ? "opacity-100" : "opacity-0"}
                 object-cover`} alt="" />
               <motion.div
                 initial={{

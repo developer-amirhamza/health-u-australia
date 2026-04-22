@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { belmore_slides } from 'config/page'
+import { granny_flat } from 'config/page'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,8 +14,8 @@ import wheelchair from "assets/images/sil-houses/wheelchiar.png"
 export const propertyData = {
   title: "NDIS SIL & Respite Housing in Ryde NSW 2112",
   location: "Ryde NSW 2112",
-  beds: 3,
-  baths: 3,
+  beds: 2,
+  baths: 2,
   parking: 2,
   provider: "Health U Australia",
 };
@@ -24,26 +24,26 @@ const page = () => {
 
 
   useEffect(() => {
-    if (belmore_slides.length === 0) return;
+    if (granny_flat.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % belmore_slides.length);
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % granny_flat.length);
     }, 5000);
     return () => { clearInterval(timer) }
   }, [])
    const handleNextBtn = ()=>{
-    setCurrentSlide((prevSlide)=> (prevSlide +1) % belmore_slides?.length);
+    setCurrentSlide((prevSlide)=> (prevSlide +1) % granny_flat?.length);
   }
   const handlePrevBtn = ()=>{
-    setCurrentSlide((prevSlide)=> (prevSlide - 1 + belmore_slides?.length) % belmore_slides?.length)
+    setCurrentSlide((prevSlide)=> (prevSlide - 1 + granny_flat?.length) % granny_flat?.length)
   }
   return (
     <div className="flex flex-col w-full h-full  ">
       <div className="min-h-[90vh] group relative">
-        {belmore_slides?.map((slide: any, index: number) => {
+        {granny_flat?.map((slide: any, index: number) => {
           console.log(slide.cta.primary)
           return (
             <div key={index}>
-              <Image src={slide.image} className={`absolute bg-amber-300 transition-opacity duration-1000 top-0 h-full  w-full  left-0  ${index === currentSlide ? "opacity-100" : "opacity-0"}
+              <Image src={slide.image} className={`absolute  transition-opacity duration-1000 top-0 h-full  w-full  left-0  ${index === currentSlide ? "opacity-100" : "opacity-0"}
                 object-cover`} alt="" />
               <motion.div
                 initial={{

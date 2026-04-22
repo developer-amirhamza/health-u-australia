@@ -21,13 +21,9 @@ const SilHouse = () => {
     const [currentId, setCurrentId] = useState(0);
 
     return (
-        <div className="flex flex-col justify-center items-center w-full h-full ">
-            {/* <PageBanner title='SIL House' path='/sil-house' /> */}
-
-
-
+        <div className="flex flex-col  items-center w-full h-full ">
             <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
-                <div className="flex flex-col items-center justify-center gap-10 py-12">
+                <div className="flex flex-col items-center justify-center gap-10 ">
                     <h1 className="text-primary text-4xl font-bold uppercase ">Our SIL House Properties </h1>
                     <div className="flex">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -36,7 +32,7 @@ const SilHouse = () => {
                                     <Image src={item.image} alt='sil-house' className=' '/>
                                     <div className="flex flex-col items-center p-4 justify-center">
                                         <div className="flex flex-col items-center justify-center gap-1 ">
-                                            <h1 className="text-2xl font-semibold text-secondary-text">SIL House at {item.address} </h1>
+                                            <h1 className="text-2xl font-semibold text-secondary-text"> {item.address} </h1>
                                     {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
                                         </div>
                                         <div className="flex items-center justify-center gap-3  w-full h-full">
