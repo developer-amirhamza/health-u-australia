@@ -78,7 +78,7 @@ const Header = () => {
       {/* navbar */}
       <div className=" flex w-full items-center relative justify-between md:px-10 shadow-2xl  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
-            <Image src={logo} alt='Health U logo' className='sm:h-24 sm:w-44 h-17 max-sm:pl-2 w-32 '  />
+            <Image src={logo} alt='Health U logo' className='sm:h-20 sm:w-38 h-17 max-sm:pl-2 w-32 '  />
         </Link>
         {/* desktop menu */}
         <nav className='w-full flex mx-auto justify-end'>
@@ -100,7 +100,7 @@ const Header = () => {
               ))}
           </ul>
           <Link className='bg-primary sm:text-lg text-base uppercase text-white font-semibold
-                rounded-full sm:px-7 px-4 py-2 sm:py-4 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
+                rounded-full sm:px-5 px-4 py-2 sm:py-3 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
           <button onClick={()=>setIsActive(!isActive)} className='text-secondary text-4xl z-100 px-4 cursor-pointer lg:hidden '>
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>

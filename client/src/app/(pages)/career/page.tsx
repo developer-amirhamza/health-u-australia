@@ -6,6 +6,14 @@ import career from "assets/images/career.png"
 import ndis_logo from "assets/ndis-logo-img.png"
 import logo from "assets/footer-logo-img.png";
 
+
+
+// meta title & description for seo ranking
+export const  metadata = {
+    title:"Apply for a Position | Health U Australia Careers",
+    description: "Join Health U Australia and build a rewarding career in disability support. Explore roles, growth opportunities, and apply today.",
+};
+
 const page = () => {
   return (
     <main className="bg-white text-gray-800">
