@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { belmore_slides, normanhurst_slides } from 'config/page'
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -10,6 +10,11 @@ import bed from "assets/images/sil-images/sil_icons/icon.png"
 import bathroom from "assets/images/sil-images/sil_icons/icon2.png"
 import car from "assets/images/sil-images/sil_icons/icon4.png"
 import wheelchair from "assets/images/sil-houses/wheelchiar.png"
+import map from "assets/images/sil-images/54A _belmore_street.png"
+import Title from 'app/utils/Title'
+import { fadeIn } from 'app/variants';
+import SlideModal from 'app/components/SlideModal'
+import SlideModalForNormanhurst from 'app/components/SlideModalForNormanhurst'
 
 export const propertyData = {
   "title": "NDIS Accessible Housing in Normanhurst NSW 2076",
@@ -21,7 +26,8 @@ export const propertyData = {
 const page = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-
+const [isOpen, setIsOpen] = useState(false);
+    const [currentId, setCurrentId] = useState(0);
   useEffect(() => {
     if (normanhurst_slides.length === 0) return;
     const timer = setInterval(() => {
@@ -105,7 +111,7 @@ const page = () => {
         </p>
 
         {/* Highlights */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center ">
           <div className="flex  justify-center items-center gap-2 p-4 border rounded-lg">
             <Image src={bed} alt='icon' />
             <div className="">
@@ -139,6 +145,26 @@ const page = () => {
           </div>
         </div>
       </section>
+
+      <div className="grid w-full my-4 gap-10 place-content-center container ">
+                    <motion.div initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} variants={fadeIn("up",0.5)} className="flex w-full h-full">
+                        <Title title1='SIL House' title2='Gallery' className={`place-items-center`} />
+                    </motion.div>
+                    <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8    place-content-around ">
+                        {normanhurst_slides.map((item, index) => (
+                            <motion.div  key={index} onClick={() => { setIsOpen(!isOpen); setCurrentId(index) }}
+                            variants={fadeIn("up",index * 0.3)} initial={"hidden"} whileInView={"show"}
+                            className="w-full h-full relative group">
+                                <Image src={item.image} alt='Health_U_australia' className='object-cover relative w-full h-full max-h-72  ' />
+                                <div className="absolute bg-black/70 flex items-center transition-all duration-700 justify-center hover:opacity-100 opacity-0 top-0 rounded-md cursor-pointer h-full w-full border-8 border-transparent ">
+                                    <div className="bg-black h-12 w-12 group-hover:opacity-100 opacity-0 transition-all duration-700 flex items-center justify-center rounded-full ">
+                                        <FaPlus className='bg-white p-0.5 rounded-full text-xl m-0 ' />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
 
       {/* Features */}
       <section className="bg-gray-100 py-12">
@@ -257,6 +283,27 @@ const page = () => {
         </p>
       </section>
 
+      {/* GOOGLE MAP */}
+                  <section className="py-16 px-6 bg-gray-50">
+                    <div className="max-w-5xl mx-auto w-full">
+                      <h2 className="text-3xl font-semibold text-center mb-6">
+                        Location Map
+                      </h2>
+                      <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
+                    <iframe
+                        className="flex h-full w-full min-h-125 rounded"
+                        src="https://www.google.com/maps/d/embed?mid=1Gb4VzkXbz9AqOeTyJ3KuuX9ogAg3ukk&ehbc=2E312F&noprof=1"
+                        width={740}
+                        height={480}
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                    />
+                </div>
+                    </div>
+                  </section>
+
       {/* CTA */}
       <section className=" text-black bg-secondary text-center py-12">
         <h2 className="text-3xl font-bold mb-4">
@@ -305,6 +352,7 @@ const page = () => {
           }),
         }}
       />
+      {isOpen && <SlideModalForNormanhurst close={() => setIsOpen(false)} currentId={currentId} />}
     </div>
   )
 }

@@ -227,7 +227,7 @@ const SilHouse = () => {
                 </motion.div>
                 {/* sil house details contents */}
 
-                <div className="grid w-full my-10 gap-10 place-content-center">
+                {/* <div className="grid w-full my-10 gap-10 place-content-center">
                     <motion.div initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} variants={fadeIn("up",0.5)} className="flex w-full h-full">
                         <Title title1='Our' title2='Gallery' className={`place-items-center`} />
                     </motion.div>
@@ -245,13 +245,14 @@ const SilHouse = () => {
                             </motion.div>
                         ))}
                     </div>
-                </div>
+                </div> */}
+
                 <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
                     <iframe
                         className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18674.576669866256!2d151.11174077427498!3d-33.80809343537377!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12a5be90fc1aad%3A0x5017d681632c9f0!2sRyde%20NSW%202112%2C%20Australia!5e1!3m2!1sen!2sbd!4v1775793398565!5m2!1sen!2sbd"
-                        width={400}
-                        height={400}
+                        src="https://www.google.com/maps/d/embed?mid=1yf7xZhexKBn-S9UFFUT2JECjfcGTuzk&ehbc=2E312F&noprof=1"
+                        width={640}
+                        height={480}
                         style={{ border: 0 }}
                         allowFullScreen={true}
                         loading="lazy"

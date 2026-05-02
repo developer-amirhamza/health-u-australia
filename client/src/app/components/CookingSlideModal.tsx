@@ -1,5 +1,5 @@
 "use client"
-import { sil_property, gallery_images } from 'config/page'
+import { cooking_gallery, gallery_images } from 'config/page'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
@@ -16,7 +16,7 @@ interface Type {
 }
 
 
-const SlideModal: React.FC<Type> = ({ close, currentId }) => {
+const CookingSlideModal: React.FC<Type> = ({ close, currentId }) => {
 
     const prevRef = useRef<any>(null);
     const nextRef = useRef<any>(null);
@@ -33,7 +33,7 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     }, [currentId]);
 
     const handlePrev = () => {
-        const newIndex = (activeIndex - 1 + gallery_images.length) % gallery_images.length;
+        const newIndex = (activeIndex - 1 + cooking_gallery.length) % cooking_gallery.length;
         setActiveIndex(newIndex);
         if (swiperRef.current && swiperRef.current.swiper) {
             swiperRef.current.swiper.slideTo(newIndex);
@@ -41,7 +41,7 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     };
 
     const handleNext = () => {
-        const newIndex = (activeIndex + 1) % gallery_images.length;
+        const newIndex = (activeIndex + 1) % cooking_gallery.length;
         setActiveIndex(newIndex);
         if (swiperRef.current && swiperRef.current.swiper) {
             swiperRef.current.swiper.slideTo(newIndex);
@@ -67,7 +67,7 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
                 >
                     <SwiperSlide key={activeIndex}>
                         <div className="flex flex-col  h-full w-full   items-center justify-self-center  rounded-2xl bg-white ">
-                            <Image src={gallery_images[activeIndex]} alt={"slide"}
+                            <Image src={cooking_gallery[activeIndex]} alt={"slide"}
                                 className=' flex w-full h-full  object-cover  rounded-lg ' />
                         </div>
                     </SwiperSlide>
@@ -86,4 +86,4 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     )
 }
 
-export default SlideModal
+export default CookingSlideModal

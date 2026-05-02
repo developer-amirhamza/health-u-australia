@@ -1,5 +1,5 @@
 "use client"
-import { sil_property, gallery_images } from 'config/page'
+import { sil_property, normanhurst_slides } from 'config/page'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
@@ -16,7 +16,7 @@ interface Type {
 }
 
 
-const SlideModal: React.FC<Type> = ({ close, currentId }) => {
+const SlideModalForNormanhurst: React.FC<Type> = ({ close, currentId }) => {
 
     const prevRef = useRef<any>(null);
     const nextRef = useRef<any>(null);
@@ -33,7 +33,7 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     }, [currentId]);
 
     const handlePrev = () => {
-        const newIndex = (activeIndex - 1 + gallery_images.length) % gallery_images.length;
+        const newIndex = (activeIndex - 1 + normanhurst_slides.length) % normanhurst_slides.length;
         setActiveIndex(newIndex);
         if (swiperRef.current && swiperRef.current.swiper) {
             swiperRef.current.swiper.slideTo(newIndex);
@@ -41,7 +41,7 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     };
 
     const handleNext = () => {
-        const newIndex = (activeIndex + 1) % gallery_images.length;
+        const newIndex = (activeIndex + 1) % normanhurst_slides.length;
         setActiveIndex(newIndex);
         if (swiperRef.current && swiperRef.current.swiper) {
             swiperRef.current.swiper.slideTo(newIndex);
@@ -67,14 +67,14 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
                 >
                     <SwiperSlide key={activeIndex}>
                         <div className="flex flex-col  h-full w-full   items-center justify-self-center  rounded-2xl bg-white ">
-                            <Image src={gallery_images[activeIndex]} alt={"slide"}
+                            <Image src={normanhurst_slides[activeIndex].image} alt={"slide"}
                                 className=' flex w-full h-full  object-cover  rounded-lg ' />
                         </div>
                     </SwiperSlide>
                     <div className="flex justify-between items-center absolute top-2/4 z-100   w-full">
                         <button ref={prevRef} onClick={handlePrev} className=" text-amber-500 text-4xl px-1.5 py-1  rounded cursor-pointer hover:bg-amber-200 bg-amber-100 "><FaAngleLeft /> </button>
                         <button ref={nextRef} onClick={handleNext}
-                        className=" text-amber-500 text-4xl px-1.5 py-1 rounded cursor-pointer hover:bg-amber-200 bg-amber-100 "><FaAngleRight /> </button>
+                            className=" text-amber-500 text-4xl px-1.5 py-1 rounded cursor-pointer hover:bg-amber-200 bg-amber-100 "><FaAngleRight /> </button>
                     </div>
                 </Swiper>
                 <button onClick={close} className="absolute top-10  border rounded-full p-1 cursor-pointer hover:text-primary transition-colors duration-300 hover:bg-secondary -right-20 text-white text-2xl">
@@ -86,4 +86,4 @@ const SlideModal: React.FC<Type> = ({ close, currentId }) => {
     )
 }
 
-export default SlideModal
+export default SlideModalForNormanhurst

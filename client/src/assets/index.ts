@@ -126,7 +126,28 @@ import granny_flat3 from "assets/images/sil-images/granny_flat/granny_flat3.png"
 import granny_flat4 from "assets/images/sil-images/granny_flat/granny_flat4.png"
 import granny_flat5 from "assets/images/sil-images/granny_flat/granny_flat5.png"
 import granny_flat6 from "assets/images/sil-images/granny_flat/granny_flat6.png"
-import granny_flat7 from "assets/images/sil-images/granny_flat/granny_flat7.png"
+import granny_flat7 from "assets/images/sil-images/granny_flat/granny_flat7.png";
+import bowden1 from "assets/images/sil-images/bowden_street/bowden1.png"
+import bowden2 from "assets/images/sil-images/bowden_street/bowden2.png"
+import bowden3 from "assets/images/sil-images/bowden_street/bowden3.png"
+import bowden4 from "assets/images/sil-images/bowden_street/bowden4.png"
+import bowden5 from "assets/images/sil-images/bowden_street/bowden5.png"
+import bowden6 from "assets/images/sil-images/bowden_street/bowden6.png"
+import bowden7 from "assets/images/sil-images/bowden_street/bowden7.png"
+import bowden8 from "assets/images/sil-images/bowden_street/bowden8.png"
+import bowden9 from "assets/images/sil-images/bowden_street/bowden9.png"
+import bowden10 from "assets/images/sil-images/bowden_street/bowden10.png"
+import cooking1 from "assets/images/cooking_gallery/cooking1.png"
+import cooking2 from "assets/images/cooking_gallery/cooking2.png"
+import cooking3 from "assets/images/cooking_gallery/cooking3.png"
+import cooking4 from "assets/images/cooking_gallery/cooking4.png"
+import cooking5 from "assets/images/cooking_gallery/cooking5.png"
+import cooking6 from "assets/images/cooking_gallery/cooking6.png"
+import cooking7 from "assets/images/cooking_gallery/cooking7.png"
+import cooking8 from "assets/images/cooking_gallery/cooking8.png"
+import cooking9 from "assets/images/cooking_gallery/cooking9.png"
+import cooking10 from "assets/images/cooking_gallery/cooking10.png"
+import cooking11 from "assets/images/cooking_gallery/cooking11.png"
 export {
     service1, service2, service3, service4,service5,service6,service7,service8,aryan, brain, evelyn,jose,
     email_icon,clack_icon,call_icon,sil_image1,sil_image2,sil_image3,sil_image4,community_participation1,
@@ -143,5 +164,7 @@ export {
     sil_house1,sil_house2,sil_house3,belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,belmore8,belmore9,
     belmore10,belmore11,belmore12,belmore13,belmore14,belmore15,normanhurst1,normanhurst2,normanhurst10,normanhurst3,normanhurst4,
     normanhurst5, normanhurst6,normanhurst7,normanhurst8,normanhurst9,granny_flat1,granny_flat2,granny_flat3,granny_flat4,
-    granny_flat5,granny_flat6,granny_flat7,
+    granny_flat5,granny_flat6,granny_flat7,bowden1,bowden10,bowden2,bowden3,bowden4,bowden5,bowden6,bowden7,bowden8,bowden9,
+    cooking1,cooking10,cooking11,cooking2,cooking3,cooking4,cooking5,cooking6,cooking7,cooking8,cooking9,
 };
+

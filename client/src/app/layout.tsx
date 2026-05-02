@@ -40,8 +40,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.png" sizes="any" />
+        <meta name="google-site-verification" content="oQduANhC4p2tTm9WVBh4u6G4YPVV7ZBkPvxHL7MMXMg" />
       </head>
-      <body className="relative flex flex-col h-full w-full" suppressHydrationWarning>
+      <body className="relative flex mx-auto px-0 flex-col h-full w-full" suppressHydrationWarning>
         <Header />
         {children}
         <Footer />

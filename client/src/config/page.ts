@@ -44,8 +44,52 @@ import {
     granny_flat5,
     granny_flat6,
     granny_flat7,
+    bowden1,
+    bowden2,
+    bowden3,
+    bowden4,
+    bowden5,
+    bowden6,
+    bowden7,
+    bowden8,
+    bowden9,
+    bowden10,
+    normanhurst_img01,
+    normanhurst_img02,
+    normanhurst_img03,
+    normanhurst_img04,
+    normanhurst_img05,
+    normanhurst_img06,
+    normanhurst_img07,
+    normanhurst_img08,
+    normanhurst_img09,
+    normanhurst_img10,
+    normanhurst10,
+    belmore15,
+    cooking9,
+    cooking8,
+    cooking7,
+    cooking6,
+    cooking5,
+    cooking4,
+    cooking3,
+    cooking2,
+    cooking11,
+    cooking10,
+    cooking1,
 } from "assets"
 
+export const gallery_images = [
+
+    sil_house1,sil_house2,sil_house3,belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,belmore8,belmore9,
+    belmore10,belmore11,belmore12,normanhurst1,normanhurst2,normanhurst10,normanhurst3,normanhurst4,
+    normanhurst5, normanhurst6,normanhurst7,normanhurst8,normanhurst9,granny_flat1,granny_flat2,granny_flat3,granny_flat4,
+    granny_flat5,granny_flat6,granny_flat7,bowden1,bowden10,bowden2,bowden3,bowden4,bowden5,bowden6,bowden7,bowden8,bowden9,
+]
+
+export const cooking_gallery = [
+        cooking1,cooking10,cooking11,cooking2,cooking3,cooking4,cooking5,cooking6,cooking7,cooking8,cooking9,
+]
 import bed from "assets/images/2026/10/icon.png"
 import bathroom from "assets/images/2026/10/icon2.png"
 import car from "assets/images/2026/10/icon4.png"
@@ -78,7 +122,7 @@ export const nav_items = [
             { label: "Past Events", path: "past-events" },
         ]
     },
-    { label: "Gallery", path: "/gallery" },
+    { label: "Career", path: "/career" },
     { label: "Contact Us", path: "/contact-us" },
     { label: "Referral", path: "/referral" },
 ]
@@ -88,97 +132,97 @@ export const belmore_slides = [
         "id": 1,
         "image": belmore1,
         "heading": "NDIS Housing in Ryde NSW – Urgent Placement Available",
-        "description": "Affordable SIL, STA & respite home in Ryde with immediate availability. Ideal for hospital discharge and fast NDIS participant placement.",
+        "description": "Spacious home ideal for hospital discharge and fast NDIS placement with flexible support.",
         "cta": {
             "primary": "Apply Now",
-            "secondary": "Refer a Participant"
+            "secondary": "Refer Participant"
         }
     },
     {
         "id": 2,
-        "image": belmore12,
-        "heading": "NDIS Property Near Hospitals & Transport in Ryde",
-        "description": "Located close to Ryde Hospital, transport, and shopping centres for easy access and convenience.",
-        "cta": {
-            "primary": "Check Location",
-            "secondary": "Enquire Now"
-        }
-    },
-    {
-        "id": 3,
         "image": belmore2,
-        "heading": "Secure Backyard & Outdoor Living for NDIS Residents",
-        "description": "Spacious and secure outdoor area with garden and seating, promoting wellbeing, relaxation, and safe daily activities.",
+        "heading": "Large Secure Backyard & Outdoor Living",
+        "description": "Expansive outdoor space perfect for relaxation, safety, and supported daily living.",
         "cta": {
             "primary": "Book Inspection",
             "secondary": "View Features"
         }
     },
     {
-        "id": 4,
+        "id": 3,
         "image": belmore3,
-        "heading": "Dual Dwelling NDIS Accommodation in Ryde",
-        "description": "Flexible dual living setup offering privacy and independence for SIL participants and shared support arrangements.",
+        "heading": "Bright & Comfortable Living Spaces",
+        "description": "Sunlit interiors designed for comfort, accessibility, and everyday living.",
         "cta": {
-            "primary": "Check Availability",
+            "primary": "Explore Home",
+            "secondary": "Enquire Now"
+        }
+    },
+    {
+        "id": 4,
+        "image": belmore4,
+        "heading": "Modern Dining Area for Shared Living",
+        "description": "Stylish dining space encouraging routine, independence, and social interaction.",
+        "cta": {
+            "primary": "View Details",
             "secondary": "Contact Us"
         }
     },
     {
         "id": 5,
-        "image": belmore4,
-        "heading": "Comfortable Shared Living Spaces for NDIS Participants",
-        "description": "Bright, modern living areas designed for accessibility, comfort, and a supportive home environment.",
+        "image": belmore5,
+        "heading": "Private Bedrooms with Natural Light",
+        "description": "Peaceful bedrooms designed for rest, recovery, and personal comfort.",
         "cta": {
-            "primary": "Explore Home",
-            "secondary": "Book Tour"
+            "primary": "Check Rooms",
+            "secondary": "Apply Today"
         }
     },
     {
         "id": 6,
-        "image": belmore5,
-        "heading": "Modern Dining Area for Supported Independent Living",
-        "description": "Stylish and accessible dining space encouraging social interaction and daily routine support.",
-        "cta": {
-            "primary": "View Details",
-            "secondary": "Enquire Now"
-        }
-    },
-    {
-        "id": 7,
         "image": belmore6,
-        "heading": "Fully Equipped Accessible Kitchen for NDIS Living",
-        "description": "Functional kitchen with modern appliances supporting independent or assisted daily living needs.",
+        "heading": "Functional & Accessible Kitchen",
+        "description": "Modern kitchen setup supporting independent or assisted living.",
         "cta": {
             "primary": "See Kitchen",
             "secondary": "Get Info"
         }
     },
     {
-        "id": 8,
+        "id": 7,
         "image": belmore7,
-        "heading": "Private Bedrooms with Built-in Storage & Natural Light",
-        "description": "Comfortable bedrooms designed for privacy, safety, and peaceful recovery for NDIS residents.",
+        "heading": "Spacious Open-Plan Kitchen & Dining",
+        "description": "Open layout allowing easy movement and daily living activities.",
         "cta": {
-            "primary": "View Rooms",
-            "secondary": "Apply Today"
+            "primary": "Explore Layout",
+            "secondary": "Enquire Now"
         }
     },
     {
-        "id": 9,
+        "id": 8,
         "image": belmore8,
-        "heading": "Accessible Bedrooms Designed for Independence",
-        "description": "Well-designed personal spaces supporting participant independence and everyday comfort.",
+        "heading": "Comfortable Bedrooms for Independent Living",
+        "description": "Private spaces supporting independence and a safe home environment.",
         "cta": {
-            "primary": "Check Rooms",
+            "primary": "View Bedrooms",
             "secondary": "Contact Team"
         }
     },
     {
-        "id": 10,
+        "id": 9,
         "image": belmore9,
-        "heading": "Safe & Practical Interior Spaces for Daily Living",
-        "description": "Clean, accessible interiors designed to ensure safety, mobility, and ease of use for all residents.",
+        "heading": "Clean & Accessible Bathroom Facilities",
+        "description": "Modern bathrooms designed for safety, accessibility, and ease of use.",
+        "cta": {
+            "primary": "View Facilities",
+            "secondary": "Book Visit"
+        }
+    },
+    {
+        "id": 10,
+        "image": belmore10,
+        "heading": "Spacious Living Area with Classic Design",
+        "description": "Large, welcoming living area ideal for relaxation and support.",
         "cta": {
             "primary": "Explore Interior",
             "secondary": "Learn More"
@@ -186,15 +230,117 @@ export const belmore_slides = [
     },
     {
         "id": 11,
-        "image": belmore10,
-        "heading": "Modern Accessible Bathroom for NDIS Participants",
-        "description": "Functional bathroom spaces designed for safety, accessibility, and comfort in daily use.",
+        "image": belmore11,
+        "heading": "Prime Ryde Location Near Key Amenities",
+        "description": "Close to hospitals, transport, and shopping for convenient supported living.",
+        "cta": {
+            "primary": "Check Location",
+            "secondary": "Enquire Now"
+        }
+    }
+];
+
+export const bowden_slides = [
+    {
+        "id": 1,
+        "image": bowden1,
+        "heading": "NDIS SIL Housing in Ryde – Available Now",
+        "description": "Comfortable and supportive home ideal for hospital discharge and flexible NDIS placements.",
+        "cta": {
+            "primary": "Apply Now",
+            "secondary": "Refer Participant"
+        }
+    },
+    {
+        "id": 2,
+        "image": bowden2,
+        "heading": "Spacious Outdoor Deck & Relaxation Area",
+        "description": "Beautiful outdoor space designed for relaxation, independence, and social interaction.",
+        "cta": {
+            "primary": "Book Inspection",
+            "secondary": "View Features"
+        }
+    },
+    // {
+    //     "id": 3,
+    //     "image": bowden3,
+    //     "heading": "Private Outdoor Living with Garden Access",
+    //     "description": "Secure backyard and garden areas supporting safe and peaceful living.",
+    //     "cta": {
+    //         "primary": "Explore Outdoors",
+    //         "secondary": "Enquire Now"
+    //     }
+    // },
+    {
+        "id": 4,
+        "image": bowden4,
+        "heading": "Bright Living Area with Open Layout",
+        "description": "Spacious shared living space ideal for comfort, routine, and daily activities.",
+        "cta": {
+            "primary": "Explore Home",
+            "secondary": "Contact Us"
+        }
+    },
+    {
+        "id": 5,
+        "image":bowden5,
+        "heading": "Elegant Lounge with Classic Design",
+        "description": "Comfortable lounge area combining style and functionality for everyday living.",
+        "cta": {
+            "primary": "View Living Area",
+            "secondary": "Learn More"
+        }
+    },
+    {
+        "id": 6,
+        "image": bowden6,
+        "heading": "Comfortable Private Bedrooms",
+        "description": "Well-lit bedrooms designed for privacy, rest, and independence.",
+        "cta": {
+            "primary": "Check Rooms",
+            "secondary": "Apply Today"
+        }
+    },
+    {
+        "id": 7,
+        "image": bowden7,
+        "heading": "Modern Bathroom with Premium Features",
+        "description": "Clean, accessible bathrooms designed for safety and comfort.",
         "cta": {
             "primary": "View Facilities",
             "secondary": "Book Visit"
         }
     },
-
+    {
+        "id": 8,
+        "image": bowden8,
+        "heading": "Functional Laundry & Utility Space",
+        "description": "Practical laundry area supporting independent daily routines.",
+        "cta": {
+            "primary": "Explore Features",
+            "secondary": "Enquire Now"
+        }
+    },
+    {
+        "id": 9,
+        "image": bowden9,
+        "heading": "Fully Equipped Kitchen for Daily Living",
+        "description": "Spacious kitchen setup encouraging independent cooking and shared meals.",
+        "cta": {
+            "primary": "See Kitchen",
+            "secondary": "Get Info"
+        }
+    },
+    {
+        "id": 10,
+        "image": bowden10,
+        "heading": "Prime Ryde Location Near Transport & Shops",
+        "description": "Close to Meadowbank Station, ferry, Top Ryde Shopping Centre, and hospitals.",
+        "cta": {
+            "primary": "Check Location",
+            "secondary": "Enquire Now"
+        }
+    }
 ];
 
 export const granny_flat = [
@@ -220,7 +366,7 @@ export const granny_flat = [
     },
     {
         "id": 6,
-        "image":granny_flat4,
+        "image": granny_flat4,
         "heading": "Modern Dining Area for Supported Independent Living",
         "description": "Stylish and accessible dining space encouraging social interaction and daily routine support.",
         "cta": {
@@ -264,48 +410,48 @@ export const granny_flat = [
 
 
 export const normanhurst_slides = [
-    {
+    {   "id":1,
         "image": normanhurst1,
         "heading": "Accessible NDIS Housing in Normanhurst",
         "description": "Fully wheelchair accessible home with flexible support options."
     },
-    {
-        "image":  normanhurst2,
+    {   "id":2,
+        "image": normanhurst2,
         "heading": "Outdoor Deck for Relaxation",
         "description": "Spacious and secure outdoor area for comfort and wellbeing."
     },
-    {
+    {   "id":3,
         "image": normanhurst3,
         "heading": "Secure Garden Space",
         "description": "Private backyard designed for safety and independence."
     },
-    {
-        "image":  normanhurst4,
+    {   "id":4,
+        "image": normanhurst4,
         "heading": "Bright Living Areas",
         "description": "Open, sunlit spaces for daily living and relaxation."
     },
-    {
+    {"id":5,
         "image": normanhurst5,
         "heading": "Comfortable Bedrooms",
         "description": "Spacious rooms with built-in wardrobes."
     },
-    {
-        "image":  normanhurst6,
+    {"id":6,
+        "image": normanhurst6,
         "heading": "Cozy Shared Living",
         "description": "Warm and inviting shared living environment."
     },
-    {
-        "image":  normanhurst7,
+    {"id":7,
+        "image": normanhurst7,
         "heading": "Open-Plan Living",
         "description": "Functional layout supporting independence."
     },
-    {
-        "image":  normanhurst8,
+    {"id":8,
+        "image": normanhurst8,
         "heading": "Modern Kitchen",
         "description": "Clean and accessible kitchen for everyday use."
     },
-    {
-        "image":  normanhurst9,
+    {"id":9,
+        "image": normanhurst9,
         "heading": "Accessible Bathroom",
         "description": "Safe and easy-to-use bathroom facilities."
     }
