@@ -3,7 +3,7 @@ import React from 'react'
 import PageBanner from 'app/utils/PageBanner'
 import Image from 'next/image';
 import Link from 'next/link';
-import compassion_in_action1 from "assets/images/compassion/compassion-in-action-img01.jpg"
+import compassion_in_action1 from "assets/images/compassion/compassion-in-action-img01.png"
 import compassion_in_action2 from "assets/images/compassion/compassion-in-action-img02.jpg"
 import { motion } from 'framer-motion';
 import { fadeIn } from 'app/variants';

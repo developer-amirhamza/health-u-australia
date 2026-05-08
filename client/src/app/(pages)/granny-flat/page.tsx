@@ -219,7 +219,7 @@ const [isOpen, setIsOpen] = useState(false);
                     <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
                     <iframe
                         className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/embed?mid=1pw_m1V9YtvaXSVaK5tZUn8EROw1x-oA&ehbc=2E312F&noprof=1"
+                        src="https://www.google.com/maps/d/u/0/embed?mid=1N9H2TXxIvhNbeF-O6TrNAZZ8g_wM_D8&ehbc=2E312F&noprof=1"
                         width={640}
                         height={480}
                         style={{ border: 0 }}

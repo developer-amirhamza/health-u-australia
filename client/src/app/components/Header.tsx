@@ -41,7 +41,7 @@ const Header = () => {
         <div className="container w-full  hidden   sm:flex items-center justify-between text-white  ">
           {/* contact list */}
           <div className="flex w-full items-center justify-start h-full gap-2">
-            <FcCustomerSupport size={40} />
+            {/* <FcCustomerSupport size={40} /> */}
             <div className="grid w-full text-sm font-semibold">
             <a href="mailto:info@healthuau.com">info@healthuau.com</a>
             <div className="flex items-center gap-0.5  ">
@@ -78,7 +78,7 @@ const Header = () => {
       {/* navbar */}
       <div className=" flex w-full items-center relative justify-between md:px-10 shadow-2xl  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
-            <Image src={logo} alt='Health U logo' className='sm:h-20 sm:w-38 h-17 max-sm:pl-2 w-32 '  />
+            <Image src={logo} alt='Health U logo' className='h-auto sm:w-38  max-sm:pl-2 w-32 '  />
         </Link>
         {/* desktop menu */}
         <nav className='w-full flex mx-auto justify-end'>

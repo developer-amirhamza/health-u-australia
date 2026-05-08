@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { belmore_slides, normanhurst_slides } from 'config/page'
+import { belmore_slides, normanhurst_gallery, normanhurst_slides } from 'config/page'
 import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -151,11 +151,11 @@ const [isOpen, setIsOpen] = useState(false);
                         <Title title1='SIL House' title2='Gallery' className={`place-items-center`} />
                     </motion.div>
                     <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8    place-content-around ">
-                        {normanhurst_slides.map((item, index) => (
+                        {normanhurst_gallery.map((item, index) => (
                             <motion.div  key={index} onClick={() => { setIsOpen(!isOpen); setCurrentId(index) }}
                             variants={fadeIn("up",index * 0.3)} initial={"hidden"} whileInView={"show"}
                             className="w-full h-full relative group">
-                                <Image src={item.image} alt='Health_U_australia' className='object-cover relative w-full h-full max-h-72  ' />
+                                <Image src={item} alt='Health_U_australia' className='object-cover relative w-full h-full max-h-72  ' />
                                 <div className="absolute bg-black/70 flex items-center transition-all duration-700 justify-center hover:opacity-100 opacity-0 top-0 rounded-md cursor-pointer h-full w-full border-8 border-transparent ">
                                     <div className="bg-black h-12 w-12 group-hover:opacity-100 opacity-0 transition-all duration-700 flex items-center justify-center rounded-full ">
                                         <FaPlus className='bg-white p-0.5 rounded-full text-xl m-0 ' />
@@ -292,7 +292,7 @@ const [isOpen, setIsOpen] = useState(false);
                       <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
                     <iframe
                         className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/embed?mid=1Gb4VzkXbz9AqOeTyJ3KuuX9ogAg3ukk&ehbc=2E312F&noprof=1"
+                        src="https://www.google.com/maps/d/u/0/embed?mid=1pw_m1V9YtvaXSVaK5tZUn8EROw1x-oA&ehbc=2E312F&noprof=1"
                         width={740}
                         height={480}
                         style={{ border: 0 }}

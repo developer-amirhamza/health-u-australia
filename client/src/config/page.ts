@@ -80,19 +80,19 @@ import {
 } from "assets"
 
 export const gallery_images = [
-
-    sil_house1,sil_house2,sil_house3,belmore1,belmore2,belmore3,belmore4,belmore5,belmore6,belmore7,belmore8,belmore9,
-    belmore10,belmore11,belmore12,normanhurst1,normanhurst2,normanhurst10,normanhurst3,normanhurst4,
-    normanhurst5, normanhurst6,normanhurst7,normanhurst8,normanhurst9,granny_flat1,granny_flat2,granny_flat3,granny_flat4,
-    granny_flat5,granny_flat6,granny_flat7,bowden1,bowden10,bowden2,bowden3,bowden4,bowden5,bowden6,bowden7,bowden8,bowden9,
+    sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
+    belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
+    normanhurst5, normanhurst6, normanhurst7, normanhurst8, normanhurst9, granny_flat1, granny_flat2, granny_flat3, granny_flat4,
+    granny_flat5, granny_flat6, granny_flat7, bowden1, bowden10, bowden2, bowden3, bowden4, bowden5, bowden6, bowden7, bowden8, bowden9,
 ]
 
 export const cooking_gallery = [
-        cooking1,cooking10,cooking11,cooking2,cooking3,cooking4,cooking5,cooking6,cooking7,cooking8,cooking9,
+    cooking1, cooking10, cooking11, cooking2, cooking3, cooking4, cooking5, cooking6, cooking7, cooking8, cooking9,
 ]
 import bed from "assets/images/2026/10/icon.png"
 import bathroom from "assets/images/2026/10/icon2.png"
 import car from "assets/images/2026/10/icon4.png"
+import wheelchair from "assets/images/sil-houses/wheelchiar.png"
 
 export const nav_items = [
     {
@@ -109,7 +109,7 @@ export const nav_items = [
             { label: "Assist In Self-care", path: "/assist-in-self-care" },
             { label: "Assist In Transport", path: "/assist-in-transport" },
             { label: "Home Modification", path: "/home-modification" },
-            { label: "Non NDIS Free Service", path: "/compassion-in-action" },
+            { label: "Non NDIS Service", path: "/compassion-in-action" },
             { label: "Gardening/House And Yard", path: "/gardening-house-yard" },
         ]
     },
@@ -283,7 +283,7 @@ export const bowden_slides = [
     },
     {
         "id": 5,
-        "image":bowden5,
+        "image": bowden5,
         "heading": "Elegant Lounge with Classic Design",
         "description": "Comfortable lounge area combining style and functionality for everyday living.",
         "cta": {
@@ -410,53 +410,64 @@ export const granny_flat = [
 
 
 export const normanhurst_slides = [
-    {   "id":1,
+    {
+        "id": 1,
         "image": normanhurst1,
         "heading": "Accessible NDIS Housing in Normanhurst",
         "description": "Fully wheelchair accessible home with flexible support options."
     },
-    {   "id":2,
+    {
+        "id": 2,
         "image": normanhurst2,
         "heading": "Outdoor Deck for Relaxation",
         "description": "Spacious and secure outdoor area for comfort and wellbeing."
     },
-    {   "id":3,
+    {
+        "id": 3,
         "image": normanhurst3,
         "heading": "Secure Garden Space",
         "description": "Private backyard designed for safety and independence."
     },
-    {   "id":4,
+    {
+        "id": 4,
         "image": normanhurst4,
         "heading": "Bright Living Areas",
         "description": "Open, sunlit spaces for daily living and relaxation."
     },
-    {"id":5,
+    {
+        "id": 5,
         "image": normanhurst5,
         "heading": "Comfortable Bedrooms",
         "description": "Spacious rooms with built-in wardrobes."
     },
-    {"id":6,
+    {
+        "id": 6,
         "image": normanhurst6,
         "heading": "Cozy Shared Living",
         "description": "Warm and inviting shared living environment."
     },
-    {"id":7,
+    {
+        "id": 7,
         "image": normanhurst7,
         "heading": "Open-Plan Living",
         "description": "Functional layout supporting independence."
     },
-    {"id":8,
+    {
+        "id": 8,
         "image": normanhurst8,
         "heading": "Modern Kitchen",
         "description": "Clean and accessible kitchen for everyday use."
     },
-    {"id":9,
+    {
+        "id": 9,
         "image": normanhurst9,
         "heading": "Accessible Bathroom",
         "description": "Safe and easy-to-use bathroom facilities."
     }
 ];
 
+export const normanhurst_gallery = [normanhurst1, normanhurst2, normanhurst3, normanhurst4,
+    normanhurst5, normanhurst6, normanhurst7, normanhurst8, normanhurst9,  normanhurst10,];
 export const service_items = [
     {
         title: "Community Participation",
@@ -494,9 +505,9 @@ export const service_items = [
         path: "/home-modification"
     },
     {
-        title: "Non NIDS Free Services",
+        title: "Non NIDS Services",
         image: service8,
-        path: "/non-ndis"
+        path: "/compassion-in-action"
     },
     {
         title: "NDIS Support Independent Living",
@@ -956,7 +967,7 @@ export const sil_houses = [
         image: sil_house3,
         address: "Denman Parade Normanhurst NSW 2076",
         features: [
-            { label: "4 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car },
+            { label: "4 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "3 Parking Spaces", icon: car }, { label: "Fully Accessible", icon: wheelchair },
         ]
     },
     {
@@ -965,7 +976,7 @@ export const sil_houses = [
         image: granny_flat1,
         address: "Belmore Street Ryde NSW 2112 (Granny Flat) ",
         features: [
-            { label: "2 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "2 Parking Spaces", icon: car },
+            { label: "2 Bedrooms", icon: bed }, { label: "2 Bathrooms", icon: bathroom }, { label: "2 Parking Spaces", icon: car }, { label: "Fully Accessible", icon: wheelchair },
         ]
     },
 

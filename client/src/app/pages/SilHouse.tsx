@@ -2,14 +2,11 @@
 import React, { useState } from 'react'
 import PageBanner from 'app/utils/PageBanner'
 import Image from 'next/image'
-import icon1 from "assets/images/2026/10/icon.png"
-import icon2 from "assets/images/2026/10/icon2.png"
-import icon3 from "assets/images/2026/10/icon4.png"
+
 import { TiTick } from 'react-icons/ti';
-import { sil_house, sil_house_details, sil_house_gallery, sil_houses } from 'config/page'
+import { sil_house, sil_house_details,  sil_houses } from 'config/page'
 import Button from 'app/utils/Button'
 import Title from 'app/utils/Title'
-import { FaPlus } from 'react-icons/fa'
 import SlideModal from 'app/components/SlideModal'
 import { motion } from 'framer-motion'
 import { fadeIn } from 'app/variants';
@@ -39,7 +36,7 @@ const SilHouse = () => {
                                             {item.features.map((itm,idx)=>(
                                                 <div key={idx} className="flex flex-col justify-center items-center gap-2">
                                                     <Image src={itm.icon} alt='icon'/>
-                                                <h3 className="text-sm">{itm.label} </h3>
+                                                <h3 className="text-sm text-center">{itm.label} </h3>
                                                 </div>
                                             ))}
                                         </div>
@@ -49,6 +46,32 @@ const SilHouse = () => {
                         </div>
                     </div>
                 </div>
+                <motion.div className="grid w-full my-10 gap-5"
+                variants={fadeIn("right",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} >
+                    <Title title1='What’s' title2='nearby' />
+                    <ul className="grid gap-2">
+                        {sil_house_details[3].options?.map((itm: any, idx: number) => (
+                            <li key={idx} className=" flex  items-start w-full gap-2 ">
+                                <h4 className=" min-w-40 font-bold uppercase">{itm.title}</h4>
+                                <p className="text-secondary-text  font-medium">{itm.text}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </motion.div>
+                <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
+                    <iframe
+                        className="flex h-full w-full min-h-125 rounded"
+                        src="https://www.google.com/maps/d/u/0/embed?mid=1yf7xZhexKBn-S9UFFUT2JECjfcGTuzk&ehbc=2E312F&noprof=1"
+                        width={640}
+                        height={480}
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                    />
+                </div>
+
+
                 {sil_house.map((item: any, index: number) => (
                     <div key={index} className={`flex flex-col my-10 gap-x-10 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
                         <motion.div className="flex w-full h-full"
@@ -213,18 +236,7 @@ const SilHouse = () => {
                     </ul>
                 </motion.div>
 
-                <motion.div className="grid w-full my-10 gap-5"
-                variants={fadeIn("right",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} >
-                    <Title title1='What’s' title2='nearby' />
-                    <ul className="grid gap-2">
-                        {sil_house_details[3].options?.map((itm: any, idx: number) => (
-                            <li key={idx} className=" flex  items-start w-full gap-2 ">
-                                <h4 className=" min-w-40 font-bold uppercase">{itm.title}</h4>
-                                <p className="text-secondary-text  font-medium">{itm.text}</p>
-                            </li>
-                        ))}
-                    </ul>
-                </motion.div>
+
                 {/* sil house details contents */}
 
                 {/* <div className="grid w-full my-10 gap-10 place-content-center">
@@ -247,18 +259,7 @@ const SilHouse = () => {
                     </div>
                 </div> */}
 
-                <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
-                    <iframe
-                        className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/embed?mid=1yf7xZhexKBn-S9UFFUT2JECjfcGTuzk&ehbc=2E312F&noprof=1"
-                        width={640}
-                        height={480}
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
-                </div>
+
 
                 {isOpen && <SlideModal close={() => setIsOpen(false)} currentId={currentId} />}
             </div>

@@ -1,5 +1,5 @@
 "use client"
-import { sil_property, normanhurst_slides } from 'config/page'
+import { sil_property, normanhurst_slides, normanhurst_gallery } from 'config/page'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
@@ -67,7 +67,7 @@ const SlideModalForNormanhurst: React.FC<Type> = ({ close, currentId }) => {
                 >
                     <SwiperSlide key={activeIndex}>
                         <div className="flex flex-col  h-full w-full   items-center justify-self-center  rounded-2xl bg-white ">
-                            <Image src={normanhurst_slides[activeIndex].image} alt={"slide"}
+                            <Image src={normanhurst_gallery[activeIndex]} alt={"slide"}
                                 className=' flex w-full h-full  object-cover  rounded-lg ' />
                         </div>
                     </SwiperSlide>
