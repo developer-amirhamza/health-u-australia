@@ -175,6 +175,79 @@ const [isOpen, setIsOpen] = useState(false);
         </div>
       </section>
 
+
+
+              {/* GOOGLE MAP */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto w-full">
+          <Title title1='Location' title2=' Map' className={`place-items-center mb-6`} />
+          <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
+        <iframe
+            className="flex h-full w-full min-h-125 rounded"
+            src="https://www.google.com/maps/d/u/0/embed?mid=1N9H2TXxIvhNbeF-O6TrNAZZ8g_wM_D8&ehbc=2E312F&noprof=1"
+            width={640}
+            height={520}
+            style={{ border: 0 }}
+            allowFullScreen={true}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+        />
+    </div>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="bg-gray-100 py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold mb-6">📍 Prime Ryde Location</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 place-items-start ">
+            <div className="">
+              <h3 className="text-xl text-gray-800 font-bold mb-4">
+                🚆 Transport
+              </h3>
+              <ul className="grid gap-4 text-gray-700">
+                <li>✔ 5 minutes to Meadowbank Train Station & Ferry Wharf</li>
+                <li>✔ Bus at doorstep to Top Ryde </li>
+              </ul>
+            </div>
+
+            <div className="">
+              <h3 className="text-xl text-gray-800 font-bold mb-4">
+                🏥 Healthcare
+              </h3>
+              <ul className="grid gap-4 text-gray-700">
+                <li>✔ Easy access to hospitals and medical services</li>
+                <li>✔ Macquarie Hospital</li>
+              </ul>
+            </div>
+
+            <div className="">
+              <h3 className="text-xl text-gray-800 font-bold mb-4">
+                🛍️ Shopping
+              </h3>
+              <ul className="grid gap-4 text-gray-700">
+                <li>✔ Near Top Ryde Shopping Centre</li>
+                <li>✔ Rhodes Waterside & Macquarie Centre</li>
+              </ul>
+            </div>
+
+            <div className="">
+              <h3 className="text-xl text-gray-800 font-bold mb-4">
+                🌳 Lifestyle
+              </h3>
+              <ul className="grid gap-4 text-gray-700">
+                <li>
+                  ✔ Green Spaces and Parks, cafes, and community facilities
+                  nearby
+                </li>
+                <li>✔ Proximity to Parramatta River</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       <div className="grid w-full my-4 gap-10 place-content-center container">
                     <motion.div initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} variants={fadeIn("up",0.5)} className="flex w-full h-full">
                         <Title title1='SIL House' title2='Gallery' className={`place-items-center`} />
@@ -195,6 +268,7 @@ const [isOpen, setIsOpen] = useState(false);
                     </div>
                 </div>
                 {isOpen && <SlideModalForBowden close={() => setIsOpen(false)} currentId={currentId} />}
+
 
       {/* Features */}
       <section className="bg-gray-100 py-12">
@@ -263,56 +337,7 @@ const [isOpen, setIsOpen] = useState(false);
         </div>
       </section>
 
-      {/* Location */}
-      <section className="bg-gray-100 py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">📍 Prime Ryde Location</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 place-items-start ">
-            <div className="">
-              <h3 className="text-xl text-gray-800 font-bold mb-4">
-                🚆 Transport
-              </h3>
-              <ul className="grid gap-4 text-gray-700">
-                <li>✔ 5 minutes to Meadowbank Train Station & Ferry Wharf</li>
-                <li>✔ Bus at doorstep to Top Ryde </li>
-              </ul>
-            </div>
 
-            <div className="">
-              <h3 className="text-xl text-gray-800 font-bold mb-4">
-                🏥 Healthcare
-              </h3>
-              <ul className="grid gap-4 text-gray-700">
-                <li>✔ Easy access to hospitals and medical services</li>
-                <li>✔ Macquarie Hospital</li>
-              </ul>
-            </div>
-
-            <div className="">
-              <h3 className="text-xl text-gray-800 font-bold mb-4">
-                🛍️ Shopping
-              </h3>
-              <ul className="grid gap-4 text-gray-700">
-                <li>✔ Near Top Ryde Shopping Centre</li>
-                <li>✔ Rhodes Waterside & Macquarie Centre</li>
-              </ul>
-            </div>
-
-            <div className="">
-              <h3 className="text-xl text-gray-800 font-bold mb-4">
-                🌳 Lifestyle
-              </h3>
-              <ul className="grid gap-4 text-gray-700">
-                <li>
-                  ✔ Green Spaces and Parks, cafes, and community facilities
-                  nearby
-                </li>
-                <li>✔ Proximity to Parramatta River</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Features */}
       <section className="bg-gray-100 py-12">
@@ -330,26 +355,7 @@ const [isOpen, setIsOpen] = useState(false);
         </div>
       </section>
 
-      {/* GOOGLE MAP */}
-                  <section className="py-16 px-6 bg-gray-50">
-                    <div className="max-w-5xl mx-auto w-full">
-                      <h2 className="text-3xl font-semibold text-center mb-6">
-                        Location Map
-                      </h2>
-                      <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
-                    <iframe
-                        className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/u/0/embed?mid=1N9H2TXxIvhNbeF-O6TrNAZZ8g_wM_D8&ehbc=2E312F&noprof=1"
-                        width={640}
-                        height={480}
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
-                </div>
-                    </div>
-                  </section>
+
 
       {/* SEO CONTENT */}
       <section className="py-16 px-6 max-w-5xl mx-auto">

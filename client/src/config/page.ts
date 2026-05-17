@@ -78,7 +78,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-
+import { MdDiversity2 } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -93,6 +93,34 @@ import bed from "assets/images/2026/10/icon.png"
 import bathroom from "assets/images/2026/10/icon2.png"
 import car from "assets/images/2026/10/icon4.png"
 import wheelchair from "assets/images/sil-houses/wheelchiar.png"
+import diversity from "assets/images/infographic/diversity.png";
+import empathy from "assets/images/infographic/empathy.png";
+import care from "assets/images/infographic/care.png";
+import innovation from "assets/images/infographic/innovation.png";
+import integrity from "assets/images/infographic/integrity.png";
+
+
+
+export const career_infographic = [
+    {icon:diversity , label:"DIVERSITY",},
+    {icon:empathy , label:"EMPATHY",},
+    {icon:care , label:"CARE",},
+    {icon:innovation , label:"INNOVATION",},
+    {icon:integrity , label:"INTEGRITY",},
+]
+
+export const career_jobs = [
+    {   id:'disability-support-worker',
+        title:"Disability Support Worker (Nursing background) Ryde / Hornsby/ Northern Districts ONLY",
+        publish_date:"12th May, 2026",
+        keywords:["Nursing Background"," Mental Health", "Support Area: Ryde- Hornsby Area ", "Vehicle:Own/renting with an Australian driver's license"],
+    },
+    {   id:"domestic-cleaner",
+        title:"Domestic Cleaner (Applicants must reside in the Northern Beaches area)",
+        publish_date:"12th May, 2026",
+        keywords:["Domestic Cleaning", "Mental Health ", "Support Area: Northern Beach area ", "Vehicle:Own/renting  with an Australian driver's license"]
+    },
+]
 
 export const nav_items = [
     {

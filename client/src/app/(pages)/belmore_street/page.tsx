@@ -122,7 +122,6 @@ const [isOpen, setIsOpen] = useState(false);
               <p>Bedrooms</p>
             </div>
           </div>
-
           <div className="flex  justify-center items-center gap-2 p-4 border rounded-lg">
             <Image src={bathroom} alt='icon' />
             <div className="">
@@ -130,7 +129,6 @@ const [isOpen, setIsOpen] = useState(false);
             <p>Bathrooms</p>
             </div>
           </div>
-
           <div className="flex  justify-center items-center gap-2 p-4 border rounded-lg">
             <Image src={car} alt='icon' />
             <div className="">
@@ -138,7 +136,6 @@ const [isOpen, setIsOpen] = useState(false);
             <p>Parking</p>
             </div>
           </div>
-
           <div className="flex  justify-center items-center gap-2 p-4 border rounded-lg">
             <Image src={wheelchair} alt='icon' />
             <div className="">
@@ -148,6 +145,47 @@ const [isOpen, setIsOpen] = useState(false);
           </div>
         </div>
       </section>
+
+      {/* GOOGLE MAP */}
+      <section className="py-10 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto w-full">
+          <Title title1='Location' title2=' Map' className={`place-items-center mb-6`} />
+
+          <div className="w-full h-full flex items-center justify-center  border-5 border-secondary rounded   ">
+
+              <iframe
+                  className="flex h-full w-full min-h-125 rounded"
+                  src="https://www.google.com/maps/d/embed?mid=1pw_m1V9YtvaXSVaK5tZUn8EROw1x-oA&ehbc=2E312F&noprof=1"
+                  width={640}
+                  height={520}
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+              />
+          </div>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="max-w-6xl mx-auto px-6 w-full  items-start py-8">
+        <h2 className="text-3xl font-bold mb-6">
+          Prime Location in Ryde
+        </h2>
+
+        <p className="text-gray-600 mb-6">
+          Close to hospitals, transport, and shopping centres for maximum
+          convenience and support access.
+        </p>
+
+        <ul className="grid md:grid-cols-2 gap-4 w-full text-gray-700">
+          <li>🏥 Ryde, Macquarie & Concord Hospitals</li>
+          <li>🛍️ Top Ryde & Macquarie Centre</li>
+          <li>🚍 Bus at your doorstep</li>
+          <li>🌳 Parks & Parramatta River nearby</li>
+        </ul>
+      </section>
+
 
       <div className="grid w-full my-4 gap-10 place-content-center container">
                     <motion.div initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} variants={fadeIn("up",0.5)} className="flex w-full h-full">
@@ -167,7 +205,10 @@ const [isOpen, setIsOpen] = useState(false);
                             </motion.div>
                         ))}
                     </div>
-                </div>
+      </div>
+
+
+
 
       {/* Features */}
       <section className="bg-gray-100 py-12">
@@ -189,47 +230,7 @@ const [isOpen, setIsOpen] = useState(false);
         </div>
       </section>
 
-      {/* Location */}
-      <section className="max-w-6xl mx-auto px-6  items-start py-12">
-        <h2 className="text-3xl font-bold mb-6">
-          Prime Location in Ryde
-        </h2>
 
-        <p className="text-gray-600 mb-6">
-          Close to hospitals, transport, and shopping centres for maximum
-          convenience and support access.
-        </p>
-
-        <ul className="grid md:grid-cols-2 gap-4 w-full text-gray-700">
-          <li>🏥 Ryde, Macquarie & Concord Hospitals</li>
-          <li>🛍️ Top Ryde & Macquarie Centre</li>
-          <li>🚍 Bus at your doorstep</li>
-          <li>🌳 Parks & Parramatta River nearby</li>
-        </ul>
-      </section>
-
-      {/* GOOGLE MAP */}
-            <section className="py-16 px-6 bg-gray-50">
-              <div className="max-w-5xl mx-auto w-full">
-                <h2 className="text-3xl font-semibold text-center mb-6">
-                  Location Map
-                </h2>
-
-                <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
-
-                    <iframe
-                        className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/embed?mid=1pw_m1V9YtvaXSVaK5tZUn8EROw1x-oA&ehbc=2E312F&noprof=1"
-                        width={640}
-                        height={480}
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
-                </div>
-              </div>
-            </section>
 
       {/* CTA */}
       <section className=" text-black bg-secondary text-center py-12">
