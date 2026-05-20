@@ -17,7 +17,7 @@ const AssistInSelf = () => {
             <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
                 <div className="grid gap-8 w-full h-full ">
                 {assist_in_self_care.map((item, index) => (
-                    <div  key={index} className={`flex flex-col gap-x-6 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
+                    <div  key={index} className={`flex flex-col gap-6 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
                         <motion.div variants={fadeIn([0,2,4].includes(index) ? "right" : "left", 0.2)} initial="hidden" whileInView={"show"}
                         className="flex w-full h-full">
                         <Image src={item.image} alt='about heath u australia'

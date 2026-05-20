@@ -146,8 +146,8 @@ export const nav_items = [
     {
         label: "Events And News",
         options: [
-            { label: "Current Events", path: "current-events" },
-            { label: "Past Events", path: "past-events" },
+            { label: "Current Events", path: "/current-events" },
+            { label: "Past Events", path: "/past-events" },
         ]
     },
     { label: "Career", path: "/career" },

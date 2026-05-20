@@ -14,16 +14,16 @@ const AssistInTransport = () => {
         <div className="flex flex-col justify-center items-center w-full h-full ">
             <PageBanner title='Assist In Transport' path='/assist-in-transport' />
             <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
-                <div className="grid w-full h-full">
+                <div className="grid w-full gap-10 h-full">
                 {assist_in_transport.map((item, index) => (
-                    <div key={index} className={`flex flex-col gap-x-0 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
+                    <div key={index} className={`flex flex-col gap-x-6 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-start items-start w-full`}>
                         <motion.div variants={fadeIn([0,2,4].includes(index) ? "right" : "left", 0.2)} initial="hidden" whileInView={"show"}
                         className="flex w-full h-full">
                         <Image src={item.image} alt='about heath u australia'
                         className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-center rounded-md inset-0 items-start justify-start p-0 m-0 ' />
                         </motion.div>
                         <motion.div variants={fadeIn([0,2,4].includes(index) ? "left" : "right", 0.2)} initial="hidden" whileInView={"show"}
-                          className="flex flex-col w-full justify-center gap-2 mt-8   ">
+                          className="flex flex-col w-full  justify-start gap-2    ">
                             <Title title1={item.title1} title2={item.title2} />
                             <p className=" flex w-full text-lg text-secondary-text font-medium  ">{item?.paragraph1}</p>
                             <ul className="grid gap-2">

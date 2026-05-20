@@ -56,8 +56,9 @@ const Footer = () => {
       {/* copyright section */}
       <div className="flex w-full flex-col items-center py-10 px-0 mx-0 gap-8 justify-center">
         <div className='w-full h-0.5 bg-white' />
-        <p className="text-white text-lg font-medium">Copyright &copy; {new Date().getFullYear()} HEALTH U AUSTRALIA Design by
-          <Link className='font-bold px-2 hover:text-primary' href={"https://amirhamza.onrender.com"}>Amir Hamza</Link> </p>
+        <p className="text-white text-lg font-medium">Copyright &copy; {new Date().getFullYear()} HEALTH U AUSTRALIA
+          {/* <Link className='font-bold px-2 hover:text-primary' href={"https://amirhamza.onrender.com"}>Amir Hamza</Link> */}
+          </p>
       </div>
     </footer>
   )

@@ -9,17 +9,20 @@ import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 import Nav from 'app/utils/Nav';
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
 import { FcCustomerSupport } from 'react-icons/fc';
+import { useRouter } from 'next/navigation';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isOpen,setIsOpen] = useState(false);
   const [showTopBar, setShoTopBar]= useState(true);
+  const router = useRouter()
 
   const handleToggle = (index:number)=>{
     setActiveIndex(index);
     setIsOpen(!isOpen);
   };
+
 
   useEffect(()=>{
     const handleScroll = ()=>{
@@ -89,9 +92,9 @@ const Header = () => {
                   {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
                     {item?.options.map((itm, idx)=>(
-                      <li key={idx}
-                      className='flex text-start hover:bg-primary hover:text-white py-3 px-5 font-medium transition-all duration-300  '>
-                        <Link className='w-full flex font-medium' href={itm?.path}>{itm?.label}</Link>
+                      <li key={idx} onClick={()=> router.push(itm?.path)}
+                      className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
+                        <span  className='w-full flex font-medium'>{itm?.label}</span>
                       </li>
                     ))}
                   </ul>
