@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 
-const WHATSAPP_NUMBER = "61400000000"; // Replace with actual number
-const MESSENGER_USERNAME = "healthuaustralia"; // Replace with actual username
+const WHATSAPP_NUMBER = "0481707758"; // Replace with actual number
+const MESSENGER_USERNAME = "healthuau"; // Replace with actual username
 
 export default function FloatingContact() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-22 right-9 z-50 flex flex-col items-end gap-3">
       {open && (
         <div className="flex flex-col gap-2 items-end">
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 transition-colors"
+            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 transition-colors"
           >
             <span>WhatsApp</span>
             <span className="w-9 h-9 flex items-center justify-center rounded-full bg-[#25D366] text-white shrink-0">
@@ -30,7 +30,7 @@ export default function FloatingContact() {
             href={`https://m.me/${MESSENGER_USERNAME}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 transition-colors"
+            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-blue-50 transition-colors"
           >
             <span>Messenger</span>
             <span className="w-9 h-9 flex items-center justify-center rounded-full bg-[#0099FF] text-white shrink-0">
@@ -45,7 +45,7 @@ export default function FloatingContact() {
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-label="Contact us"
-        className="w-14 h-14 rounded-full bg-[#6B2D8B] text-white shadow-xl flex items-center justify-center hover:bg-[#5a2575] transition-colors"
+        className="w-12 h-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:bg-[#d30101] transition-colors"
       >
         {open ? (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
