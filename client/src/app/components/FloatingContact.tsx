@@ -1,22 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { IoMdChatboxes } from "react-icons/io";
 
-const WHATSAPP_NUMBER = "0481707758"; // Replace with actual number
-const MESSENGER_USERNAME = "healthuau"; // Replace with actual username
+const WHATSAPP_NUMBER = "61400000000"; // Replace with actual number
+const MESSENGER_USERNAME = "healthuaustralia"; // Replace with actual username
 
 export default function FloatingContact() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-22 right-9 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-22 right-9 cursor-pointer z-50 flex flex-col items-end gap-3">
       {open && (
         <div className="flex flex-col gap-2 items-end">
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 transition-colors"
+            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 transition-colors"
           >
             <span>WhatsApp</span>
             <span className="w-9 h-9 flex items-center justify-center rounded-full bg-[#25D366] text-white shrink-0">
@@ -25,12 +26,11 @@ export default function FloatingContact() {
               </svg>
             </span>
           </a>
-
           <a
             href={`https://m.me/${MESSENGER_USERNAME}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-blue-50 transition-colors"
+            className="flex items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 transition-colors"
           >
             <span>Messenger</span>
             <span className="w-9 h-9 flex items-center justify-center rounded-full bg-[#0099FF] text-white shrink-0">
@@ -41,20 +41,17 @@ export default function FloatingContact() {
           </a>
         </div>
       )}
-
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-label="Contact us"
-        className="w-12 h-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:bg-[#d30101] transition-colors"
+        className="w-12 h-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:bg-[#be0505] transition-colors"
       >
         {open ? (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-            <path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2zm-2 10H6v-2h12v2zm0-4H6V6h12v2z" />
-          </svg>
+          <IoMdChatboxes size={28} />
         )}
       </button>
     </div>
