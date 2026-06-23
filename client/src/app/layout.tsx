@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import "./styles/globals.css"
 import ScrollToTop from "utils/ScrollToTop";
+import FloatingContact from "./components/FloatingContact";
 
 export const metadata = {
   metadataBase: new URL("https://healthuau.com.au"),
@@ -48,6 +49,7 @@ export default function RootLayout({
         <Footer />
         <ScrollToTop />
         <ScrollToTopBtn />
+        <FloatingContact/>
       </body>
     </html>
   )
