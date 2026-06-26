@@ -1,5 +1,6 @@
 import ParticipantFeedbackForm from 'app/components/ParticipantFeedbackForm'
-import PageBanner from 'app/utils/PageBanner'
+import ParticipantFeedback from 'app/pages/ParticipantFeedback';
+
 import { Metadata } from 'next'
 import React from 'react'
 
@@ -11,8 +12,7 @@ export const metadata: Metadata = {
 const page = () => {
   return (
     <>
-      <PageBanner title='Participant Feedback' path='/participant-feedback' />
-      <ParticipantFeedbackForm />
+      <ParticipantFeedback />
     </>
   )
 }
