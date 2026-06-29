@@ -79,7 +79,7 @@ const Header = () => {
       </div>
       }
       {/* navbar */}
-      <div className=" flex w-full items-center relative justify-between md:px-10 shadow-2xl  sm:px-5 px-2.5  ">
+      <div className=" flex w-full items-center relative justify-between md:px-8 shadow-2xl  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
             <Image src={logo} alt='Health U logo' className='h-auto sm:w-38  max-sm:pl-2 w-32 '  />
         </Link>
@@ -87,7 +87,7 @@ const Header = () => {
         <nav className='w-full flex mx-auto justify-end'>
           <ul className=" w-full items-center justify-end hidden  transition-all duration-500 lg:flex ">
             {nav_items.map((item, index)=>(
-                <li key={index} className=' py-3 px-4 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
+                <li key={index} className=' py-2 px-3 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
                   <Nav path={item?.path} label={item?.label} />
                   {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
@@ -103,7 +103,7 @@ const Header = () => {
               ))}
           </ul>
           <Link className='bg-primary sm:text-lg text-base uppercase text-white font-semibold
-                rounded-full sm:px-5 px-4 py-2 sm:py-3 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
+                rounded-full  px-4 py-2  hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
           <button onClick={()=>setIsActive(!isActive)} className='text-secondary text-4xl z-100 px-4 cursor-pointer lg:hidden '>
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>

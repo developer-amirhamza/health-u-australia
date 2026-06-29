@@ -4,7 +4,7 @@ import { useState } from "react";
 import { IoMdChatboxes } from "react-icons/io";
 
 const WHATSAPP_NUMBER = "61400000000"; // Replace with actual number
-const MESSENGER_USERNAME = "healthuaustralia"; // Replace with actual username
+// const MESSENGER_USERNAME = "healthuaustralia"; // Replace with actual username
 
 export default function FloatingContact() {
   const [open, setOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function FloatingContact() {
               </svg>
             </span>
           </a>
-          <a
+          {/* <a
             href={`https://m.me/${MESSENGER_USERNAME}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -38,7 +38,7 @@ export default function FloatingContact() {
                 <path d="M16 2C8.268 2 2 7.82 2 15c0 4.144 2.033 7.837 5.21 10.28V30l4.79-2.633C13.2 27.773 14.578 28 16 28c7.732 0 14-5.82 14-13S23.732 2 16 2zm1.39 17.503l-3.565-3.8-6.958 3.8 7.653-8.12 3.652 3.8 6.87-3.8-7.652 8.12z" />
               </svg>
             </span>
-          </a>
+          </a> */}
         </div>
       )}
       <button

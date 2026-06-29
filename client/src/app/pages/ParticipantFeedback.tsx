@@ -48,7 +48,7 @@ const externalBodies = [
     link: "https://www.ndiscommission.gov.au/",
   },
   {
-    name: "NDIS Quality and Safeguards Commission — Online Complaint",
+    name: "NDIS Quality and Safeguards Commission Online Complaint",
     desc: "Submit your complaint online directly through the NDIS Commission website.",
     contact: "Online form available",
     link: "https://www.ndiscommission.gov.au/participants/complaints-ndis-supports-and-services",
@@ -86,7 +86,7 @@ const feedbackTypes = [
   {
     icon: <FiPhone className="text-3xl text-primary" />,
     title: "General Feedback",
-    desc: "Any other feedback about your experience — your support plan, communication, scheduling or anything else — is welcome and valued.",
+    desc: "Any other feedback about your experience your support plan, communication, scheduling or anything else is welcome and valued.",
   },
 ]
 
@@ -105,7 +105,7 @@ const ParticipantFeedback = () => {
           >
             <Title title1="Your Voice" title2="Matters to Us" />
             <p className="text-lg text-secondary-text font-medium leading-relaxed">
-              At Health U Australia, we are committed to delivering high-quality NDIS supports that respect your rights, dignity and individual goals. Your feedback — whether a compliment, concern or complaint — is essential to helping us continuously improve.
+              At Health U Australia, we are committed to delivering high-quality NDIS supports that respect your rights, dignity and individual goals. Your feedback  whether a compliment, concern or complaint is essential to helping us continuously improve.
             </p>
             <p className="text-lg text-secondary-text font-medium leading-relaxed">
               As a registered NDIS provider, we operate under the <strong>NDIS Practice Standards</strong> and the <strong>NDIS Code of Conduct</strong>, which require us to have a transparent, accessible and fair complaints management process. We take every piece of feedback seriously and are committed to resolving concerns promptly and fairly.
@@ -221,7 +221,7 @@ const ParticipantFeedback = () => {
         <div className="container mx-auto px-5 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h2 className="text-3xl font-extrabold text-white">Ready to Share Your Feedback?</h2>
-            <p className="text-white/80 text-lg mt-1">Complete the secure form below — it takes less than 5 minutes.</p>
+            <p className="text-white/80 text-lg mt-1">Complete the secure form below it takes less than 5 minutes.</p>
           </div>
           <Link href="https://healthuaustralia.snapforms.com.au/form/health-u-participant-feedback-form" className="text-primary cursor-pointer text-base uppercase font-bold px-8 py-3.5 rounded-full bg-white hover:bg-secondary hover:text-white transition-colors duration-300 whitespace-nowrap">
             Go to Form ↓

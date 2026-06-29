@@ -143,7 +143,7 @@ export const nav_items = [
     },
     { label: "SIL House", path: "/sil-house" },
     { label: "Compassion in Action", path: "/compassion-in-action" },
-    { label: "Participant Feedback", path: "/participant-feedback" },
+    { label: "Feedback", path: "/participant-feedback" },
     {
         label: "Events And News",
         options: [
