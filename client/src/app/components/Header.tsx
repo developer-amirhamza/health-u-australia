@@ -10,6 +10,7 @@ import Nav from 'app/utils/Nav';
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
 import { FcCustomerSupport } from 'react-icons/fc';
 import { useRouter } from 'next/navigation';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -82,6 +83,7 @@ const Header = () => {
       <div className=" flex w-full items-center relative justify-between md:px-8 shadow-2xl  sm:px-5 px-2.5  ">
         <Link href="/" className="max-h-full ">
             <Image src={logo} alt='Health U logo' className='h-auto sm:w-38  max-sm:pl-2 w-32 '  />
+            <LanguageSwitcher />
         </Link>
         {/* desktop menu */}
         <nav className='w-full flex mx-auto justify-end'>
