@@ -7,8 +7,7 @@
     "build": "next build && cp -r .next/static .next/standalone/.next/static",
     "start": "next start -H 0.0.0.0 -p 3000",
     "lint": "next lint",
-    "postbuild": "next-sitemap",
-    "translate": "next-i18n-auto --config translate.config.js"
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",
