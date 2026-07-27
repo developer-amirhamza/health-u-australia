@@ -82,7 +82,7 @@ body {
   height: 100%;
 }
 
-body, main {
+body {
   overflow-x: hidden;
   overflow-y: auto; /* normal page scroll */
 }

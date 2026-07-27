@@ -10,8 +10,8 @@ const Hero = () => {
             <Image src={banner1} alt="Hero Image" layout="fill" objectFit="cover "  className="absolute   inset-0 z-0" />
             <div className="container mx-auto z-10  flex flex-col sm:flex-row ">
                 <div className="w-full  flex flex-col flex-1 lg:justify-start justify-center rounded-lg  bg-secondary-light/20  p-10 gap-10 h-full">
-                    <h2 className="text-4xl uppercase font-bold text-secondary ">Welcome to</h2>
-                    <h1 className="text-secondary text-5xl font-bold uppercase">Health U <strong className="text-primary"> Support Services</strong></h1>
+                    <h2 className="text-4xl uppercase font-bold text-black ">Welcome to</h2>
+                    <h1 className="text-black text-5xl font-bold uppercase">Internship <strong className="text-primary"> Support Services</strong></h1>
                     <p className="text-lg font-medium text-foreground ">
                         NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently
                     </p>
