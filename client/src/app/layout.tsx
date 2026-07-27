@@ -1,11 +1,12 @@
 import ScrollToTopBtn from "utils/ScrollToTopBtn";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import FloatingContact from "./components/FloatingContact";
+// import FloatingContact from "./components/FloatingContact";
 import FaqChatbot from "./components/FaqChatbot";
 import "./styles/globals.css"
 import ScrollToTop from "utils/ScrollToTop";
 import { GoogleTranslateProvider, LanguageOption } from './components/GoogleTranslateProvider';
+import FloatingContact from "./components/FloatingContact";
 
 const availableLanguages: LanguageOption[] = [
   { value: "en|en", label: "English" },

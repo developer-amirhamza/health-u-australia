@@ -57,7 +57,7 @@ export default function FaqChatbot() {
   };
 
   return (
-    <div className="fixed bottom-10 left-9 z-50 flex flex-col items-start gap-3">
+    <div className="fixed bottom-22 right-9 z-50 flex flex-col items-start gap-3">
       {isOpen && (
         <div className="w-[min(90vw,340px)] h-[min(70vh,480px)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
           <div className="bg-primary text-white px-4 py-3 font-semibold">Health U FAQ Assistant</div>
@@ -111,7 +111,7 @@ export default function FaqChatbot() {
             <button
               type="submit"
               aria-label="Send"
-              className="w-9 h-9 shrink-0 rounded-full bg-primary text-white flex items-center justify-center hover:bg-[#be0505] transition-colors"
+              className="sm:w-9 sm:h-9 w-7 h-7 shrink-0 rounded-full bg-primary text-white flex items-center justify-center hover:bg-[#be0505] transition-colors"
             >
               <IoSend size={16} />
             </button>

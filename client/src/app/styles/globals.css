@@ -84,6 +84,7 @@ body {
 
 body {
   overflow-x: hidden;
+  width: 100%;
   overflow-y: auto; /* normal page scroll */
 }
 iframe {

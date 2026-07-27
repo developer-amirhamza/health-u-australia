@@ -9,11 +9,8 @@ import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 import Nav from 'app/utils/Nav';
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-<<<<<<< HEAD
 import { li } from 'framer-motion/client';
-=======
 import LanguageSelector from './LanguageSelector';
->>>>>>> 810d96e90a21e24f5b19a72d09114ee55066feb2
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -43,7 +40,7 @@ const Header = () => {
   return (
     <header className='w-full flex flex-col items-center justify-center sticky bg-white top-0 z-50 '>
       {/* top bar */}
-      {showTopBar && <div className="flex w-full bg-secondary max-h-13 items-center justify-center h-full">
+      {showTopBar && <div className="flex w-full bg-secondary max-h-12 items-center justify-center h-full">
         <div className="container w-full  hidden   sm:flex items-center justify-between text-white  ">
           {/* contact list */}
           <div className="flex w-full items-center justify-start h-full gap-2">
@@ -84,7 +81,7 @@ const Header = () => {
         {/* Logo and Language Selector */}
         <div className="flex items-center gap-4">
           <Link href="/" className="max-h-full ">
-            <Image src={logo} alt='Health U logo' className='h-auto sm:w-38  max-sm:pl-2 w-32 ' />
+            <Image src={logo} alt='Health U logo' className='h-auto sm:w-36  max-sm:pl-2 w-32 ' />
           </Link>
           <LanguageSelector buttonClassName="bg-secondary rounded-full hover:bg-primary transition-colors duration-300" />
         </div>
@@ -96,19 +93,11 @@ const Header = () => {
                 <Nav path={item?.path} label={item?.label} />
                 {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
-<<<<<<< HEAD
                     {item?.options.map((itm, idx)=>(
                       <Link href={itm.path} key={idx}
                       className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
                         <span  className='w-full flex font-medium'>{itm?.label}</span>
                       </Link>
-=======
-                    {item?.options.map((itm, idx) => (
-                      <li key={idx} onClick={() => router.push(itm?.path)}
-                        className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
-                        <span className='w-full flex font-medium'>{itm?.label}</span>
-                      </li>
->>>>>>> 810d96e90a21e24f5b19a72d09114ee55066feb2
                     ))}
                   </ul>
                 }
