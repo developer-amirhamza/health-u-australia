@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r .next/static .next/standalone/.next/static",
-    "start": "next start -H 0.0.0.0 -p 3000",
-    "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "build": "next build",
+    "postbuild": "next-sitemap",
+    "start": "next start"
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",

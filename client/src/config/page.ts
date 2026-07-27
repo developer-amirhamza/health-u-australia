@@ -125,35 +125,34 @@ export const career_jobs = [
 export const nav_items = [
     {
         label: "Home",
-        options: [{ label: "About Health U", path: "/about" }]
+        options: [{ label: "About Health U", path: "/about/" }]
     },
-    { label: "NDIS", path: "/ndis" },
+    { label: "NDIS", path: "/ndis/" },
     {
         label: "Services",
         options: [
-            { label: "Community Participation", path: "/community-participation" },
-            { label: "Capacity Building", path: "/capacity-building" },
-            { label: "Support Coordination", path: "/support-coordination" },
-            { label: "Assist In Self-care", path: "/assist-in-self-care" },
-            { label: "Assist In Transport", path: "/assist-in-transport" },
-            { label: "Home Modification", path: "/home-modification" },
-            { label: "Non NDIS Service", path: "/compassion-in-action" },
-            { label: "Gardening/House And Yard", path: "/gardening-house-yard" },
+            { label: "Community Participation", path: "/community-participation/" },
+            { label: "Capacity Building", path: "/capacity-building/" },
+            { label: "Support Coordination", path: "/support-coordination/" },
+            { label: "Assist In Self-care", path: "/assist-in-self-care/" },
+            { label: "Assist In Transport", path: "/assist-in-transport/" },
+            { label: "Home Modification", path: "/home-modification/" },
+            { label: "Non NDIS Service", path: "/compassion-in-action/" },
+            { label: "Gardening/House And Yard", path: "/gardening-house-yard/" },
         ]
     },
-    { label: "SIL House", path: "/sil-house" },
-    { label: "Compassion in Action", path: "/compassion-in-action" },
-    { label: "Feedback", path: "/participant-feedback" },
+    { label: "SIL House", path: "/sil-house/" },
+    { label: "Compassion in Action", path: "/compassion-in-action/" },
     {
         label: "Events And News",
         options: [
-            { label: "Current Events", path: "/current-events" },
+            { label: "Current Events", path: "/current-events/" },
             { label: "Past Events", path: "/past-events" },
         ]
     },
-    { label: "Career", path: "/career" },
-    { label: "Contact Us", path: "/contact-us" },
-    { label: "Referral", path: "/referral" },
+    { label: "Career", path: "/career/" },
+    { label: "Contact Us", path: "/contact-us/" },
+    { label: "Referral", path: "/referral/" },
 ]
 
 export const belmore_slides = [
@@ -501,47 +500,47 @@ export const service_items = [
     {
         title: "Community Participation",
         image: service1,
-        path: "/community-participation"
+        path: "/community-participation/"
     },
     {
         title: "Assist In Self-Care",
         image: service2,
-        path: "/assist-in-self-care"
+        path: "/assist-in-self-care/"
     },
     {
         title: "Assist In Transport",
         image: service3,
-        path: "/assist-in-transport"
+        path: "/assist-in-transport/"
     },
     {
         title: "Support Coordination",
         image: service4,
-        path: "/support-coordination"
+        path: "/support-coordination/"
     },
     {
         title: "Gardening / House And Yard Maintenance",
         image: service5,
-        path: "/gardening-yard-maintenance"
+        path: "/gardening-yard-maintenance/"
     },
     {
         title: "Capacity Building",
         image: service6,
-        path: "/capacity-building"
+        path: "/capacity-building/"
     },
     {
         title: "Home Modification",
         image: service7,
-        path: "/home-modification"
+        path: "/home-modification/"
     },
     {
         title: "Non NIDS Services",
         image: service8,
-        path: "/compassion-in-action"
+        path: "/compassion-in-action/"
     },
     {
         title: "NDIS Support Independent Living",
         image: service10,
-        path: "/support-independent-living"
+        path: "/support-independent-living/"
     },
 
 ]
@@ -973,7 +972,7 @@ export const support_coordination = [
 export const sil_houses = [
     {
         label: "Health U Australia",
-        path: "/belmore_street",
+        path: "/belmore_street/",
         image: sil_house1,
         address: "Belmore Street Ryde NSW 2112",
         features: [
@@ -983,7 +982,7 @@ export const sil_houses = [
 
     {
         label: "Health U Australia ",
-        path: "/bowden_street",
+        path: "/bowden_street/",
         image: sil_house2,
         address: "Bowden Street Ryde NSW 2112",
         features: [
@@ -992,7 +991,7 @@ export const sil_houses = [
     },
     {
         label: "Health U Australia ",
-        path: "/normanhurst",
+        path: "/normanhurst/",
         image: sil_house3,
         address: "Denman Parade Normanhurst NSW 2076",
         features: [
@@ -1001,7 +1000,7 @@ export const sil_houses = [
     },
     {
         label: "Health U Australia",
-        path: "/granny-flat",
+        path: "/granny-flat/",
         image: granny_flat1,
         address: "Belmore Street Ryde NSW 2112 (Granny Flat) ",
         features: [

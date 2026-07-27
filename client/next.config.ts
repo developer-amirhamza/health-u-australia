@@ -1,10 +1,13 @@
+import { withNextVideo } from "next-video/process";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  experimental:{
-    turbopackFileSystemCacheForDev:true,
+  /* config options here */
+  output: "export",
+  trailingSlash: true,
+  images:{
+    unoptimized:true,
   }
 };
 
-export default nextConfig;
+export default withNextVideo(nextConfig);
