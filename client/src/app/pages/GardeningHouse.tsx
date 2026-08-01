@@ -77,7 +77,7 @@ const GardeningHouse = () => {
 
                 <motion.div variants={fadeIn("down",0.2)} initial="hidden" whileInView={"show"}
                 className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
-                    <h1 className="text-3xl font-bold  ">Make an Appointment with Us</h1>
+                    <h2 className="text-3xl font-bold  ">Make an Appointment with Us</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" flex  text-lg text-secondary-text font-medium text-center ">
                         Get in touch with us now to opt for our exceptional SIL assistance and get started attaining independence and cheerfulness in life.

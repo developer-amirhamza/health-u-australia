@@ -28,13 +28,13 @@ const availableLanguages: LanguageOption[] = [
 export const metadata = {
   metadataBase: new URL("https://healthuau.com.au"),
   title: {
-    default: "Health U Australia",
-    template: "%s | Health U Support Services",
+    default: "Health U Australia - NDIS Service Provider",
+    template: "%s | Health U Australia",
   },
-  description: "NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently",
+  description: "NDIS support provider in Sydney helping participants live independently with tailored SIL, support coordination and care services.",
   openGraph: {
-    title: "Health U Support Services",
-    description: "NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently",
+    title: "Health U Australia - NDIS Service Provider",
+    description: "NDIS support provider in Sydney helping participants live independently with tailored SIL, support coordination and care services.",
     url: "https://healthuau.com.au",
     siteName: "Health U Australia",
     images: [

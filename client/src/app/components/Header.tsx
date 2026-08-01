@@ -114,7 +114,7 @@ const Header = () => {
       <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all w-full ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
                 ${isActive ? "left-0" : "-left-122"}
           `} >
-        <h1 className="text-4xl font-bold text-center text-white">Menu </h1>
+        <p className="text-4xl font-bold text-center text-white">Menu </p>
         <ul className=" w-full items-start justify-end border-t-3  text-white flex flex-col   ">
           {nav_items.map((item, index) => (
             <li key={index} className=' flex flex-col w-full  cursor-pointer last:hidden relative   text-white text-base   '>

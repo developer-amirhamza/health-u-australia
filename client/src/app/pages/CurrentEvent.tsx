@@ -25,9 +25,9 @@ const CurrentEvents = () => {
                 </div> */}
                 <motion.div className="flex flex-col gap-6 items-start py-5 text-lg w-full "
                     initial="hidden" whileInView={"show"} variants={fadeIn('left', 0.3)} viewport={{ once: false, amount: 0.2 }}>
-                    <h1 className="text-4xl font-semibold ">Health U Australia - Cooking Class</h1>
+                    <h2 className="text-4xl font-semibold ">Health U Australia - Cooking Class</h2>
                     <div className="grid gap-3 py-5">
-                        <h1 className="text-2xl font-semibold ">Class Time & Date</h1>
+                        <h3 className="text-2xl font-semibold ">Class Time & Date</h3>
                         <div className="flex items-center justify-between gap-10">
                             <div className="flex items-center gap-2 text-secondary-text ">
                                 <FaClock size={30} className='text-primary' />
@@ -40,7 +40,7 @@ const CurrentEvents = () => {
                         </div>
                     </div>
                     <div className="grid gap-3 pb-5">
-                        <h1 className="text-2xl font-semibold ">Location:</h1>
+                        <h3 className="text-2xl font-semibold ">Location:</h3>
                         <div className="flex items-center justify-between gap-10">
                             <div className="flex items-center gap-2 text-secondary-text ">
                                 <FaMapLocationDot size={30} className='text-primary' />

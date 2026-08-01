@@ -29,7 +29,7 @@ const SilHouse = () => {
                                     <Image src={item.image} alt='sil-house' className=' '/>
                                     <div className="flex flex-col items-center p-4 justify-center">
                                         <div className="flex flex-col items-center justify-center gap-1 ">
-                                            <h1 className="text-2xl font-semibold text-secondary-text"> {item.address} </h1>
+                                            <h3 className="text-2xl font-semibold text-secondary-text"> {item.address} </h3>
                                     {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
                                         </div>
                                         <div className="flex items-center justify-center gap-3  w-full h-full">
@@ -60,6 +60,7 @@ const SilHouse = () => {
                 </motion.div>
                 <div className="w-full h-full flex items-center justify-center my-12 border-5 border-secondary rounded   ">
                     <iframe
+                        title="Map showing our Ryde SIL house locations"
                         className="flex h-full w-full min-h-125 rounded"
                         src="https://www.google.com/maps/d/u/0/embed?mid=1yf7xZhexKBn-S9UFFUT2JECjfcGTuzk&ehbc=2E312F&noprof=1"
                         width={640}
@@ -134,7 +135,7 @@ const SilHouse = () => {
                 <motion.div className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10"
                 initial={"hidden"} whileInView={"show"} variants={fadeIn("up",0.5)}
                 >
-                    <h1 className="text-3xl font-bold  ">Get Started with Our Exceptional SIL Assistance!</h1>
+                    <h2 className="text-3xl font-bold  ">Get Started with Our Exceptional SIL Assistance!</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" flex  text-lg text-secondary-text font-medium text-center ">
                         Get in touch with us now to opt for our exceptional SIL assistance and get started attaining independence and cheerfulness in life.

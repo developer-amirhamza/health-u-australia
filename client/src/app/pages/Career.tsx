@@ -41,7 +41,7 @@ const Career = () => {
                                 {career_jobs.map((item:any,index:any)=>(
                                 <Link href={`/career/${item?.id}`} key={index} className=" shadow-2xl py-10 rounded-md max-w-sm items-center min-h-107 scale-100 hover:scale-105
                                 justify-between bg-red-50 p-2 gap-3 flex flex-col cursor-pointer duration-300 transition-transform text-neutral-800 ">
-                                    <h1 className="text-xl font-bold text-secondary-text  ">{item.title}</h1>
+                                    <h3 className="text-xl font-bold text-secondary-text  ">{item.title}</h3>
                                     <span className="text-secondary-text   font-medium ">{item.publish_date} </span>
                                     <ul className="flex flex-col gap-2 mb-2 items-start justify-center px-4 text-secondary-text  ">
                                         {item.keywords.map((itm:any,idx:number)=>(

@@ -67,7 +67,7 @@ const Contact = () => {
                                         <LuPhoneCall className='text-2xl text-primary ' />
                                     </div>
                                     <div className="grid gap-">
-                                        <h1 className="text-xl font-semibold">Call Us</h1>
+                                        <h3 className="text-xl font-semibold">Call Us</h3>
                                         <a className='text-secondary-text text-lg font-semibold' href={`tel:${item.phone}`}>{item.phone}</a>
                                     </div>
                                 </li>
@@ -76,7 +76,7 @@ const Contact = () => {
                                         <MdOutlineMail className='text-2xl text-primary ' />
                                     </div>
                                     <div className="grid ">
-                                        <h1 className="text-2xl font-semibold">Email Us</h1>
+                                        <h3 className="text-2xl font-semibold">Email Us</h3>
                                         <a className='text-secondary-text text-lg font-semibold' href={`mailto:${item.email}`}>{item.email}</a>
                                     </div>
                                 </li>
@@ -85,7 +85,7 @@ const Contact = () => {
                                         <PiMapPinAreaBold className='text-2xl text-primary ' />
                                     </div>
                                     <div className="grid gap-3">
-                                        <h1 className="text-2xl font-semibold">Address</h1>
+                                        <h3 className="text-2xl font-semibold">Address</h3>
                                         <address className=' text-secondary-text font-semibold '>{item?.address} </address>
                                     </div>
                                 </li>
@@ -94,7 +94,7 @@ const Contact = () => {
                                         <TbClockHour3 className='text-2xl text-primary ' />
                                     </div>
                                     <div className="grid gap-3">
-                                        <h1 className="text-2xl font-semibold">Working Hour</h1>
+                                        <h3 className="text-2xl font-semibold">Working Hour</h3>
                                         <span className=' text-secondary-text font-semibold '>{item?.time}</span>
                                     </div>
                                 </li>

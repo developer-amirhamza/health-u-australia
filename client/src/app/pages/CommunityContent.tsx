@@ -39,7 +39,7 @@ const CommunityContent = () => {
                 ))}
 
                 <motion.div initial="hidden" whileInView={"show"} variants={fadeIn("down",0.2)} className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
-                    <h1 className="text-3xl font-bold  ">It’s Time to Bravely Participate in Your Community!</h1>
+                    <h2 className="text-3xl font-bold  ">It’s Time to Bravely Participate in Your Community!</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" text-lg text-secondary-text font-medium text-center ">
                         Bravely move forward to participate in your community, as we have got your back. <Link className='text-blue-600' href={"/contact"}> Get in touch</Link>  with our team to learn how they can make this possible.

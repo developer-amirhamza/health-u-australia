@@ -145,7 +145,7 @@ const AboutContent = () => {
               ease: [0.25, 0.25, 0.25, 0.75]
             }
           }}>
-          <h1 className="text-3xl font-bold  ">Let Us Guide You To A New Tomorrow</h1>
+          <h2 className="text-3xl font-bold  ">Let Us Guide You To A New Tomorrow</h2>
           <div className='w-14 h-0.75 bg-primary items-center  ' />
           <p className=" flex w-full text-lg text-secondary-text font-medium text-center ">
             Talk to our support staff so that we know what precisely you want from us. You can also write to us stating your support needs and we will get back to you immediately.

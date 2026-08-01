@@ -42,7 +42,7 @@ const Capacity = () => {
                 ))}
 
                 <motion.div initial={"hidden"} whileInView={"show"} variants={fadeIn("up",0.2)} className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
-                    <h1 className="text-3xl font-bold  ">Talk To Us Now!</h1>
+                    <h2 className="text-3xl font-bold  ">Talk To Us Now!</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" text-lg text-secondary-text font-medium text-center ">
                         <Link className='text-blue-600' href={"/contact"}> Contact us</Link>  now to talk to our team and gain more knowledge about our unparalleled capacity-building support before commencing your journey to attaining independence.

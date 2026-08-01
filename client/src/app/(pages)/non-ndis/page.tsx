@@ -1,4 +1,5 @@
 import React from 'react'
+import { Metadata } from 'next'
 import PageBanner from 'app/utils/PageBanner'
 import Image from 'next/image'
 import ndis1 from "assets/images/about/ndis-img01.jpg"
@@ -9,6 +10,13 @@ import { TiTick } from 'react-icons/ti';
 import Link from 'next/link';
 import { sil_house } from 'config/page'
 
+export const metadata: Metadata = {
+    title: "Non-NDIS Support Services",
+    description: "Health U Australia also supports non-NDIS and privately funded clients with tailored disability and aged care assistance.",
+    alternates: { canonical: "/compassion-in-action" },
+    robots: { index: false, follow: true },
+}
+
 const SilHouse = () => {
     return (
         <div className="flex flex-col justify-center items-center w-full h-full ">
@@ -18,7 +26,7 @@ const SilHouse = () => {
                     <div key={index} className={`flex flex-col gap-x-0 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
                         <Image src={item.image} alt='about heath u australia' className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-scale-down inset-0 items-start justify-start p-0 m-0 ' />
                         <div className="flex flex-col w-full justify-center gap-2 mt-8   ">
-                            <h1 className="text-[27px] font-bold  ">{item.title1} <span className="text-secondary">{item.title2}</span></h1>
+                            <h2 className="text-[27px] font-bold  ">{item.title1} <span className="text-secondary">{item.title2}</span></h2>
                             <div className='w-14 h-0.75 bg-primary items-center  ' />
                             <p className=" flex w-full text-lg text-secondary-text font-medium  ">{item.paragraph1}</p>
                             <ul className="grid gap-2">
@@ -36,7 +44,7 @@ const SilHouse = () => {
                 ))}
 
                 <div className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
-                    <h1 className="text-3xl font-bold  ">Get Started with Our Exceptional SIL Assistance!</h1>
+                    <h2 className="text-3xl font-bold  ">Get Started with Our Exceptional SIL Assistance!</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" flex  text-lg text-secondary-text font-medium text-center ">
                         Get in touch with us now to opt for our exceptional SIL assistance and get started attaining independence and cheerfulness in life.

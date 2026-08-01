@@ -27,7 +27,7 @@ const Compassion = () => {
                     {/* images section end */}
                     <div className="flex flex-col w-full justify-center gap-10     ">
                         <motion.div initial="hidden" whileInView={"show"} variants={fadeIn("left", 0.3)} viewport={{once:false,amount:0.3}} className="grid gap-4">
-                            <h1 className="text-[32px] font-bold  ">Compassion in Action<span className="text-secondary"> For Non NDIS Participants</span></h1>
+                            <h2 className="text-[32px] font-bold  ">Compassion in Action<span className="text-secondary"> For Non NDIS Participants</span></h2>
                             <div className='w-14 h-0.75 bg-primary items-center  ' />
                         </motion.div>
                         <motion.p initial="hidden" whileInView={"show"} variants={fadeIn("left", 0.3)} viewport={{once:false,amount:0.3}} className="  w-full text-lg text-secondary-text font-medium  ">At Health U, we believe that no one should feel left behind when they face short-term challenges in daily life.

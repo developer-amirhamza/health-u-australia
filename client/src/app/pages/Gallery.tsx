@@ -24,6 +24,11 @@ const Gallery = () => {
                 className="">
                     <Title title1='SIL Gallery – ' title2='Health U Australia' className={`place-content-center place-items-center `} />
                 </motion.div>
+                <p className="text-secondary-text text-lg font-medium max-w-3xl text-center mb-8">
+                    Take a look inside our Supported Independent Living (SIL) properties and community events across Sydney.
+                    These photos showcase the accessible homes, shared living spaces and wellness activities that help our
+                    NDIS participants live independently and stay connected with their community.
+                </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 lg:grid-cols-4  place-content-around  w-full ">
                     {gallery_images.map((img, index) => (
@@ -45,7 +50,7 @@ const Gallery = () => {
                         }}
                         viewport={{once:false,amount:0.2}} custom={index}
                          key={index} onClick={() => { setIsOpen(!isOpen); setCurrentId(index) }} className="relative h-full w-full group ">
-                            <Image src={img} alt={`sil property` + index} className='object-cover  relative rounded-md max-h-72 min-h-56  w-full h-full' />
+                            <Image src={img} alt={`Health U Australia SIL property photo ${index + 1}`} className='object-cover  relative rounded-md max-h-72 min-h-56  w-full h-full' />
                             <div className="absolute bg-black/70 flex items-center transition-all duration-700 justify-center hover:opacity-100 opacity-0 top-0 rounded-md cursor-pointer h-full w-full border-8 border-transparent ">
                                 <div className="bg-black h-12 w-12 group-hover:opacity-100 opacity-0 transition-all duration-700 flex items-center justify-center rounded-full ">
                                     <FaPlus className='bg-white p-0.5 rounded-full text-xl m-0 ' />

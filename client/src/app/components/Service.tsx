@@ -45,8 +45,8 @@ const Service = () => {
           }
         }}
         >
-        <h1 className=" text-4xl w-full text-center  text-primary font-bold ">Our Services</h1>
-        <h1 className="text-4xl w-full  text-center text-black font-bold uppercase ">Comprehensive Disability Care Services</h1>
+        <p className=" text-4xl w-full text-center  text-primary font-bold ">Our Services</p>
+        <h2 className="text-4xl w-full  text-center text-black font-bold uppercase ">Comprehensive Disability Care Services</h2>
         </motion.div>
         <motion.div className="flex w-full h-full min-h-110 relative justify-center mx-auto  items-center"
         initial={{
@@ -104,7 +104,7 @@ const Service = () => {
              bg-white ">
                 <Image src={item.image} alt={item.title}
                   className=' flex w-full h-full max-h-64 object-scale-cover absolute top-0 rounded-t-3xl rounded-b-full ' />
-                <h1 className="absolute top-70 p-3 w-full flex text-center justify-center text-xl font-bold items-center">{item.title}</h1>
+                <h3 className="absolute top-70 p-3 w-full flex text-center justify-center text-xl font-bold items-center">{item.title}</h3>
                 <Link href={item.path} className=" py-3 px-5 hover:bg-secondary z-50 cursor-pointer transition-colors duration-300 rounded-full
               absolute -bottom-6 font-bold text-base uppercase bg-primary text-white  items-center justify-self-center  flex ">
                   View Details
