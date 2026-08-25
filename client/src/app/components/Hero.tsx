@@ -5,8 +5,7 @@ import Link from "next/link"
 
 const Hero = () => {
     return (
-        <div className="flex w-full mx-auto items-center  justify-center relative sm:min-h-screen h-full "
-        >
+        <div className="flex w-full mx-auto items-center  justify-center relative sm:min-h-screen h-full ">
             <Image src={banner1} alt="Hero Image" layout="fill" objectFit="cover "  className="absolute   inset-0 z-0" />
             <div className="container mx-auto z-10  flex flex-col sm:flex-row ">
                 <div className="w-full  flex flex-col flex-1 lg:justify-start justify-center rounded-lg  bg-secondary-light/20  p-10 gap-10 h-full">
