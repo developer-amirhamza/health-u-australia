@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && prisma generate",
     "start": "node dist/index.js",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
@@ -23,8 +23,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
-    "typescript": "^7.0.2"
+    "typescript": "^5.7.3"
   }
 }
