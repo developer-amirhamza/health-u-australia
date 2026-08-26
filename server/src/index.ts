@@ -1,15 +1,15 @@
-import express from "express"
+import app from "./app"
 import dotenv from "dotenv"
 
 dotenv.config()
-const app = express();
+
 
 
 
 const PORT = Number(process.env.PORT) || 5000;
 
 
-app.use(express.json());
+
 app.get("/", (req,res)=>{
     res.send("<center> <h1>Welcome to Health U Australia</h1> </center>")
 })
