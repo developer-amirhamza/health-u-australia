@@ -7,13 +7,13 @@
     "build": "tsc && prisma generate",
     "start": "node dist/index.js",
     "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts"
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@prisma/client": "^7.10.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/helmet": "^0.0.48",
@@ -34,6 +34,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.10.0"
+    "@prisma/adapter-pg": "^7.10.0",
+    "init": "^0.1.2"
   }
 }
