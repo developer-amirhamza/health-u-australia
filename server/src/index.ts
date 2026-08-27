@@ -1,5 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
+import { prisma } from "./lib/prisma";
 
 dotenv.config()
 const app = express();
@@ -18,3 +19,10 @@ app.get("/", (req,res)=>{
 app.listen(PORT, '0.0.0.0',()=>{
     console.log(`The server is running at http://0.0.0.0:${PORT}`)
 })
+
+
+async function main() {
+ console.log("Database successfully connected!")
+}
+
+main().finally(() => prisma.$disconnect());
