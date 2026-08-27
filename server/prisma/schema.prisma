@@ -1,0 +1,29 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()"))
+  email                  String              @unique
+  password               String
+  verify_email           Boolean?            @default(false)
+  status                 String?             @default("ACTIVE")
+  avatar                 String?
+  mobile                 String?
+  last_login_date        DateTime?           @db.Timestamp(6)
+  refresh_token          String?
+  forgot_password_otp    String?
+  forgot_password_expire DateTime?           @db.Timestamp(6)
+  createdAt              DateTime?           @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime?           @default(now()) @db.Timestamp(6)
+  role                   String?             @default("USER")
+  firstName              String?
+  lastName               String?
+}
