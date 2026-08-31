@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2020",                // Use modern JavaScript features
-    "module": "commonjs",               // Node.js uses CommonJS
+                                    // Use modern JavaScript features
+                                  // Node.js uses CommonJS
     "outDir": "./dist",                 // Output folder for compiled JS
     "rootDir": "./src",                 // Source folder for TypeScript files
     "strict": true,                      // Enable strict type checking
@@ -10,7 +10,10 @@
     "forceConsistentCasingInFileNames": true,
     "allowArbitraryExtensions": true,
     "allowImportingTsExtensions":null,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
   },
   "include": ["src/**/*.ts"],                // Files to compile
   "exclude": ["node_modules"]             // Exclude dependencies
