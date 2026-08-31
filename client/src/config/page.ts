@@ -89,6 +89,22 @@ export const gallery_images = [
 export const cooking_gallery = [
     cooking1, cooking10, cooking11, cooking2, cooking3, cooking4, cooking5, cooking6, cooking7, cooking8, cooking9,
 ]
+
+import cooking_class_event from "assets/images/events/cooking class.png";
+
+export const upcoming_events = [
+    {
+        id: "cooking-class",
+        image: cooking_class_event,
+        title: "Health U Australia – Cooking Class",
+        date: "Every Wednesday",
+        time: "1:00 PM – 3:00 PM",
+        location: "SIL Bowden Street, Ryde NSW 2112",
+        audience: ["NDIS Participants", "Carers & Families"],
+        description: "Healthy eating starts with confidence in the kitchen. Join our cooking class to learn simple, nutritious recipes that bring joy back to mealtimes.",
+        path: "/current-events/",
+    },
+]
 import bed from "assets/images/2026/10/icon.png"
 import bathroom from "assets/images/2026/10/icon2.png"
 import car from "assets/images/2026/10/icon4.png"

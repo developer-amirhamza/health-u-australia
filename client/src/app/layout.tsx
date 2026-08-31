@@ -11,10 +11,12 @@ const availableLanguages: LanguageOption[] = [
   { value: "en|en", label: "English" },
   { value: "en|zh-CN", label: "中文 (Mandarin)" },
   { value: "en|yue", label: "廣東話 (Cantonese)" },
+  { value: "en|fr", label: "Français" },
   { value: "en|hi", label: "हिंदी" },
   { value: "en|bn", label: "বাংলা" },
   { value: "en|gu", label: "ગુજરાતી" },
   { value: "en|kn", label: "ಕನ್ನಡ" },
+  { value: "en|ko", label: "한국어" },
   { value: "en|ml", label: "മലയാളം" },
   { value: "en|mr", label: "मराठी" },
   { value: "en|or", label: "ଓଡିଆ" },
@@ -23,6 +25,7 @@ const availableLanguages: LanguageOption[] = [
   { value: "en|ta", label: "தமிழ்" },
   { value: "en|te", label: "తెలుగు" },
   { value: "en|ur", label: "اردو" },
+  { value: "en|vi", label: "Tiếng Việt" },
 ];
 
 export const metadata = {

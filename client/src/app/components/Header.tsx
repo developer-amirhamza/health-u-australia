@@ -7,7 +7,7 @@ import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 import Nav from 'app/utils/Nav';
-import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
+import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import LanguageSelector from './LanguageSelector';
 
@@ -43,10 +43,14 @@ const Header = () => {
         <div className="container w-full  hidden   sm:flex items-center justify-between text-white  ">
           {/* contact list */}
           <div className="flex w-full items-center justify-start h-full gap-2">
-            <div className="grid w-full text-sm font-semibold">
-              <a href="mailto:info@healthuau.com">info@healthuau.com</a>
-              <div className="flex items-center gap-0.5  ">
-                <a href="tel:+0481 707 758">0481 707 758 </a> /
+            <div className="grid w-full text-sm font-semibold gap-1">
+              <a href="mailto:info@healthuau.com" className="flex items-center gap-1.5">
+                <FaEnvelope size={14} />
+                info@healthuau.com
+              </a>
+              <div className="flex items-center gap-1.5">
+                <FaPhoneAlt size={13} />
+                <a href="tel:+0481 707 758">0481 707 758</a> /
                 <a href="tel:+0481 707 758">0431 377 132</a>
               </div>
             </div>
