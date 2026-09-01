@@ -1,5 +1,5 @@
 import express from "express";
-import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, verifyEmail } from "../controllers/user.controllers";
+import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, verifyEmail } from "../controllers/user.controllers.js";
 
 
 
