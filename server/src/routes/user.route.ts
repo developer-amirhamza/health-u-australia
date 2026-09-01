@@ -1,5 +1,6 @@
 import express from "express";
-import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, verifyEmail } from "../controllers/user.controllers.js";
+import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, uploadAvatar, verifyEmail } from "../controllers/user.controllers.js";
+import { uploadAvatarImage } from "../middlewares/upload.js";
 
 
 
@@ -18,6 +19,7 @@ router.post("/reset-password", resetPassword);
 router.get("/get-user-details", GetUserDetails);
 router.put("/update-user", updateUserDetails);
 router.put("/change-password", changePassword);
+router.post("/upload-avatar", uploadAvatarImage, uploadAvatar);
 
 // Admin only
 router.get("/all-users",  getAllUsers);

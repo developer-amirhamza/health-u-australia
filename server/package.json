@@ -23,6 +23,7 @@
     "@types/helmet": "^0.0.48",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.2.0",
     "@types/node": "^26.3.0",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.23.1",
@@ -47,6 +48,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
     "init": "^0.1.2",
+    "multer": "^2.3.0",
     "resend": "^6.25.0"
   }
 }

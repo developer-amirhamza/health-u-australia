@@ -19,7 +19,6 @@ import dotenv from "dotenv";
 dotenv.config()
 interface AuthRequest extends Request {
     userId?: string;
-    file?: any;
 }
 
 const SignUp = async (req: Request, res: Response) => {
