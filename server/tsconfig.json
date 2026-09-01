@@ -11,8 +11,8 @@
     "allowArbitraryExtensions": true,
     "allowImportingTsExtensions":null,
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "target": "ES2023",
   },
   "include": ["src/**/*.ts"],                // Files to compile
