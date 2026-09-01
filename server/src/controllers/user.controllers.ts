@@ -14,12 +14,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { uploadImageCloudinary } from "../config/cloudinary.js";
 import { primaryClientUrl } from "../config/clientUrl.js";
 import dotenv from "dotenv";
+import type { AuthRequest } from "../middlewares/auth.js";
 
 
 dotenv.config()
-interface AuthRequest extends Request {
-    userId?: string;
-}
 
 const SignUp = async (req: Request, res: Response) => {
     try {
