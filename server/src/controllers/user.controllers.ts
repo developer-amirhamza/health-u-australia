@@ -2,24 +2,22 @@
 import { Response, Request } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { errorHandler } from "../utils/errorHandler";
-import { sendEmail } from "../config/sendEmail";
-import { prisma } from "../lib/prisma";
-import generateRefreshToken from "../utils/refreshToken";
-import generateAccessToken from "../utils/accessToken";
-import verifyEmailTemplate from "../utils/verifyEmailTemplate";
-import forgotPasswordTemplate from "../utils/forgotPasswordTemplate";
+import { errorHandler } from "../utils/errorHandler.js";
+import { sendEmail } from "../config/sendEmail.js";
+import { prisma } from "../lib/prisma.js";
+import generateRefreshToken from "../utils/refreshToken.js";
+import generateAccessToken from "../utils/accessToken.js";
+import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
+import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
-import { uploadImageCloudinary } from "../config/cloudinary";
-import { primaryClientUrl } from "../config/clientUrl";
+import { uploadImageCloudinary } from "../config/cloudinary.js";
+import { primaryClientUrl } from "../config/clientUrl.js";
 import dotenv from "dotenv";
+import type { AuthRequest } from "../middlewares/auth.js";
 
 
 dotenv.config()
-interface AuthRequest extends Request {
-    userId?: string;
-}
 
 const SignUp = async (req: Request, res: Response) => {
     try {
@@ -136,7 +134,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
                 sendTo: email,
                 subject: "Reset your Health U Shop password",
                 html: forgotPasswordTemplate({ firstName: user.firstName || "there", otp }),
-            }).catch((err) => console.error("Forgot-password email failed:", err.message));
+            }).catch((err: Error) => console.error("Forgot-password email failed:", err.message));
         }
 
         res.status(200).json({

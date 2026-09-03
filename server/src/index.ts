@@ -1,6 +1,7 @@
-import app from "./app"
+import app from "./app.js"
 import dotenv from "dotenv"
-import { prisma } from "./lib/prisma";
+import type { Request, Response } from "express"
+import { prisma } from "./lib/prisma.js";
 
 dotenv.config()
 
@@ -11,7 +12,7 @@ const PORT = Number(process.env.PORT) || 5000;
 
 
 
-app.get("/", (req,res)=>{
+app.get("/", (req: Request, res: Response)=>{
     res.send("<center> <h1>Welcome to Health U Australia</h1> </center>")
 })
 
