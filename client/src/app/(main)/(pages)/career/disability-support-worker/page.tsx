@@ -1,5 +1,5 @@
 "use client"
-import Title from 'app/utils/Title'
+import Title from 'utils/Title'
 import Link from 'next/link'
 import React from 'react'
 import { FaArrowRightLong } from 'react-icons/fa6'

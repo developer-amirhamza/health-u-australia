@@ -1,13 +1,13 @@
 "use client"
 
 import React from 'react'
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 import { motion } from 'framer-motion';
 import { TiTick } from 'react-icons/ti';
 import Link from 'next/link';
 import { ndis_items } from 'config/page';
-import Title from 'app/utils/Title';
+import Title from 'utils/Title';
 import { fadeIn } from 'app/variants';
 
 

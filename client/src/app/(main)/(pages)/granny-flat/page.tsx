@@ -11,7 +11,7 @@ import bathroom from "assets/images/sil-images/sil_icons/icon2.png"
 import car from "assets/images/sil-images/sil_icons/icon4.png"
 import wheelchair from "assets/images/sil-houses/wheelchiar.png"
 import map from "assets/images/sil-images/54A _belmore_street.png"
-import Title from 'app/utils/Title'
+import Title from 'utils/Title'
 import { fadeIn } from 'app/variants';
 import SlideModal from 'app/components/SlideModal'
 import SlideModalForGranny from 'app/components/SlideModalForGranny'
@@ -27,8 +27,8 @@ export const propertyData = {
 };
 const page = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
-const [isOpen, setIsOpen] = useState(false);
-    const [currentId, setCurrentId] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentId, setCurrentId] = useState(0);
 
   useEffect(() => {
     if (granny_flat.length === 0) return;
@@ -37,11 +37,11 @@ const [isOpen, setIsOpen] = useState(false);
     }, 5000);
     return () => { clearInterval(timer) }
   }, [])
-   const handleNextBtn = ()=>{
-    setCurrentSlide((prevSlide)=> (prevSlide +1) % granny_flat?.length);
+  const handleNextBtn = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % granny_flat?.length);
   }
-  const handlePrevBtn = ()=>{
-    setCurrentSlide((prevSlide)=> (prevSlide - 1 + granny_flat?.length) % granny_flat?.length)
+  const handlePrevBtn = () => {
+    setCurrentSlide((prevSlide) => (prevSlide - 1 + granny_flat?.length) % granny_flat?.length)
   }
   return (
     <div className="flex flex-col w-full h-full  ">
@@ -127,8 +127,8 @@ const [isOpen, setIsOpen] = useState(false);
           <div className="flex  justify-center items-center gap-2 p-4 border rounded-lg">
             <Image src={bathroom} alt='icon' />
             <div className="">
-               <p className="text-xl font-bold">{propertyData.baths}</p>
-            <p>Bathrooms</p>
+              <p className="text-xl font-bold">{propertyData.baths}</p>
+              <p>Bathrooms</p>
             </div>
           </div>
 
@@ -136,7 +136,7 @@ const [isOpen, setIsOpen] = useState(false);
             <Image src={car} alt='icon' />
             <div className="">
               <p className="text-xl font-bold">{propertyData.parking}</p>
-            <p>Parking</p>
+              <p>Parking</p>
             </div>
           </div>
 
@@ -150,24 +150,24 @@ const [isOpen, setIsOpen] = useState(false);
         </div>
       </section>
 
-                          {/* GOOGLE MAP */}
-                  <section className="py-8 px-6 bg-gray-50">
-                    <div className="max-w-6xl mx-auto w-full">
-                     <Title title1='Location' title2=' Map' className={`place-items-center mb-6`} />
-                    <div className="w-full h-full flex items-center justify-center  border-5 border-secondary rounded   ">
-                    <iframe
-                        className="flex h-full w-full min-h-125 rounded"
-                        src="https://www.google.com/maps/d/u/0/embed?mid=1N9H2TXxIvhNbeF-O6TrNAZZ8g_wM_D8&ehbc=2E312F&noprof=1"
-                        width={640}
-                        height={480}
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
-                </div>
-                    </div>
-                  </section>
+      {/* GOOGLE MAP */}
+      <section className="py-8 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto w-full">
+          <Title title1='Location' title2=' Map' className={`place-items-center mb-6`} />
+          <div className="w-full h-full flex items-center justify-center  border-5 border-secondary rounded   ">
+            <iframe
+              className="flex h-full w-full min-h-125 rounded"
+              src="https://www.google.com/maps/d/u/0/embed?mid=1N9H2TXxIvhNbeF-O6TrNAZZ8g_wM_D8&ehbc=2E312F&noprof=1"
+              width={640}
+              height={480}
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Location */}
       <section className="max-w-6xl mx-auto px-6  items-start py-12">
@@ -189,25 +189,25 @@ const [isOpen, setIsOpen] = useState(false);
       </section>
 
       <div className="grid w-full my-4 gap-10 place-content-center container">
-                          <motion.div initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} variants={fadeIn("up",0.5)} className="flex w-full h-full">
-                              <Title title1='SIL House' title2='Gallery' className={`place-items-center`} />
-                          </motion.div>
-                          <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8    place-content-around ">
-                              {granny_flat.map((item, index) => (
-                                  <motion.div  key={index} onClick={() => { setIsOpen(!isOpen); setCurrentId(index) }}
-                                  variants={fadeIn("up",index * 0.3)} initial={"hidden"} whileInView={"show"}
-                                  className="w-full h-full relative group">
-                                      <Image src={item.image} alt='Health_U_australia' className='object-cover relative w-full h-full max-h-72  ' />
-                                      <div className="absolute bg-black/70 flex items-center transition-all duration-700 justify-center hover:opacity-100 opacity-0 top-0 rounded-md cursor-pointer h-full w-full border-8 border-transparent ">
-                                          <div className="bg-black h-12 w-12 group-hover:opacity-100 opacity-0 transition-all duration-700 flex items-center justify-center rounded-full ">
-                                              <FaPlus className='bg-white p-0.5 rounded-full text-xl m-0 ' />
-                                          </div>
-                                      </div>
-                                  </motion.div>
-                              ))}
-                          </div>
-                      </div>
-                      {isOpen && <SlideModalForGranny close={() => setIsOpen(false)} currentId={currentId} />}
+        <motion.div initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }} variants={fadeIn("up", 0.5)} className="flex w-full h-full">
+          <Title title1='SIL House' title2='Gallery' className={`place-items-center`} />
+        </motion.div>
+        <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8    place-content-around ">
+          {granny_flat.map((item, index) => (
+            <motion.div key={index} onClick={() => { setIsOpen(!isOpen); setCurrentId(index) }}
+              variants={fadeIn("up", index * 0.3)} initial={"hidden"} whileInView={"show"}
+              className="w-full h-full relative group">
+              <Image src={item.image} alt='Health_U_australia' className='object-cover relative w-full h-full max-h-72  ' />
+              <div className="absolute bg-black/70 flex items-center transition-all duration-700 justify-center hover:opacity-100 opacity-0 top-0 rounded-md cursor-pointer h-full w-full border-8 border-transparent ">
+                <div className="bg-black h-12 w-12 group-hover:opacity-100 opacity-0 transition-all duration-700 flex items-center justify-center rounded-full ">
+                  <FaPlus className='bg-white p-0.5 rounded-full text-xl m-0 ' />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      {isOpen && <SlideModalForGranny close={() => setIsOpen(false)} currentId={currentId} />}
 
 
 

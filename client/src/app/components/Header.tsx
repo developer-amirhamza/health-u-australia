@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
-import Nav from 'app/utils/Nav';
+import Nav from 'utils/Nav';
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { li } from 'framer-motion/client';
@@ -93,10 +93,10 @@ const Header = () => {
                 <Nav path={item?.path} label={item?.label} />
                 {item?.options &&
                   <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
-                    {item?.options.map((itm, idx)=>(
+                    {item?.options.map((itm, idx) => (
                       <Link href={itm.path} key={idx}
-                      className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
-                        <span  className='w-full flex font-medium'>{itm?.label}</span>
+                        className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
+                        <span className='w-full flex font-medium'>{itm?.label}</span>
                       </Link>
                     ))}
                   </ul>

@@ -1,9 +1,9 @@
 "use client"
 
 import { useForm, ValidationError } from '@formspree/react'
-import { errorAlert, successAlert } from 'app/utils/alart'
-import PageBanner from 'app/utils/PageBanner'
-import Title from 'app/utils/Title'
+import { errorAlert, successAlert } from 'utils/alart'
+import PageBanner from 'utils/PageBanner'
+import Title from 'utils/Title'
 import { nav_items } from 'config/page'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
