@@ -13,13 +13,14 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/redux/store";
-import Axios from "@/utils/Axios";
-import AxiosToastError from "@/utils/AxiosToastError";
-import { setLogout } from "@/redux/slices/userSlices";
-import AdminPermission from "./AdminPermission";
-import { SummeryApi } from "@/app/common/SummeryApi";
+
 import { TbHomeMove } from "react-icons/tb";
+import { RootState } from "app/redux/store";
+import Axios from "utils/Axios";
+import { SummeryApi } from "app/common/SummeryApi";
+import { setLogout } from "app/redux/slices/userSlices";
+import AxiosToastError from "utils/AxiosToastError";
+import AdminPermission from "./AdminPermission";
 interface Props {
     sidebar: any;
 }
@@ -123,7 +124,7 @@ const AdminHeader: React.FC<Props> = ({ sidebar }) => {
                     >
                         Settings
                     </li>
-                    <AdminPermission>
+                    <AdminPermission >
                         <li
                             onClick={() => {
                                 router.push(`/all-users`), setIsActive(false);

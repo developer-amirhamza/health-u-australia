@@ -10,9 +10,13 @@ const app = express();
 
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(cors({ origin: clientOrigins, credentials: true }));
+app.use(cors({
+    credentials:true,
+    origin:clientOrigins,
+}));
 app.use(express.json());
 app.use(cookieParser());
+
 
 app.use("/api/user/", userRouter);
 
