@@ -64,7 +64,7 @@ const SignIn = () => {
                 router.push(`/verify-email?email=${encodeURIComponent(unverifiedEmail)}`);
                 return;
             }
-            AxiosToastError(error);
+            AxiosToastError("error");
         } finally {
             setLoading(false)
         }
@@ -105,7 +105,7 @@ const SignIn = () => {
                             </div>
                         </div>
                         <input disabled={!validInput} type="submit" value={loading ? "Processing.." : "Login"}
-                            className={`${validInput ? "bg-secondary-hover text-white cursor-pointer hover:bg-secondary" : "bg-primary-hover   cursor-not-allowed"}  p-2 text-secondary
+                            className={`${validInput ? " text-white cursor-pointer bg-secondary" : "bg-amber-200  cursor-not-allowed"}  p-2 text-secondary
                                   text-xl font-semibold rounded   `} />
                         <div className="flex justify-between w-full px-1">
                             <h1 className="text-slate-600 font-medium">Don't have an account?</h1>

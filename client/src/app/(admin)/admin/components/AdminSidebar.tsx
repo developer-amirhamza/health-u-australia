@@ -31,7 +31,7 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
             <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10">
                 <img
                     className="w-10 h-10 rounded-full object-cover shrink-0"
-                    src={user?.avatar || `https://themewagon.github.io/pluto/images/layout_img/user_img.jpg`}
+                    src={user?.avatar || `https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=`}
                     alt=""
                 />
                 <div className={`${activeSidebar ? "flex flex-col" : "hidden"} min-w-0`}>
