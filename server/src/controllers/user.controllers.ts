@@ -271,11 +271,12 @@ const SignIn = async (req: Request, res: Response) => {
         }
         res.cookie("accessToken",accessToken,cookiesOption);
         res.cookie("refreshToken",refreshToken,cookiesOption);
+        const { password: _password, refresh_token: _refreshToken, ...safeUser } = user;
         res.status(200).json({
             success: true,
             error: false,
             message: "User signed in successfully",
-            data:{accessToken,refreshToken,user}
+            data:{accessToken,refreshToken,user:safeUser}
         });
     } catch (error: any) {
         res.status(500).json({
@@ -293,12 +294,12 @@ export const refreshToken = async (req:AuthRequest, res:Response)=>{
         const refreshToken = req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
         if(!refreshToken) return errorHandler(res,401,"No refresh token provided",true);
 
-        const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN as string) as {_id:string};
+        const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN as string) as {id:string};
         if(!decoded){
             return errorHandler(res,401,"Invalid or expired refresh token");
         };
 
-        const userId = decoded._id;
+        const userId = decoded.id;
         const newAccessToken = await generateAccessToken(userId);
 
         const cookiesOption:any = {
@@ -307,6 +308,12 @@ export const refreshToken = async (req:AuthRequest, res:Response)=>{
             sameSite: "None" as const,
         };
         res.cookie("accessToken", newAccessToken, cookiesOption)
+        res.status(200).json({
+            success: true,
+            error: false,
+            message: "Access token refreshed successfully",
+            data: { accessToken: newAccessToken },
+        });
     } catch (error:any) {
         errorHandler(res,500,error.message || "Internal server error!",true);
     }
@@ -321,11 +328,11 @@ const SignOut = async (req: AuthRequest, res: Response) => {
         const cookiesOption = {
             httpOnly:true,
             secure:true,
-            sameSite:"None",
+            sameSite:"none" as const,
         };
 
-        res.cookie("accessToken", cookiesOption);
-        res.cookie("refreshToken", cookiesOption);
+        res.clearCookie("accessToken", cookiesOption);
+        res.clearCookie("refreshToken", cookiesOption);
 
         await prisma.user.update({
             where:{id:userId},
@@ -435,12 +442,12 @@ export const uploadAvatar = async (req:AuthRequest,res:Response)=>{
         const userId:any = req.userId;
         const image:any = req.file;
         if(!userId){
-            errorHandler(res,404,"Unauthorized User",true);
+            return errorHandler(res,404,"Unauthorized User",true);
         };
 
         const upload:any = await uploadImageCloudinary(image);
         if(!upload?.url){
-            errorHandler(res,404,"Image uploading failed!",true);
+            return errorHandler(res,404,"Image uploading failed!",true);
         }
 
         const updateUser = await prisma.user.update({
