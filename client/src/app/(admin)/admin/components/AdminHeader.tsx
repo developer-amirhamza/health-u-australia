@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { IoMenuSharp } from "react-icons/io5";
-import Logo from "@/assets/header-logosr.png";
 import { TbLogout } from "react-icons/tb";
 import { FaRegBell, FaRegEnvelope } from "react-icons/fa";
 import { BsQuestionCircleFill } from "react-icons/bs";
@@ -11,12 +10,11 @@ import { useSelector } from "react-redux";
 
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/redux/store";
+import { RootState } from "@/app/redux/store";
 import Axios from "@/utils/Axios";
 import AxiosToastError from "@/utils/AxiosToastError";
-import { setLogout } from "@/redux/slices/userSlices";
+import { setLogout } from "@/app/redux/slices/userSlices";
 import AdminPermission from "./AdminPermission";
 import { SummeryApi } from "@/app/common/SummeryApi";
 import { TbHomeMove } from "react-icons/tb";
@@ -56,8 +54,6 @@ const AdminHeader: React.FC<Props> = ({ sidebar }) => {
                 <IoMenuSharp className="text-2xl" />
             </button>
             <div className="flex w-full h-full items-center justify-between px-4">
-                {/* <Image className="max-h-10 object-scale-down max-w-fit" src={Logo} alt="" /> */}
-
                 <button
                 onClick={()=> router.push("/")}
                 className="cursor-pointer min-h-full p-4 flex text-[#c9b89a] hover:bg-white/10 transition-colors"
