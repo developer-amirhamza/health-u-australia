@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 import { TiTick } from 'react-icons/ti';
 import Link from 'next/link';
@@ -15,12 +15,12 @@ const SupportCoordination = () => {
             <div className="container px-5 flex gap-8 flex-col items-center mx-auto justify-center w-full h-full ">
                 {support_coordination.map((item, index) => (
                     <div key={index} className={`flex flex-col gap-x-10 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
-                        <motion.div variants={fadeIn([0,2,4].includes(index) ? "right":"left",0.2)} initial="hidden" whileInView={"show"}
-                        className="flex w-full h-full">
-                        <Image src={item.image} alt='about heath u australia' className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-center inset-0 items-start justify-start p-0 m-0 ' />
+                        <motion.div variants={fadeIn([0, 2, 4].includes(index) ? "right" : "left", 0.2)} initial="hidden" whileInView={"show"}
+                            className="flex w-full h-full">
+                            <Image src={item.image} alt='about heath u australia' className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-center inset-0 items-start justify-start p-0 m-0 ' />
                         </motion.div>
-                        <motion.div variants={fadeIn([0,2,4].includes(index) ? "left":"right",0.2)} initial="hidden" whileInView={"show"}
-                        className="flex flex-col w-full justify-center gap-2    ">
+                        <motion.div variants={fadeIn([0, 2, 4].includes(index) ? "left" : "right", 0.2)} initial="hidden" whileInView={"show"}
+                            className="flex flex-col w-full justify-center gap-2    ">
                             <h1 className="text-[27px] font-bold  ">{item.title1} <span className="text-secondary">{item.title2}</span></h1>
                             <div className='w-14 h-0.75 bg-primary items-center  ' />
                             <p className=" flex w-full text-lg text-secondary-text font-medium  ">{item?.paragraph1}</p>
@@ -41,7 +41,7 @@ const SupportCoordination = () => {
                 ))}
 
                 <motion.div variants={fadeIn("up", 0.2)} initial="hidden" whileInView={"show"}
-                className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
+                    className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
                     <h1 className="text-3xl font-bold  ">Reach Out to Us Today!</h1>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" text-lg text-secondary-text font-medium text-center ">

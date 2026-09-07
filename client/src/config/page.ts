@@ -1,3 +1,4 @@
+
 import {
     aryan, assist_self1, assist_self2, assist_self3, assist_transport1, assist_transport2, assist_transport3,
     assist_transport4, assist_transport5, brain, capacity1, capacity2, capacity3, community_participation1,
@@ -78,7 +79,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-import { MdDiversity2 } from "react-icons/md";
+import { MdDiversity2, MdOutlinePendingActions, MdTaskAlt } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -98,6 +99,41 @@ import empathy from "assets/images/infographic/empathy.png";
 import care from "assets/images/infographic/care.png";
 import innovation from "assets/images/infographic/innovation.png";
 import integrity from "assets/images/infographic/integrity.png";
+import { AiFillDashboard } from "react-icons/ai";
+import { FaUsersGear } from "react-icons/fa6";
+
+
+
+
+
+
+export const adminNavItems = [
+    {
+        label: "Dashboard",
+        path: "/admin",
+        icon: AiFillDashboard,
+    },
+    {
+        label: "Team Tasks",
+        icon: MdTaskAlt,
+        path: "/admin/tasks",
+    },
+    {
+        label: "Waitlist",
+        icon: MdOutlinePendingActions,
+        path: "/admin/waitlist",
+    },
+    {
+        label: "All Users",
+        icon: FaUsersGear,
+        path: "/admin/users"
+    },
+    {
+        label: "Applications",
+        icon: FaUsersGear,
+        path: "/admin/applications",
+    },
+]
 
 
 
