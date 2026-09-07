@@ -1,6 +1,6 @@
 "use client"
 
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 import React from 'react';
 
@@ -9,13 +9,13 @@ import about_icon1 from "assets/images/about/about-icon-img02.png"
 import { TiTick } from 'react-icons/ti';
 import Link from 'next/link';
 import { about } from 'config/page';
-import Title from 'app/utils/Title';
+import Title from 'utils/Title';
 import { motion } from 'framer-motion';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title:"NDIS Service Providers: Empowering Your Independence",
-  description:"Explore our range of NDIS service providers dedicated to empowering participants for a life of choice and autonomy.",
+  title: "NDIS Service Providers: Empowering Your Independence",
+  description: "Explore our range of NDIS service providers dedicated to empowering participants for a life of choice and autonomy.",
 };
 const AboutContent = () => {
   const { image, title1, title2, paragraph1 } = about[2];
@@ -45,7 +45,7 @@ const AboutContent = () => {
                 }}
               >
                 <Image src={item.image} alt='about heath u australia'
-                className='hover:scale-102 ease-in-out transition-all duration-500 rounded-md w-full h-full object-center inset-0 items-start justify-start p-0 m-0 ' />
+                  className='hover:scale-102 ease-in-out transition-all duration-500 rounded-md w-full h-full object-center inset-0 items-start justify-start p-0 m-0 ' />
               </motion.div>
               <motion.div className="flex flex-col w-full justify-center gap-2    "
                 initial={{

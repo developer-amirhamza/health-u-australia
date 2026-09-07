@@ -6,7 +6,7 @@ import { BsChatDotsFill } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoSend } from "react-icons/io5";
 import { faqEntries } from "../data/faq";
-import { matchFaq } from "../utils/faqMatcher";
+import { matchFaq } from "../../utils/faqMatcher";
 
 interface Message {
   role: "user" | "bot";
@@ -66,11 +66,10 @@ export default function FaqChatbot() {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-snug ${
-                  message.role === "user"
+                className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-snug ${message.role === "user"
                     ? "self-end bg-primary text-white"
                     : "self-start bg-white text-gray-800 border border-gray-200"
-                }`}
+                  }`}
               >
                 <p>{message.text}</p>
                 {message.link && (

@@ -1,4 +1,4 @@
-import { FaqEntry } from "../data/faq";
+import { FaqEntry } from "../app/data/faq";
 
 function normalize(text: string): string {
   return text.toLowerCase().replace(/[^\w\s]/g, " ").replace(/\s+/g, " ").trim();

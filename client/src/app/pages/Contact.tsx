@@ -1,10 +1,10 @@
 "use client"
 
 import { useForm, ValidationError } from '@formspree/react'
-import Button from 'app/utils/Button'
-import PageBanner from 'app/utils/PageBanner'
-import { errorAlert, successAlert } from 'app/utils/alart'
-import Title from 'app/utils/Title'
+import Button from 'utils/Button'
+import PageBanner from 'utils/PageBanner'
+import { errorAlert, successAlert } from 'utils/alart'
+import Title from 'utils/Title'
 import { contact_details } from 'config/page';
 import { LuPhoneCall } from 'react-icons/lu'
 import { MdOutlineMail } from 'react-icons/md'

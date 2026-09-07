@@ -1,12 +1,12 @@
 "use client"
 import React, { useState } from 'react'
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 
 import { TiTick } from 'react-icons/ti';
-import { sil_house, sil_house_details,  sil_houses } from 'config/page'
-import Button from 'app/utils/Button'
-import Title from 'app/utils/Title'
+import { sil_house, sil_house_details, sil_houses } from 'config/page'
+import Button from 'utils/Button'
+import Title from 'utils/Title'
 import SlideModal from 'app/components/SlideModal'
 import { motion } from 'framer-motion'
 import { fadeIn } from 'app/variants';
@@ -24,19 +24,19 @@ const SilHouse = () => {
                     <h1 className="text-primary text-4xl font-bold uppercase ">Our SIL House Properties </h1>
                     <div className="flex">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {sil_houses.map((item,index)=>(
+                            {sil_houses.map((item, index) => (
                                 <Link href={item.path} key={index} className="flex flex-col border-[0.5px] cursor-pointer hover:scale-105 duration-300 transition-all border-secondary-text overflow-hidden rounded shadow-2xl border-dotted  ">
-                                    <Image src={item.image} alt='sil-house' className=' '/>
+                                    <Image src={item.image} alt='sil-house' className=' ' />
                                     <div className="flex flex-col items-center p-4 justify-center">
                                         <div className="flex flex-col items-center justify-center gap-1 ">
                                             <h1 className="text-2xl font-semibold text-secondary-text"> {item.address} </h1>
-                                    {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
+                                            {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
                                         </div>
                                         <div className="flex items-center justify-center gap-3  w-full h-full">
-                                            {item.features.map((itm,idx)=>(
+                                            {item.features.map((itm, idx) => (
                                                 <div key={idx} className="flex flex-col justify-center items-center gap-2">
-                                                    <Image src={itm.icon} alt='icon'/>
-                                                <h3 className="text-sm text-center">{itm.label} </h3>
+                                                    <Image src={itm.icon} alt='icon' />
+                                                    <h3 className="text-sm text-center">{itm.label} </h3>
                                                 </div>
                                             ))}
                                         </div>
@@ -47,7 +47,7 @@ const SilHouse = () => {
                     </div>
                 </div>
                 <motion.div className="grid w-full my-10 gap-5"
-                variants={fadeIn("right",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} >
+                    variants={fadeIn("right", 0.5)} initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }} >
                     <Title title1='What’s' title2='nearby' />
                     <ul className="grid gap-2">
                         {sil_house_details[3].options?.map((itm: any, idx: number) => (
@@ -75,42 +75,42 @@ const SilHouse = () => {
                 {sil_house.map((item: any, index: number) => (
                     <div key={index} className={`flex flex-col my-10 gap-x-10 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-center items-start w-full`}>
                         <motion.div className="flex w-full h-full"
-                        initial={{
-                            opacity:0,
-                            x:[0,2,4].includes(index) ? 80 : -80,
-                            y:0,
-                        }}
-                        whileInView={{
-                            opacity:1,
-                            x:0,
-                            y:0,
-                            transition:{
-                                type:"tween",
-                                delay:0.3,
-                                duration:1,
-                                ease:[0.25,0.25,0.25,0.75]
-                            }
-                        }}
+                            initial={{
+                                opacity: 0,
+                                x: [0, 2, 4].includes(index) ? 80 : -80,
+                                y: 0,
+                            }}
+                            whileInView={{
+                                opacity: 1,
+                                x: 0,
+                                y: 0,
+                                transition: {
+                                    type: "tween",
+                                    delay: 0.3,
+                                    duration: 1,
+                                    ease: [0.25, 0.25, 0.25, 0.75]
+                                }
+                            }}
                         >
-                        <Image src={item.image} alt='about heath u australia' className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-contain inset-0 items-start justify-start p-0 m-0 ' />
+                            <Image src={item.image} alt='about heath u australia' className='hover:scale-102 ease-in-out transition-all duration-500  w-full h-full md:object-contain inset-0 items-start justify-start p-0 m-0 ' />
                         </motion.div>
                         <motion.div className="flex flex-col w-full justify-center gap-2 "
-                        initial={{
-                            opacity:0,
-                            x:[0,2,4].includes(index) ? -80 : 80,
-                            y:0,
-                        }}
-                        whileInView={{
-                            opacity:1,
-                            x:0,
-                            y:0,
-                            transition:{
-                                type:"tween",
-                                delay:0.3,
-                                duration:1,
-                                ease:[0.25,0.25,0.25,0.75]
-                            }
-                        }}
+                            initial={{
+                                opacity: 0,
+                                x: [0, 2, 4].includes(index) ? -80 : 80,
+                                y: 0,
+                            }}
+                            whileInView={{
+                                opacity: 1,
+                                x: 0,
+                                y: 0,
+                                transition: {
+                                    type: "tween",
+                                    delay: 0.3,
+                                    duration: 1,
+                                    ease: [0.25, 0.25, 0.25, 0.75]
+                                }
+                            }}
                         >
                             <Title title1={item.title1} title2={item.title2} />
                             <p className=" flex w-full text-lg text-secondary-text font-medium  ">{item.paragraph1}</p>
@@ -132,7 +132,7 @@ const SilHouse = () => {
 
                 {/* blogs footer ends */}
                 <motion.div className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10"
-                initial={"hidden"} whileInView={"show"} variants={fadeIn("up",0.5)}
+                    initial={"hidden"} whileInView={"show"} variants={fadeIn("up", 0.5)}
                 >
                     <h1 className="text-3xl font-bold  ">Get Started with Our Exceptional SIL Assistance!</h1>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
@@ -175,7 +175,7 @@ const SilHouse = () => {
                 </div> */}
 
                 <motion.div className="flex flex-col w-full justify-center gap-4 mt-8"
-                initial="hidden" whileInView={"show"} variants={fadeIn("up",0.5)} viewport={{once:false, amount:0.3}} >
+                    initial="hidden" whileInView={"show"} variants={fadeIn("up", 0.5)} viewport={{ once: false, amount: 0.3 }} >
                     <Title title1={sil_house_details[0].title1} title2={sil_house_details[0].title2} />
                     <p className=" flex w-full text-lg text-secondary-text font-medium  ">{sil_house_details[0].paragraph1}</p>
                     <p className=" flex w-full text-lg text-secondary-text font-medium  ">{sil_house_details[0].paragraph2}</p>
@@ -194,7 +194,7 @@ const SilHouse = () => {
                 </motion.div>
 
                 <div className="flex w-full items-start flex-col justify-start overflow-x-auto  ">
-                    <motion.div  className="flex w-full h-full" variants={fadeIn("right",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}} >
+                    <motion.div className="flex w-full h-full" variants={fadeIn("right", 0.5)} initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }} >
                         <Title title1='Property' title2='Features' />
                     </motion.div>
                     <table className='w-full rounded my-5 '>
@@ -212,10 +212,10 @@ const SilHouse = () => {
                 </div>
 
                 <div className="grid w-full my-10 gap-5">
-                    <motion.div className="flex w-full h-full" variants={fadeIn("right",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}}>
-                    <Title title1='Provider' title2='Details' />
+                    <motion.div className="flex w-full h-full" variants={fadeIn("right", 0.5)} initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }}>
+                        <Title title1='Provider' title2='Details' />
                     </motion.div>
-                    <motion.ul variants={fadeIn("down",0.4)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}}
+                    <motion.ul variants={fadeIn("down", 0.4)} initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }}
                         className="flex text-lg flex-wrap w-full items-center justify-between">
                         <li className="font-semibold text-xl">The building </li>
                         <li className="">SIL Provider:</li>
@@ -223,8 +223,8 @@ const SilHouse = () => {
                     </motion.ul>
                 </div>
 
-                <motion.div variants={fadeIn("left",0.5)} initial={"hidden"} whileInView={"show"} viewport={{once:false,amount:0.2}}
-                className="grid w-full my-10 gap-5">
+                <motion.div variants={fadeIn("left", 0.5)} initial={"hidden"} whileInView={"show"} viewport={{ once: false, amount: 0.2 }}
+                    className="grid w-full my-10 gap-5">
                     <Title title1='Application' title2='Criteria' />
                     <ul className="grid gap-2">
                         {sil_house_details[2].bullet_points?.map((itm: any, idx: number) => (
