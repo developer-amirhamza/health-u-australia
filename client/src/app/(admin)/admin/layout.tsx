@@ -1,13 +1,15 @@
 "use client"
 import React, { useEffect, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
+
+import { useDispatch, useSelector } from 'react-redux'
+
+import { useParams, useRouter } from 'next/navigation'
 import AdminSidebar from './components/AdminSidebar'
 import AdminHeader from './components/AdminHeader'
-import { Toaster } from 'react-hot-toast'
-import { fetchUser } from '@/redux/slices/userSlices'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/redux/store'
-import { useParams, useRouter } from 'next/navigation'
-import IsAdmin from '@/utils/IsAdmin'
+import IsAdmin from 'utils/IsAdmin'
+import { AppDispatch, RootState } from 'app/redux/store'
+import { fetchUser } from 'app/redux/slices/userSlices'
 
 const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
@@ -61,7 +63,7 @@ const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 <div
                     className={`w-full max-w-fit sticky h-screen overflow-y-auto no-scrollbar bg-[#1a1a18] z-50 flex`}
                 >
-                    <AdminSidebar activeSidebar={showSidebar} />
+                    <AdminSidebar   activeSidebar={showSidebar} />
                 </div>
                 <div className="w-full h-screen flex  flex-col">
                     <AdminHeader sidebar={() => setShowSidebar(!showSidebar)} />

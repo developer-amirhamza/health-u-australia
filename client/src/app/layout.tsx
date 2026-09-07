@@ -7,6 +7,7 @@ import "./styles/globals.css"
 import ScrollToTop from "utils/ScrollToTop";
 import { GoogleTranslateProvider, LanguageOption } from './components/GoogleTranslateProvider';
 import FloatingContact from "./components/FloatingContact";
+import { ReduxProvider } from "./redux/provider";
 
 const availableLanguages: LanguageOption[] = [
   { value: "en|en", label: "English" },
@@ -65,6 +66,7 @@ export default function RootLayout({
       </head>
       <body className="relative flex mx-auto px-0 flex-col min-h-screen w-full" suppressHydrationWarning>
         <GoogleTranslateProvider pageLanguage="en" availableLanguages={availableLanguages}>
+          <ReduxProvider>
           <Header />
           {children}
           <Footer />
@@ -72,6 +74,7 @@ export default function RootLayout({
           <ScrollToTopBtn />
           <FloatingContact />
           <FaqChatbot />
+          </ReduxProvider>
         </GoogleTranslateProvider>
       </body>
     </html>
