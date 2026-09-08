@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route.js";
 import { clientOrigins } from "./config/clientUrl.js";
+import scBillingRouter from "./routes/scBilling.route.js"
 
 
 const app = express();
@@ -25,7 +26,7 @@ app.use(helmet({
 
 
 app.use("/api/user/", userRouter);
-
+app.use("/api/sc-billing", scBillingRouter);
 
 
 

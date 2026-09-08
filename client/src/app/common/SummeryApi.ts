@@ -67,4 +67,14 @@ export const SummeryApi = {
         url: "/api/user/delete-user",
         method: "delete",
     },
+
+    // ── SC Billing Tracker (admin-only: support coordination plans + time log) ──
+    getScPlans: { url: "/api/sc-billing/plans", method: "get" },
+    createScPlan: { url: "/api/sc-billing/plans/create", method: "post" },
+    updateScPlan: { url: "/api/sc-billing/plans/update", method: "put" },
+    deleteScPlan: { url: "/api/sc-billing/plans/delete", method: "delete" },
+    getScEntries: { url: "/api/sc-billing/entries", method: "get" },
+    createScEntry: { url: "/api/sc-billing/entries/create", method: "post" },
+    updateScEntry: { url: "/api/sc-billing/entries/update", method: "put" },
+    deleteScEntry: { url: "/api/sc-billing/entries/delete", method: "delete" },
 };

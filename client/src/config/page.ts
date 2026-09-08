@@ -79,7 +79,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-import { MdDiversity2, MdOutlinePendingActions, MdTaskAlt } from "react-icons/md";
+import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -132,6 +132,11 @@ export const adminNavItems = [
         label: "Applications",
         icon: FaUsersGear,
         path: "/admin/applications",
+    },
+    {
+        label: "SC Billing",
+        icon: MdReceiptLong,
+        path: "/admin/sc-billing",
     },
 ]
 
