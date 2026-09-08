@@ -1,55 +1,60 @@
-import type { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { errorHandler } from "../utils/errorHandler.js";
-import { prisma } from "../lib/prisma.js";
+import dotenv from "dotenv"
+dotenv.config();
 
-export interface AuthRequest extends Request {
-    userId?: string;
+
+interface AuthRequest extends Request {
+  userId?: string;
 }
+export const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = req.cookies.accessToken || req?.headers?.authorization?.split(" ")[1];
 
-const getAccessToken = (req: Request): string | undefined => {
-    return req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
-};
-
-// Populates req.userId from a valid access token (cookie or `Authorization:
-// Bearer <token>`). Every "logged-in user" and "admin only" route needs this
-// first — none of them can trust req.userId without it.
-export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-    const token = getAccessToken(req);
-    if (!token) {
-        return errorHandler(res, 401, "Unauthorized: no access token provided", true);
+    // Validate token type
+    if (!token || typeof token !== 'string' || token.trim() === '') {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication token is missing or invalid"
+      });
     }
 
-    try {
+    // Verify secret exists
+    const secret = process.env.SECRET_KEY_ACCESS_TOKEN;
+
+
+    // Verify token
+    const decoded = await jwt.verify(token,process.env.SECRET_KEY_ACCESS_TOKEN as string) as {id:string};
+    req.userId = decoded.id;
+    next();
+  } catch (error: any) {
+    return res.status(401).json({
+      success: false,
+      message: error.message === 'jwt must be a string'
+        ? 'Invalid token format'
+        : 'Invalid or expired token'
+    });
+  }
+};
+
+// Optional auth: attaches req.userId when a valid token is present, but lets
+// the request through as a GUEST when the token is missing/invalid/expired.
+// Use on routes that must work for both signed-in users and guests (cart,
+// checkout, place-order) — the controllers already handle a missing userId
+// by falling back to the guest cart token / a supplied email.
+export const optionalAuth = async (req: AuthRequest, _res: Response, next: NextFunction) => {
+  try {
+    const token = req.cookies?.accessToken || req?.headers?.authorization?.split(" ")[1];
+    if (token && typeof token === "string" && token.trim() !== "") {
+      try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN as string) as { id: string };
         req.userId = decoded.id;
-        next();
-    } catch {
-        return errorHandler(res, 401, "Unauthorized: invalid or expired access token", true);
+      } catch {
+        // Invalid / expired token → treat as a guest, don't block the request.
+      }
     }
-};
-
-const ADMIN_ROLES = ["ADMIN", "OWNER"];
-
-// Must run after verifyToken. Checks the user's current role in the
-// database rather than trusting a role claim baked into the token, since
-// access tokens are only 1 day (accessToken.ts) but a role change (e.g. a
-// demotion via updateUserByAdmin) should take effect immediately, not after
-// the old token expires.
-export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try {
-        if (!req.userId) {
-            return errorHandler(res, 401, "Unauthorized", true);
-        }
-        const user = await prisma.user.findUnique({
-            where: { id: req.userId },
-            select: { role: true },
-        });
-        if (!user || !ADMIN_ROLES.includes(user.role || "")) {
-            return errorHandler(res, 403, "Forbidden: admin access required", true);
-        }
-        next();
-    } catch (error: any) {
-        errorHandler(res, 500, error.message || "Internal server error!", true);
-    }
+  } catch {
+    // Never fail the request from optional auth.
+  }
+  next();
 };
