@@ -77,4 +77,11 @@ export const SummeryApi = {
     createScEntry: { url: "/api/sc-billing/entries/create", method: "post" },
     updateScEntry: { url: "/api/sc-billing/entries/update", method: "put" },
     deleteScEntry: { url: "/api/sc-billing/entries/delete", method: "delete" },
+
+    // ── Service Agreement Tool (create: any signed-in staff member; the rest are admin-only) ──
+    getServiceAgreements: { url: "/api/service-agreements", method: "get" },
+    getServiceAgreementById: { url: "/api/service-agreements/single", method: "get" },
+    createServiceAgreement: { url: "/api/service-agreements/create", method: "post" },
+    updateServiceAgreement: { url: "/api/service-agreements/update", method: "put" },
+    deleteServiceAgreement: { url: "/api/service-agreements/delete", method: "delete" },
 };

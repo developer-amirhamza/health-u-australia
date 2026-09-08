@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 import { TiTick } from 'react-icons/ti';
 import Link from 'next/link';

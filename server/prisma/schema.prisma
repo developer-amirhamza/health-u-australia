@@ -24,6 +24,7 @@ model User {
   role                   String?             @default("USER")
   firstName              String?
   lastName               String?
+  serviceAgreements      ServiceAgreement[]
 }
 
 // A participant's support-coordination NDIS plan: budget, billing rates and
@@ -76,4 +77,91 @@ model ScTimeEntry {
 
   @@index([planId])
   @@index([date])
+}
+
+// A submitted NDIS Service Agreement & Consent Form from the Service
+// Agreement Tool (client/src/app/components/ServiceAgreementForm.tsx).
+// Field names mirror that form's FormValues 1:1 so the controller can pass
+// req.body straight through. `items` is the Schedule of Supports line-item
+// table — stored as JSON since it's only ever read/written as a whole
+// array with the agreement, never queried by individual item.
+model ServiceAgreement {
+  id String @id @default(dbgenerated("gen_random_uuid()"))
+
+  // Lifecycle: DRAFT (saved, not yet signed) -> SIGNED (both signatures
+  // present) -> ARCHIVED (superseded/cancelled). Set by the controller
+  // based on whether both signatures are present, not chosen by the client.
+  status String @default("DRAFT")
+
+  // Staff member who prepared/submitted this agreement, if signed in.
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  // 1. Parties
+  participantName    String
+  participantNdisNumber String
+  participantRepName String
+  agreementStartDate String
+  agreementEndDate   String
+
+  // 3 & 4. Schedule of supports / responsibilities
+  supportsProvided String[] @default([])
+  livesAlone       String   @default("")
+
+  // 6. Pricing and payments
+  managementType   String @default("")
+  planManagerName  String @default("")
+  planManagerEmail String @default("")
+
+  // 11. Cancellation policy
+  cancellationPolicyAcknowledged Boolean @default(false)
+
+  // Consent for service delivery
+  consentInfoConfidential Boolean @default(false)
+  consentChangeAnytime    Boolean @default(false)
+  consentMedication       String  @default("")
+  consentMoneyManagement  String  @default("")
+  consentPhotosService    String  @default("")
+  consentPhotosMedia      String  @default("")
+  consentPublishFeedback  String  @default("")
+
+  // 12. Contact details
+  contactAddress       String
+  contactPhone         String
+  contactEmail         String @default("")
+  hasAlternativeContact String @default("")
+  altRelationship      String[] @default([])
+  altContactName       String   @default("")
+  altContactNumber     String   @default("")
+  altContactEmail      String   @default("")
+
+  orgContactName    String @default("Health U Australia")
+  orgPhone          String @default("")
+  orgEmail          String @default("")
+  orgPostalAddress  String @default("")
+
+  // 13. Schedule of supports / quote
+  quoteNumber    String  @default("")
+  quoteDate      String  @default("")
+  planStartDate  String  @default("")
+  planEndDate    String  @default("")
+  preparedBy     String  @default("")
+  contactPerson  String  @default("")
+  applyGst       Boolean @default(false)
+  items          Json    @default("[]")
+
+  // 14. Signatures
+  agreementExplained      Boolean @default(false)
+  participantSignature     String  @default("")
+  participantSignatureName String  @default("")
+  participantSignedDate    String  @default("")
+  providerSignature         String  @default("")
+  providerSignatureName     String  @default("")
+  providerSignedDate        String  @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([participantName])
+  @@index([status])
 }

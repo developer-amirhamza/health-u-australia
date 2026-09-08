@@ -1,9 +1,13 @@
 "use client"
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useForm, useFieldArray, useWatch, Controller, type SubmitHandler } from 'react-hook-form'
 import Image from 'next/image'
+import toast from 'react-hot-toast'
 import logo from "assets/logo.png"
 import SignaturePad from './SignaturePad'
+import { SummeryApi } from 'app/common/SummeryApi'
+import Axios from 'utils/Axios'
+import AxiosToastError from 'utils/AxiosToastError'
 
 const SCHEDULE_OPTIONS = [
   'Assistance in Daily Living',
@@ -219,6 +223,8 @@ const YesNo = ({
 const ServiceAgreementForm = () => {
   const { register, control, handleSubmit, watch, reset } = useForm<FormValues>({ defaultValues })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
+  const [saving, setSaving] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const watchedItems = useWatch({ control, name: 'items' })
   const applyGst = useWatch({ control, name: 'applyGst' })
@@ -245,7 +251,27 @@ const ServiceAgreementForm = () => {
   const gstAmount = applyGst ? subtotal * 0.1 : 0
   const grandTotal = subtotal + gstAmount
 
-  const onDownload: SubmitHandler<FormValues> = () => {
+  // Saves the agreement (create on first submit, update on subsequent ones)
+  // so it shows up in the admin's Service Agreements list, then still opens
+  // the print dialog either way — a save failure shouldn't block staff from
+  // getting their PDF.
+  const onDownload: SubmitHandler<FormValues> = async (values) => {
+    try {
+      setSaving(true)
+      const response = savedId
+        ? await Axios({ ...SummeryApi.updateServiceAgreement, data: { id: savedId, ...values } })
+        : await Axios({ ...SummeryApi.createServiceAgreement, data: values })
+      if (response.data?.success) {
+        if (!savedId) setSavedId(response.data?.data?.id ?? null)
+        toast.success('Agreement saved')
+      } else {
+        toast.error(response.data?.message || 'Could not save the agreement')
+      }
+    } catch (error) {
+      AxiosToastError(error)
+    } finally {
+      setSaving(false)
+    }
     window.print()
   }
 
@@ -281,9 +307,10 @@ const ServiceAgreementForm = () => {
           </button>
           <button
             type="submit"
-            className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300"
+            disabled={saving}
+            className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Download PDF
+            {saving ? 'Saving…' : 'Save & Download PDF'}
           </button>
         </div>
       </div>
@@ -864,9 +891,10 @@ const ServiceAgreementForm = () => {
       <div className="print:hidden flex justify-end mt-10">
         <button
           type="submit"
-          className="text-white cursor-pointer text-lg font-semibold px-8 py-3.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300"
+          disabled={saving}
+          className="text-white cursor-pointer text-lg font-semibold px-8 py-3.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Download PDF
+          {saving ? 'Saving…' : 'Save & Download PDF'}
         </button>
       </div>
     </form>

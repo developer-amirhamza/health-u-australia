@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { FaUser, FaEnvelope, FaPhoneAlt, FaLock, FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import logo from 'assets/logo.png'
-import { successAlert, errorAlert } from 'app/utils/alart'
+import { successAlert, errorAlert } from 'utils/alart'
 
 type RegisterFormValues = {
   fullName: string
