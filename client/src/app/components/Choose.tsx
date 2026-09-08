@@ -29,8 +29,8 @@ const Choose = () => {
               }
             }}
             viewport={{once:false, amount:1}}>
-          <h1 className=" text-3xl w-full text-center  text-primary font-bold ">Health U Australia</h1>
-        <h1 className="text-4xl w-full  text-center text-black font-bold uppercase ">Why Choose Us</h1>
+          <p className=" text-3xl w-full text-center  text-primary font-bold ">Health U Australia</p>
+        <h2 className="text-4xl w-full  text-center text-black font-bold uppercase ">Why Choose Us</h2>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
@@ -56,10 +56,10 @@ const Choose = () => {
             viewport={{once:false, amount:1}}
             className="w-full h-full min-h-80 relative flex">
             <div className={`bg-secondary absolute min-h-80 w-full p-3 py-10 h-full ${[0,2,4].includes(index) ? "rounded-tr-[4rem]" : "rounded-tl-[4rem]" }  grid gap-5`} >
-              <Image src={item.logo} alt='' className={`absolute top-0 ${[0,2,4].includes(index) ? "left-0" : "right-0" }`} />
-              <Image src={item.icon} alt='' className={`absolute top-3 object-scale-down ${[0,2,4].includes(index) ? "right-3" : "left-3" }`} />
+              <Image src={item.logo} alt='' aria-hidden="true" className={`absolute top-0 ${[0,2,4].includes(index) ? "left-0" : "right-0" }`} />
+              <Image src={item.icon} alt={`${item.title} icon`} className={`absolute top-3 object-scale-down ${[0,2,4].includes(index) ? "right-3" : "left-3" }`} />
               <div className="absolute lg:top-1/2 md:top-1/3 top-1/2  md:py-5 lg:py-0 px-5   mb-10 grid gap-3">
-                <h1 className="lg:text-[1.3rem] md:text-[1.3rem] sm:text-2xl font-bold  text-3xl ">{item.title} </h1>
+                <h3 className="lg:text-[1.3rem] md:text-[1.3rem] sm:text-2xl font-bold  text-3xl ">{item.title} </h3>
                 <p className="text-lg font-medium lg:text-base  ">{item.paragraph} </p>
               </div>
             </div>

@@ -48,7 +48,7 @@ const About = () => {
                  }}
                 className="flex-1 flex flex-col gap-8">
                     <h2 className="text-primary font-bold text-3xl">About Us</h2>
-                    <h1 className="text-black font-extrabold text-[2.3rem] uppercase">We Offer Care <span className='text-secondary'>that Matters</span> </h1>
+                    <h2 className="text-black font-extrabold text-[2.3rem] uppercase">We Offer Care <span className='text-secondary'>that Matters</span> </h2>
                     <p className="text-secondary-text text-lg font-medium ">
                         To reach your goals and achieve independence as a participant, you will need Health U Support Services since we are here to assist you by taking individual-specific approaches.
                         From the development of a support plan to implementing it, we will follow the steps required to make your life convenient.

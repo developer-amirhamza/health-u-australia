@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
-import Nav from 'utils/Nav';
-import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch } from 'react-icons/fa';
+import Nav from 'app/utils/Nav';
+import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { li } from 'framer-motion/client';
 import LanguageSelector from './LanguageSelector';
@@ -44,10 +44,14 @@ const Header = () => {
         <div className="container w-full  hidden   sm:flex items-center justify-between text-white  ">
           {/* contact list */}
           <div className="flex w-full items-center justify-start h-full gap-2">
-            <div className="grid w-full text-sm font-semibold">
-              <a href="mailto:info@healthuau.com">info@healthuau.com</a>
-              <div className="flex items-center gap-0.5  ">
-                <a href="tel:+0481 707 758">0481 707 758 </a> /
+            <div className="grid w-full text-sm font-semibold gap-1">
+              <a href="mailto:info@healthuau.com" className="flex items-center gap-1.5">
+                <FaEnvelope size={14} />
+                info@healthuau.com
+              </a>
+              <div className="flex items-center gap-1.5">
+                <FaPhoneAlt size={13} />
+                <a href="tel:+0481 707 758">0481 707 758</a> /
                 <a href="tel:+0481 707 758">0431 377 132</a>
               </div>
             </div>
@@ -115,7 +119,7 @@ const Header = () => {
       <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all w-full ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
                 ${isActive ? "left-0" : "-left-122"}
           `} >
-        <h1 className="text-4xl font-bold text-center text-white">Menu </h1>
+        <p className="text-4xl font-bold text-center text-white">Menu </p>
         <ul className=" w-full items-start justify-end border-t-3  text-white flex flex-col   ">
           {nav_items.map((item, index) => (
             <li key={index} className=' flex flex-col w-full  cursor-pointer last:hidden relative   text-white text-base   '>

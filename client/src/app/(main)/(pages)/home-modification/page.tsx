@@ -4,7 +4,7 @@ import HomeModification from 'app/pages/HomeModification';
 
 
 export const metadata : Metadata = {
-    title:"NDIS Home Modifications & Accessibility Solutions in Sydney",
+    title:"NDIS Home Modifications Sydney",
     description:"Enhance your home with NDIS home modifications and accessibility features. Professional services for improved independence and mobility.",
 };
 const page = () => {

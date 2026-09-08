@@ -39,9 +39,9 @@ const AssistInTransport = () => {
                         </div>
                     ))}
                 </div>
-                <motion.div variants={fadeIn("up", 0.2)} initial="hidden" whileInView={"show"}
-                    className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
-                    <h1 className="text-3xl font-bold  ">Connect with Us Today!</h1>
+                <motion.div variants={fadeIn("up",0.2)} initial="hidden" whileInView={"show"}
+                className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    ">
+                    <h2 className="text-3xl font-bold  ">Connect with Us Today!</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" text-lg text-secondary-text font-medium text-center ">
                         <a className='text-blue-600' href="tel:0481 707 758">Call now</a>to book an appointment to learn more about how our experts can help you live independently and offer safe transport assistance. If you have any further queries, you can send an email, and we will reply to you soon.

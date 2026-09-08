@@ -4,8 +4,8 @@ import React from 'react'
 
 
 export const metadata : Metadata = {
-  title:"NDIS Service Sydney | NDIS Provider | NDIS Service Provider",
-  description:"Looking for a trusted NDIS Service Provider? Get personalised care and NDIS support from certified NDIS providers today. We are the best NDIS provider in Sydney.",
+  title:"NDIS Service Provider Sydney",
+  description:"Looking for a trusted NDIS service provider? Get personalised care and support from certified NDIS providers in Sydney today.",
 };
 const page = () => {
   return (
