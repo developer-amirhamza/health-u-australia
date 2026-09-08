@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
-import Nav from 'app/utils/Nav';
+
 import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { li } from 'framer-motion/client';
 import LanguageSelector from './LanguageSelector';
+import Nav from 'utils/Nav';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);

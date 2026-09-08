@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { FaCalendarAlt, FaClock, FaUsers } from 'react-icons/fa'
 import { FaMapLocationDot } from 'react-icons/fa6'
 import { upcoming_events } from 'config/page'
-import Title from 'app/utils/Title'
+import Title from 'utils/Title'
 import { fadeIn } from 'app/variants'
 
 const UpcomingEvents = () => {

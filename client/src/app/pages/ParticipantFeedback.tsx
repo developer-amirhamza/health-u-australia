@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import Title from 'app/utils/Title'
+import Title from 'utils/Title'
 import { motion } from 'framer-motion'
 import { TiTick } from 'react-icons/ti'
 import { fadeIn } from 'app/variants'

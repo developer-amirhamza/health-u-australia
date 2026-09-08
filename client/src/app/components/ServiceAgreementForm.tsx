@@ -450,7 +450,7 @@ const ServiceAgreementForm = () => {
           <li>Care for your health and wellbeing as much as you are able.</li>
           <li>Provide us with information that will help us better meet your needs.</li>
           <li>Provide us with a minimum of 7 days&apos; notice when you know you will not be home for your scheduled service.</li>
-          <li>Be aware that our workers are only authorised to perform the agreed number of hours and tasks outlined in your Service Agreement.</li>
+          <li>Be aware that our workers are only authorized to perform the agreed number of hours and tasks outlined in your Service Agreement.</li>
           <li>Participate in safety assessments of your home.</li>
           <li>Ensure pets are controlled during service provision.</li>
           <li>Provide a smoke-free working environment.</li>

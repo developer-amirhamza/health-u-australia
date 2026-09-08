@@ -1,6 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import PageBanner from 'app/utils/PageBanner'
+import PageBanner from 'utils/PageBanner'
 import ParticipantFeedback from 'app/pages/ParticipantFeedback'
 
 export const metadata: Metadata = {

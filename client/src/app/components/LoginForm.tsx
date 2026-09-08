@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { FaEnvelope, FaLock, FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import logo from 'assets/logo.png'
-import { successAlert, errorAlert } from 'app/utils/alart'
+import { successAlert, errorAlert } from 'utils/alart'
 
 type LoginFormValues = {
   email: string
@@ -46,7 +46,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="flex min-h-[80vh] w-full items-center justify-center bg-gradient-to-br from-secondary/10 via-white to-primary/10 px-4 py-12">
+    <div className="flex min-h-[80vh] w-full items-center justify-center bg-linear-to-br from-secondary/10 via-white to-primary/10 px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-black/5 sm:p-10">
         <Link href="/" className="mx-auto block w-40">
           <Image src={logo} alt="Health U Australia" className="mx-auto w-40" />
