@@ -4,7 +4,7 @@ import CurrentEvents from 'app/pages/CurrentEvent';
 
 
 export const metadata: Metadata = {
-    title:"Stay Updated with Current Events | Health U Australia",
+    title:"Current Events",
     description:"Discover the latest health events, wellness workshops, and news updates. Join Health U Australia to better health."
 };
 const page = () => {

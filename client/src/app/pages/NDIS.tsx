@@ -78,7 +78,7 @@ const NDIS = () => {
                     initial={"hidden"}
                     whileInView={"show"}
                 >
-                    <h1 className="text-3xl font-bold  ">Contact us to Get an NDIS Service as Per Your Needs</h1>
+                    <h2 className="text-3xl font-bold  ">Contact us to Get an NDIS Service as Per Your Needs</h2>
                     <div className='w-14 h-0.75 bg-primary items-center  ' />
                     <p className=" flex  text-lg text-secondary-text font-medium text-center ">
                         Call us or send us an email requesting an appointment, and we will get back to you as soon as possible.

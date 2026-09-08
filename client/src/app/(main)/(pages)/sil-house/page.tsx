@@ -3,8 +3,8 @@ import { Metadata } from 'next'
 import SilHouse from 'app/pages/SilHouse'
 
 export const metadata : Metadata = {
-    title:"SIL House - Health U Australia Supported Independent Living (SIL) NSW",
-    description:"Boost independence with Health U’s person-centered SIL program, offering 24/7 support and shared living in Ryde. Check eligibility and tour accessible residences.",
+    title:"SIL House – Supported Independent Living NSW",
+    description:"Boost independence with our person-centred SIL program, offering 24/7 support and shared living in Ryde. Check eligibility today.",
 }
 const page = () => {
   return (

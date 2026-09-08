@@ -35,19 +35,19 @@ const Testimonials = () => {
     return (
         <section className='w-full h-full     flex  '>
             <div className="container mx-auto w-full h-full sm-max:px-5  items-center justify-center py-12 flex flex-col  ">
-                <motion.h1 className=" text-3xl w-full text-center p-5 text-primary font-bold "
+                <motion.p className=" text-3xl w-full text-center p-5 text-primary font-bold "
                 variants={fadeIn("left",0.5)}
                             initial="hidden"
-                            whileInView={"show"} >Health U Australia</motion.h1>
-                <motion.h1 className="text-4xl w-full p-5 text-center text-black font-bold uppercase "
+                            whileInView={"show"} >Health U Australia</motion.p>
+                <motion.h2 className="text-4xl w-full p-5 text-center text-black font-bold uppercase "
                 variants={fadeIn("right",0.5)}
                             initial="hidden"
-                            whileInView={"show"}>Our Testimonial</motion.h1>
+                            whileInView={"show"}>Our Testimonial</motion.h2>
                 <div className="flex flex-col md:flex-row w-full h-full">
                     <div className="flex  items-start justify-start w-full h-full max-w-2/12 gap-2 my-6 ">
                         <Image src={google_map} alt='Health U Australia' className='object-cover h-full w-full max-h-16 max-w-16'/>
                         <div className="grid gap-3">
-                            <h1 className="text-base font-semibold ">Health U Australia</h1>
+                            <h3 className="text-base font-semibold ">Health U Australia</h3>
                             <div className="">
                                 <StarRating rating={rating}handleRatingChange={handleRatingChange} />
                                 <p className="text-secondary-text font-medium">{google_reviews.length} Google reviews</p>
@@ -98,7 +98,7 @@ const Testimonials = () => {
                                     }
 
                                     <div className="">
-                                        <h1 className=" w-full flex  justify-center text-base font-bold ">{item.name}</h1>
+                                        <p className=" w-full flex  justify-center text-base font-bold ">{item.name}</p>
                                         <p className="text-sm text-secondary-text font-medium  ">{item.date} ago</p>
                                     </div>
                                     <Image src={google_icon} className='flex object-scale-down w-5.5 h-5.5' alt='google'/>

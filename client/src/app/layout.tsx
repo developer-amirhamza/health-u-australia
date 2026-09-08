@@ -14,10 +14,12 @@ const availableLanguages: LanguageOption[] = [
   { value: "en|en", label: "English" },
   { value: "en|zh-CN", label: "中文 (Mandarin)" },
   { value: "en|yue", label: "廣東話 (Cantonese)" },
+  { value: "en|fr", label: "Français" },
   { value: "en|hi", label: "हिंदी" },
   { value: "en|bn", label: "বাংলা" },
   { value: "en|gu", label: "ગુજરાતી" },
   { value: "en|kn", label: "ಕನ್ನಡ" },
+  { value: "en|ko", label: "한국어" },
   { value: "en|ml", label: "മലയാളം" },
   { value: "en|mr", label: "मराठी" },
   { value: "en|or", label: "ଓଡିଆ" },
@@ -26,18 +28,19 @@ const availableLanguages: LanguageOption[] = [
   { value: "en|ta", label: "தமிழ்" },
   { value: "en|te", label: "తెలుగు" },
   { value: "en|ur", label: "اردو" },
+  { value: "en|vi", label: "Tiếng Việt" },
 ];
 
 export const metadata = {
   metadataBase: new URL("https://healthuau.com.au"),
   title: {
-    default: "Health U Australia",
-    template: "%s | Health U Support Services",
+    default: "Health U Australia - NDIS Service Provider",
+    template: "%s | Health U Australia",
   },
-  description: "NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently",
+  description: "NDIS support provider in Sydney helping participants live independently with tailored SIL, support coordination and care services.",
   openGraph: {
-    title: "Health U Support Services",
-    description: "NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently",
+    title: "Health U Australia - NDIS Service Provider",
+    description: "NDIS support provider in Sydney helping participants live independently with tailored SIL, support coordination and care services.",
     url: "https://healthuau.com.au",
     siteName: "Health U Australia",
     images: [
