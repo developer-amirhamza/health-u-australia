@@ -5,13 +5,15 @@ import { fetchUser } from 'app/redux/slices/userSlices';
 import { AppDispatch } from 'app/redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import logo from 'assets/logo.png'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaRegEye, FaRegEyeSlash } from 'react-icons/fa6';
 import { useDispatch, useSelector } from 'react-redux';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
+import Image from 'next/image';
 
 
 
@@ -70,52 +72,97 @@ const SignIn = () => {
         }
     }
     const validInput = Object.values(formData).every(el => el);
+const inputClass =''
+
     return (
-        <section className='  w-full min-h-screen h-full bg-no-repeat bg-center '
-        //style={{ backgroundImage: `url(${image})` }}
-        >
-            <div className="container px-5 mx-auto flex w-full justify-center py-6">
-                <div className=" text-white shadow-2xl p-10 flex justify-center items-center w-full max-w-md h-full flex-col rounded-md gap-5  ">
-                    <h1 className="text-2xl text-text text-center text-neutral-700 uppercase font-semibold">Login your account</h1>
-                    <form onSubmit={handleSubmit} className="grid gap-5 w-full text-lg">
-                        <div className="grid gap-2 place-items-start">
-                            <label htmlFor="email" className="font-medium text-text-hover">Email:</label>
-                            <input className='w-full font-medium text-text p-2 outline-none border-2 border-secondary rounded focus-within:border-text'
-                                value={formData.email} type="text" onChange={handleOnChange} name="email" id="email" placeholder='Enter your email' />
-                        </div>
-                        <div className="grid gap-2 place-items-start">
-                            <label htmlFor="password" className="font-medium text-text-hover">Password:</label>
-                            <div className="relative w-full flex">
-                                <input className='w-full font-medium text-text p-2 flex outline-none border-2 border-secondary rounded focus-within:border-text'
-                                    placeholder='Enter your password'
-                                    value={formData.password}
-                                    onChange={handleOnChange}
-                                    type={`${showPassword ? "text" : "password"}`}
-                                    name="password"
-                                    id="password"
-                                />
-                                <div className="absolute right-3.5 text-xl text-secondary-hover cursor-pointer top-3.5 ">
-                                    {showPassword ?
-                                        <FaEye onClick={() => setShowPassword(false)} />
-                                        : <FaEyeSlash onClick={() => setShowPassword(true)} />}
-                                </div>
-                            </div>
-                            <div className="w-full flex justify-end">
-                                <Link href={"/forgot-password"} className='text-sm font-semibold text-secondary hover:underline'>Forgot password?</Link>
-                            </div>
-                        </div>
-                        <input disabled={!validInput} type="submit" value={loading ? "Processing.." : "Login"}
-                            className={`${validInput ? " text-white cursor-pointer bg-secondary" : "bg-amber-200  cursor-not-allowed"}  p-2 text-secondary
-                                  text-xl font-semibold rounded   `} />
-                        <div className="flex justify-between w-full px-1">
-                            <h1 className="text-slate-600 font-medium">Don't have an account?</h1>
-                            <Link href={"/signup"} className='text-xl font-bold text-secondary'>Signup</Link>
-                        </div>
-                    </form>
-                </div>
+    <div className="flex min-h-[80vh] w-full items-center justify-center bg-linear-to-br from-secondary/10 via-white to-primary/10 px-4 py-12">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-black/5 sm:p-10">
+        <Link href="/" className="mx-auto block w-40">
+          <Image src={logo} alt="Health U Australia" className="mx-auto w-40" />
+        </Link>
+
+        <h1 className="mt-6 text-center text-2xl font-bold text-secondary-text">Welcome back</h1>
+        <p className="mt-1 text-center text-sm text-secondary-text/80">
+          Log in to access your Health U Australia account.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4" noValidate>
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-secondary-text">
+              Email address
+            </label>
+            <div className="relative">
+              <FaEnvelope className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+              <input
+                id="email"
+                type="email"
+                name='email'
+                autoComplete="email"
+                placeholder="you@example.com"
+                className={`w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-secondary-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30`}
+                value={formData.email}
+                onChange={handleOnChange}
+
+              />
             </div>
-        </section>
-    )
+          </div>
+
+          {/* Password */}
+          <div>
+            <label htmlFor="password" className="mb-1 block text-sm font-medium text-secondary-text">
+              Password
+            </label>
+            <div className="relative">
+              <FaLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+              <input
+                id="password"
+                name='password'
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="Your password"
+                className={`w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-secondary-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30`}
+                value={formData?.password}
+                onChange={handleOnChange}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary-text"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <FaRegEyeSlash size={15} /> : <FaRegEye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 text-secondary-text">
+              <input type="checkbox" className="h-4 w-4 accent-primary"  />
+              Remember me
+            </label>
+            <Link href="/contact-us" className="font-medium text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+
+          <input
+            type="submit"
+            disabled={!validInput}
+            value={loading ? "Processing.." : "Signin"}
+            className="mt-2 w-full rounded-full bg-primary py-2.5 text-sm font-semibold uppercase text-white transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
+          />
+        </form>
+
+        <p className="mt-6 text-center text-sm text-secondary-text">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="font-semibold text-primary hover:underline">
+            Signup
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
 }
 
 export default SignIn

@@ -130,26 +130,26 @@ export const adminNavItems = [
         path: "/admin",
         icon: AiFillDashboard,
     },
-    {
-        label: "Team Tasks",
-        icon: MdTaskAlt,
-        path: "/admin/tasks",
-    },
-    {
-        label: "Waitlist",
-        icon: MdOutlinePendingActions,
-        path: "/admin/waitlist",
-    },
+    // {
+    //     label: "Team Tasks",
+    //     icon: MdTaskAlt,
+    //     path: "/admin/tasks",
+    // },
+    // {
+    //     label: "Waitlist",
+    //     icon: MdOutlinePendingActions,
+    //     path: "/admin/waitlist",
+    // },
     {
         label: "All Users",
         icon: FaUsersGear,
         path: "/admin/users"
     },
-    {
-        label: "Applications",
-        icon: FaUsersGear,
-        path: "/admin/applications",
-    },
+    // {
+    //     label: "Applications",
+    //     icon: FaUsersGear,
+    //     path: "/admin/applications",
+    // },
     {
         label: "SC Billing",
         icon: MdReceiptLong,
