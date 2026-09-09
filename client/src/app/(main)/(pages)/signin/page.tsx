@@ -56,8 +56,7 @@ const SignIn = () => {
 
                 dispatch(fetchUser())
                 setFormData(initialFormData);
-                const role = response?.data?.data?.user?.role;
-                // router.push(portalPath(role))
+                router.push("/welcome");
             }
         } catch (error: any) {
             if (error?.response?.data?.data?.code === "EMAIL_NOT_VERIFIED") {
@@ -66,7 +65,7 @@ const SignIn = () => {
                 router.push(`/verify-email?email=${encodeURIComponent(unverifiedEmail)}`);
                 return;
             }
-            AxiosToastError("error");
+            AxiosToastError(error);
         } finally {
             setLoading(false)
         }
