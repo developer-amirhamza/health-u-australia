@@ -8,7 +8,7 @@ import ScrollToTop from "utils/ScrollToTop";
 import { GoogleTranslateProvider, LanguageOption } from './components/GoogleTranslateProvider';
 import FloatingContact from "./components/FloatingContact";
 import { ReduxProvider } from "./redux/provider";
-import { Toaster } from "react-hot-toast";
+import ClientToaster from "./components/ClientToaster";
 
 const availableLanguages: LanguageOption[] = [
   { value: "en|en", label: "English" },
@@ -78,7 +78,7 @@ export default function RootLayout({
           <ScrollToTopBtn />
           <FloatingContact />
           <FaqChatbot />
-          <Toaster/>
+          <ClientToaster/>
           </ReduxProvider>
         </GoogleTranslateProvider>
       </body>

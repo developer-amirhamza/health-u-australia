@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { Toaster } from 'react-hot-toast'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -71,7 +70,6 @@ const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                         {children}
                     </div>
                 </div>
-                <Toaster />
             </div>
         </>
     )
