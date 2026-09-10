@@ -27,7 +27,7 @@ type LoginFormValues = {
  }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// const inputClass ='w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-secondary-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30'
+const inputClass ='w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-secondary-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30'
 
 const LoginForm = () => {
   const router = useRouter()
@@ -125,7 +125,7 @@ const LoginForm = () => {
                 name='email'
                 autoComplete="email"
                 placeholder="you@example.com"
-                // className={inputClass}
+                className={inputClass}
                 value={formData.email}
                 onChange={handleOnChange}
                 // {...register('email', {
@@ -149,7 +149,7 @@ const LoginForm = () => {
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="Your password"
-                // className={inputClass}
+                className={inputClass}
                 value={formData?.password}
                 onChange={handleOnChange}
               />

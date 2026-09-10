@@ -20,12 +20,13 @@ const normalise = (role: string) => (role === 'USER' || !role ? 'CONSUMER' : rol
 // Roles an admin can assign. OWNER is deliberately absent — it's set once,
 // directly in the database, and can never be granted or changed via the UI.
 const ASSIGNABLE_ROLES = [
-    { value: 'CONSUMER', label: 'Consumer' },
+    // { value: 'CONSUMER', label: 'Consumer' },
+    { value: 'USER', label: 'User' },
     { value: 'ADMIN', label: 'Admin' },
-    { value: 'TRADE', label: 'Trade Partners' },
-    { value: 'RETAILER', label: 'Retailer' },
-    { value: 'DISTRIBUTOR', label: 'Distributor' },
-    { value: 'NDIS_COORDINATOR', label: 'NDIS/Aged Care Provider' },
+    // { value: 'TRADE', label: 'Trade Partners' },
+    // { value: 'RETAILER', label: 'Retailer' },
+    // { value: 'DISTRIBUTOR', label: 'Distributor' },
+    // { value: 'NDIS_COORDINATOR', label: 'NDIS/Aged Care Provider' },
 ];
 
 const ROLE_BADGE: Record<string, string> = {

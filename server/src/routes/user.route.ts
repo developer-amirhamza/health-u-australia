@@ -1,3 +1,4 @@
+import { resendVerificationEmail } from '@/utils/resendVerificationEmail';
 import express from "express";
 import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, uploadAvatar, verifyEmail } from "../controllers/user.controllers.js";
 import { uploadAvatarImage } from "../middlewares/upload.js";
@@ -15,6 +16,7 @@ router.post("/verify-email",verifyEmail);
 router.post("/refresh-token", refreshToken);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.post("/resend-verification-email", resendVerificationEmail)
 
 
 // Logged-in user

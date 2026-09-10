@@ -2,19 +2,16 @@
 import { Response, Request } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { errorHandler } from "../utils/errorHandler.js";
-import { sendEmail } from "../config/sendEmail.js";
-import { prisma } from "../lib/prisma.js";
-import generateRefreshToken from "../utils/refreshToken.js";
-import generateAccessToken from "../utils/accessToken.js";
-import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
-import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
+
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
-import { uploadImageCloudinary } from "../config/cloudinary.js";
-import { primaryClientUrl } from "../config/clientUrl.js";
 import dotenv from "dotenv";
-// import type { AuthRequest } from "../middlewares/auth.js";
+import { prisma } from "../lib/prisma.js";
+import { sendEmail } from "../config/sendEmail.js";
+import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
+import { errorHandler } from "../utils/errorHandler.js";
+import generateRefreshToken from "../utils/refreshToken.js";
+import generateAccessToken from "../utils/accessToken.js";
 
 
 dotenv.config()
@@ -22,17 +19,10 @@ interface AuthRequest extends Request {
     userId?: string;
 }
 
-// Roles the public signup form may assign to itself. ADMIN and OWNER are
-// deliberately absent — those are granted only via updateUserByAdmin (which
-// requires an existing admin) or set directly in the database, never
-// through this unauthenticated endpoint.
-const SELF_SERVICE_ROLES = ["USER", "CONSUMER", "TRADE", "RETAILER", "DISTRIBUTOR", "NDIS_COORDINATOR"];
-
 const SignUp = async (req: Request, res: Response) => {
     try {
         console.log(req.body, "test user")
-        const { firstName, lastName, email, mobile, password } = req.body;
-        const role = SELF_SERVICE_ROLES.includes(req.body.role) ? req.body.role : "USER";
+        const { firstName, lastName, email, mobile, password,role } = req.body;
 
         const id = uuidv4();
         if (!firstName || !email || !password) {
@@ -49,6 +39,8 @@ const SignUp = async (req: Request, res: Response) => {
         };
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const otpHash = await bcrypt.hash(otp, await bcrypt.genSalt(10));
         const user = await prisma.user.create({
             data: {
                 id,
@@ -58,21 +50,26 @@ const SignUp = async (req: Request, res: Response) => {
                 role,
                 password: hashPassword,
                 verify_email: false,
+                verify_email_otp: otpHash,
+                verify_email_otp_expire: new Date(Date.now() + 10 * 60 * 1000),
                 status: "ACTIVE",
                 mobile: mobile?.toString(),
             },
         });
-        const verifyEmailUrl = `${primaryClientUrl}/verify-email?code=${user.id}`;
         // Email failure shouldn't fail the signup — the account is already created.
+        // But don't lie about it either: the client only knows to offer "resend"
+        // if the response tells it the first send didn't go out.
+        let emailFailed = false;
         const emailResult = await sendEmail({
             sendTo: email,
-            subject: "Verify email from Bestiee",
+            subject: "Verify your email - Bestiee",
             html: verifyEmailTemplate({
                 firstName,
-                url: verifyEmailUrl,
+                otp,
             }),
-        }).catch((err:any) => {
+        }).catch((err) => {
             console.error("Verify email failed:", err.message);
+            emailFailed = true;
             return null;
         });
 
@@ -80,7 +77,9 @@ const SignUp = async (req: Request, res: Response) => {
         res.status(200).json({
             success: true,
             error: false,
-            message: "Your account has been created successfully!",
+            message: emailFailed
+                ? "Your account has been created, but we couldn't send the verification email just now. Please use \"Resend it\" on the verification page."
+                : "Your account has been created! Please verify your email with the code we sent you.",
             data: emailResult,
         })
     } catch (error: any) {
@@ -93,26 +92,103 @@ const SignUp = async (req: Request, res: Response) => {
 };
 
 
-export const verifyEmail = async (req:Request,res:Response)=>{
+// Verify with the emailed OTP. On success also signs the user in (same as
+// SignIn) so the client can redirect straight to their portal by role
+// without a second sign-in step.
+export const verifyEmail = async (req: Request, res: Response) => {
     try {
-        const {code} = req.body;
-        const user = await prisma.user.findUnique({where:{id:code}});
-        if(!user){
-            return errorHandler(res,400,"Invalid code entered!");
+        const { email, otp } = req.body;
+        if (!email || !otp) {
+            return errorHandler(res, 400, "Email and verification code are required", true);
         }
-        const updateUser = await prisma.user.update({
-            where:{id:code},
-            data:{verify_email:true}
-        })
 
+        const user:any = await prisma.user.findUnique({ where: { email } });
+        if (!user || !user.verify_email_otp || !user.verify_email_otp_expire) {
+            return errorHandler(res, 400, "Invalid or expired verification code", true);
+        }
+        if (user.verify_email_otp_expire.getTime() < Date.now()) {
+            return errorHandler(res, 400, "This code has expired. Please request a new one.", true);
+        }
+        const otpMatches = await bcrypt.compare(otp, user.verify_email_otp);
+        if (!otpMatches) {
+            return errorHandler(res, 400, "Invalid or expired verification code", true);
+        }
+
+        const refreshToken = await generateRefreshToken(user.id);
+        const accessToken = await generateAccessToken(user.id);
+
+        const updatedUser = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                verify_email: true,
+                verify_email_otp: null,
+                verify_email_otp_expire: null,
+                last_login_date: new Date(),
+                refresh_token: refreshToken,
+            },
+        });
+
+        const cookiesOption: any = {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None" as const,
+        };
+        res.cookie("accessToken", accessToken, cookiesOption);
+        res.cookie("refreshToken", refreshToken, cookiesOption);
+
+        const { password: _password, refresh_token: _refreshToken, forgot_password_otp: _fpOtp, verify_email_otp: _vOtp, ...safeUser } = updatedUser;
         res.status(200).json({
-            success:true,
-            error:false,
-            message:"Your email verified successfully!",
-            data:updateUser,
+            success: true,
+            error: false,
+            message: "Your email has been verified successfully!",
+            data: { accessToken, refreshToken, user: safeUser },
         })
     } catch (error:any) {
         errorHandler(res,500,`${error.message} || "Internal server error!"`)
+    }
+};
+
+// Resend the verification OTP — for the still-signed-in-but-unverified
+// header alert (identified via the access token) and the verify-email
+// screen (identified by the email just typed, since no token exists yet
+// right after signup). Always responds with the same generic message so
+// this can't be used to probe which emails are registered.
+export const resendVerificationEmail = async (req: AuthRequest, res: Response) => {
+    try {
+        const { email } = req.body;
+        const user = req.userId
+            ? await prisma.user.findUnique({ where: { id: req.userId } })
+            : email
+                ? await prisma.user.findUnique({ where: { email } })
+                : null;
+
+        if (user && !user.verify_email) {
+            const otp = crypto.randomInt(100000, 1000000).toString();
+            const otpHash = await bcrypt.hash(otp, await bcrypt.genSalt(10));
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    verify_email_otp: otpHash,
+                    verify_email_otp_expire: new Date(Date.now() + 10 * 60 * 1000),
+                },
+            });
+            await sendEmail({
+                sendTo: user.email,
+                subject: "Verify your email - Bestiee",
+                html: verifyEmailTemplate({
+                    firstName: user.firstName || "there",
+                    otp,
+                }),
+            }).catch((err) => console.error("Resend verification OTP failed:", err.message));
+        }
+
+        res.status(200).json({
+            success: true,
+            error: false,
+            message: "If that account exists and isn't verified yet, a new verification code has been sent.",
+        });
+    } catch (error: any) {
+        errorHandler(res, 500, error.message || "Internal server error!");
     }
 };
 
@@ -144,7 +220,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
                 sendTo: email,
                 subject: "Reset your Health U Shop password",
                 html: forgotPasswordTemplate({ firstName: user.firstName || "there", otp }),
-            }).catch((err: Error) => console.error("Forgot-password email failed:", err.message));
+            }).catch((err) => console.error("Forgot-password email failed:", err.message));
         }
 
         res.status(200).json({
@@ -262,6 +338,16 @@ const SignIn = async (req: Request, res: Response) => {
             return errorHandler(res, 400, "Incorrect Password", true);
         };
 
+        if (!user.verify_email) {
+            return errorHandler(
+                res,
+                403,
+                "Please verify your email before signing in. Check your inbox for the verification link, or request a new one.",
+                true,
+                { code: "EMAIL_NOT_VERIFIED", email: user.email }
+            );
+        }
+
         const refreshToken = await generateRefreshToken(user.id);
         const accessToken = await generateAccessToken(user.id);
 
@@ -281,7 +367,8 @@ const SignIn = async (req: Request, res: Response) => {
         }
         res.cookie("accessToken",accessToken,cookiesOption);
         res.cookie("refreshToken",refreshToken,cookiesOption);
-        const { password: _password, refresh_token: _refreshToken, ...safeUser } = user;
+        // Never send the password hash (or other private fields) to the client.
+        const { password: _password, refresh_token: _refreshToken, forgot_password_otp: _otp, ...safeUser } = user;
         res.status(200).json({
             success: true,
             error: false,
@@ -304,12 +391,12 @@ export const refreshToken = async (req:AuthRequest, res:Response)=>{
         const refreshToken = req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
         if(!refreshToken) return errorHandler(res,401,"No refresh token provided",true);
 
-        const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN as string) as {id:string};
+        const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN as string) as {_id:string};
         if(!decoded){
             return errorHandler(res,401,"Invalid or expired refresh token");
         };
 
-        const userId = decoded.id;
+        const userId = decoded._id;
         const newAccessToken = await generateAccessToken(userId);
 
         const cookiesOption:any = {
@@ -318,31 +405,25 @@ export const refreshToken = async (req:AuthRequest, res:Response)=>{
             sameSite: "None" as const,
         };
         res.cookie("accessToken", newAccessToken, cookiesOption)
-        res.status(200).json({
-            success: true,
-            error: false,
-            message: "Access token refreshed successfully",
-            data: { accessToken: newAccessToken },
-        });
     } catch (error:any) {
         errorHandler(res,500,error.message || "Internal server error!",true);
     }
 };
 
 const SignOut = async (req: AuthRequest, res: Response) => {
-    const userId = req.userId; // get from auth
-    console.log(userId,"userid")
-    if(!userId){
+     const userId = req.userId; // get from auth
+     console.log(userId,"userid")
+     if(!userId){
         return errorHandler(res,400,"Unauthorized",true);
-    }
+     }
         const cookiesOption = {
             httpOnly:true,
             secure:true,
-            sameSite:"none" as const,
+            sameSite:"None",
         };
 
-        res.clearCookie("accessToken", cookiesOption);
-        res.clearCookie("refreshToken", cookiesOption);
+        res.cookie("accessToken", cookiesOption);
+        res.cookie("refreshToken", cookiesOption);
 
         await prisma.user.update({
             where:{id:userId},
@@ -362,7 +443,7 @@ const GetUserDetails = async (req: AuthRequest, res: Response) => {
             return errorHandler(res, 400, "User ID is required", true);
         };
         const user = await prisma.user.findUnique({
-            where: { id: id },
+             where: { id: id },
             select:{
                 id:true,
                 firstName:true,
@@ -372,6 +453,7 @@ const GetUserDetails = async (req: AuthRequest, res: Response) => {
                 avatar:true,
                 role:true,
                 refresh_token:true,
+                verify_email:true,
             }
             });
         if (!user) {
@@ -394,9 +476,9 @@ const GetUserDetails = async (req: AuthRequest, res: Response) => {
 const getAllUsers = async (req: Request, res: Response) => {
     try {
         const users = await prisma.user.findMany({
-        select:{
-        id:true, firstName:true, lastName:true, email:true, mobile:true, avatar:true,
-        role:true, status:true, verify_email:true, last_login_date:true, createdAt:true,
+           select:{
+    id:true, firstName:true, lastName:true, email:true, mobile:true, avatar:true,
+    role:true, status:true, verify_email:true, last_login_date:true, createdAt:true,
 },
 orderBy: { createdAt: 'desc' }
         });
@@ -452,12 +534,12 @@ export const uploadAvatar = async (req:AuthRequest,res:Response)=>{
         const userId:any = req.userId;
         const image:any = req.file;
         if(!userId){
-            return errorHandler(res,404,"Unauthorized User",true);
+            errorHandler(res,404,"Unauthorized User",true);
         };
 
         const upload:any = await uploadImageCloudinary(image);
         if(!upload?.url){
-            return errorHandler(res,404,"Image uploading failed!",true);
+            errorHandler(res,404,"Image uploading failed!",true);
         }
 
         const updateUser = await prisma.user.update({

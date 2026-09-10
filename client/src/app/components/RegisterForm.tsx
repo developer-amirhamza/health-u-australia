@@ -7,9 +7,12 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { FaUser, FaEnvelope, FaPhoneAlt, FaLock, FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import logo from 'assets/logo.png'
 import { successAlert, errorAlert } from 'utils/alart'
+import Axios from 'utils/Axios'
+import { SummeryApi } from 'app/common/SummeryApi'
 
 type RegisterFormValues = {
-  fullName: string
+  firstName: string
+  lastName:string
   email: string
   phone: string
   password: string
@@ -34,7 +37,8 @@ const RegisterForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     defaultValues: {
-      fullName: '',
+      firstName: '',
+      lastName:"",
       email: '',
       phone: '',
       password: '',
@@ -47,13 +51,16 @@ const RegisterForm = () => {
 
   const onSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
     try {
-      // TODO: Backend not implemented yet. Replace this simulated call with the
-      // real registration API request once the endpoint is available.
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      // eslint-disable-next-line no-console
-      console.log('Register form submitted:', data)
-      successAlert('Account created successfully!')
-      router.push(`/welcome?name=${encodeURIComponent(data.fullName)}`)
+      const response = await Axios({
+        ...SummeryApi.signup,
+        data:data,
+        withCredentials:true
+      })
+      if(response?.data?.success){
+        successAlert(response?.data?.message)
+      router.push(`/welcome?name=${encodeURIComponent(data.firstName)}`)
+      }
+
     } catch {
       errorAlert('Something went wrong. Please try again.')
     }
@@ -74,24 +81,44 @@ const RegisterForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 flex flex-col gap-4" noValidate>
           {/* Full name */}
           <div>
-            <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-secondary-text">
+            <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-secondary-text">
               Full name
             </label>
             <div className="relative">
               <FaUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
               <input
-                id="fullName"
+                id="firstName"
                 type="text"
                 autoComplete="name"
-                placeholder="Jane Doe"
+                placeholder="Jane"
                 className={inputClass}
-                {...register('fullName', {
+                {...register('firstName', {
                   required: 'Full name is required',
                   minLength: { value: 2, message: 'Please enter your full name' },
                 })}
               />
             </div>
-            {errors.fullName && <p className="mt-1 text-xs text-primary">{errors.fullName.message}</p>}
+            {errors.firstName && <p className="mt-1 text-xs text-primary">{errors.firstName.message}</p>}
+          </div>
+          <div>
+            <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-secondary-text">
+              Full name
+            </label>
+            <div className="relative">
+              <FaUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+              <input
+                id="lastName"
+                type="text"
+                autoComplete="name"
+                placeholder="Doe"
+                className={inputClass}
+                {...register('lastName', {
+                  required: 'Full name is required',
+                  minLength: { value: 2, message: 'Please enter your full name' },
+                })}
+              />
+            </div>
+            {errors.lastName && <p className="mt-1 text-xs text-primary">{errors.lastName.message}</p>}
           </div>
 
           {/* Email */}

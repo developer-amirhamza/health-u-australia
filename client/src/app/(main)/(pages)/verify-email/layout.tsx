@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 
 // export const metadata: Metadata = seoMetadata.signin;
 export const metadata: Metadata = {
-  title: 'Signin',
-  description: 'Signin to your Health U Australia account.',
+  title: 'Email verification',
+  description: 'Verify your email for your Health U Australia account.',
   robots: { index: false, follow: false },
 }
 

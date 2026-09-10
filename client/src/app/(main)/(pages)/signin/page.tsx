@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
 import Image from 'next/image';
+import { portalPath } from 'utils/roles';
 
 
 
@@ -56,7 +57,7 @@ const SignIn = () => {
 
                 dispatch(fetchUser())
                 setFormData(initialFormData);
-                router.push("/welcome");
+                router.push(portalPath(user.role));
             }
         } catch (error: any) {
             if (error?.response?.data?.data?.code === "EMAIL_NOT_VERIFIED") {

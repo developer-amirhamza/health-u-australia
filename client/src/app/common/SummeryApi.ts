@@ -11,6 +11,10 @@ export const SummeryApi = {
         url: "/api/user/verify-email",
         method: "post",
     },
+    resendVerificationEmail: {
+        url: "/api/user/resend-verification-email",
+        method: "post",
+    },
     forgotPassword: {
         url: "/api/user/forgot-password",
         method: "post",
