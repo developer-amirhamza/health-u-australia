@@ -9,9 +9,11 @@ import dotenv from "dotenv";
 import { prisma } from "../lib/prisma.js";
 import { sendEmail } from "../config/sendEmail.js";
 import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
+import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import { errorHandler } from "../utils/errorHandler.js";
 import generateRefreshToken from "../utils/refreshToken.js";
 import generateAccessToken from "../utils/accessToken.js";
+import { uploadImageCloudinary } from "../config/cloudinary.js";
 
 
 dotenv.config()
@@ -19,10 +21,17 @@ interface AuthRequest extends Request {
     userId?: string;
 }
 
+// Roles the public signup form may assign to itself. ADMIN and OWNER are
+// deliberately absent — those are granted only via updateUserByAdmin (which
+// requires an existing admin) or set directly in the database, never
+// through this unauthenticated endpoint.
+const SELF_SERVICE_ROLES = ["USER", "CONSUMER", "TRADE", "RETAILER", "DISTRIBUTOR", "NDIS_COORDINATOR"];
+
 const SignUp = async (req: Request, res: Response) => {
     try {
         console.log(req.body, "test user")
-        const { firstName, lastName, email, mobile, password,role } = req.body;
+        const { firstName, lastName, email, mobile, password } = req.body;
+        const role = SELF_SERVICE_ROLES.includes(req.body.role) ? req.body.role : "USER";
 
         const id = uuidv4();
         if (!firstName || !email || !password) {

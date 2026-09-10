@@ -1,14 +1,14 @@
 interface Type {
-    firstName:string,
-    url:string,
+    firstName: string,
+    otp: string,
 }
-const verifyEmailTemplate = ({firstName, url}:Type):string=>{
-    return`
+const verifyEmailTemplate = ({ firstName, otp }: Type): string => {
+    return `
     <h2>Dear ${firstName}!</h2>
-    <p>Thank you for registering Health U Australia.</p>
-    <p>Please click for verify your email.</p>
-    <a href="${url}" target="_blank" rel="noopener noreferrer" style="color:white; background:green; padding: 5px 10px; margin-top: 10px; border-radius: 10px; display:inline-block; text-decoration:none;" >
-    Verify Email</a>
+    <p>Thank you for registering with Health U Australia.</p>
+    <p>Your email verification code is:</p>
+    <p style="font-size: 28px; font-weight: bold; letter-spacing: 6px; color: green;">${otp}</p>
+    <p>This code expires in 10 minutes. If you didn't create this account, you can safely ignore this email.</p>
     `
 }
 

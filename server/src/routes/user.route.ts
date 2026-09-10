@@ -1,6 +1,5 @@
-import { resendVerificationEmail } from '@/utils/resendVerificationEmail';
 import express from "express";
-import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, uploadAvatar, verifyEmail } from "../controllers/user.controllers.js";
+import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resendVerificationEmail, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, uploadAvatar, verifyEmail } from "../controllers/user.controllers.js";
 import { uploadAvatarImage } from "../middlewares/upload.js";
 import { auth } from "../middlewares/auth.js";
 import { admin } from "../middlewares/admin.js";

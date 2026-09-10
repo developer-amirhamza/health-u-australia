@@ -12,6 +12,8 @@ model User {
   email                  String              @unique
   password               String
   verify_email           Boolean?            @default(false)
+  verify_email_otp       String?
+  verify_email_otp_expire DateTime?          @db.Timestamp(6)
   status                 String?             @default("ACTIVE")
   avatar                 String?
   mobile                 String?
