@@ -7,11 +7,19 @@ import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 
-import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
+import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt, FaUserCircle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { li } from 'framer-motion/client';
 import LanguageSelector from './LanguageSelector';
 import Nav from 'utils/Nav';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import { RootState, AppDispatch } from 'app/redux/store';
+import { setLogout } from 'app/redux/slices/userSlices';
+import { portalPath } from 'utils/roles';
+import { SummeryApi } from 'app/common/SummeryApi';
+import Axios from 'utils/Axios';
+import AxiosToastError from 'utils/AxiosToastError';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -19,6 +27,23 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showTopBar, setShoTopBar] = useState(true);
   const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.userSlice);
+
+  const handleLogout = async () => {
+    try {
+      const response = await Axios({ ...SummeryApi.signout });
+      if (response.data?.success) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      AxiosToastError(error);
+    } finally {
+      dispatch(setLogout());
+      localStorage.clear();
+      router.push("/");
+    }
+  }
 
   const handleToggle = (index: number) => {
     setActiveIndex(index);
@@ -109,6 +134,44 @@ const Header = () => {
               </li>
             ))}
           </ul>
+          {/* account menu (desktop) */}
+          <div className='relative group hidden lg:flex items-center px-2'>
+            <button aria-label="Account" className='text-secondary text-3xl cursor-pointer hover:text-primary transition-colors duration-300'>
+              <FaUserCircle />
+            </button>
+            <ul className="absolute right-0 top-10 bg-white text-neutral-900 flex-col min-w-44 hidden transition-all duration-300 group-hover:flex shadow-lg border border-neutral-100 rounded-md overflow-hidden z-50">
+              {user ? (
+                <>
+                  <li className='px-4 py-2.5 text-sm font-medium text-neutral-500 border-b border-neutral-100 truncate'>
+                    {user?.firstName || user?.email}
+                  </li>
+                  <li>
+                    <Link href={portalPath(user?.role)} className='flex px-4 py-2.5 hover:bg-primary hover:text-white font-medium transition-all duration-300'>
+                      My account
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout} className='flex w-full text-left px-4 py-2.5 hover:bg-primary hover:text-white font-medium transition-all duration-300 cursor-pointer'>
+                      Sign out
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/signin" className='flex px-4 py-2.5 hover:bg-primary hover:text-white font-medium transition-all duration-300'>
+                      Sign in
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/signup" className='flex px-4 py-2.5 hover:bg-primary hover:text-white font-medium transition-all duration-300'>
+                      Sign up
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
           <Link className='bg-primary sm:text-lg text-base uppercase text-white font-semibold
                 rounded-full  px-4 py-2  hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
           <button onClick={() => setIsActive(!isActive)} className='text-secondary text-4xl z-100 px-4 cursor-pointer lg:hidden '>
@@ -121,6 +184,37 @@ const Header = () => {
                 ${isActive ? "left-0" : "-left-122"}
           `} >
         <p className="text-4xl font-bold text-center text-white">Menu </p>
+        {/* account menu (mobile) */}
+        <div className="flex flex-col w-full text-white border-b border-white/20 pb-2">
+          {user ? (
+            <>
+              <div className="flex items-center gap-2 py-3 px-10">
+                <FaUserCircle size={20} />
+                <span className="truncate">{user?.firstName || user?.email}</span>
+              </div>
+              <Link onClick={() => setIsActive(!isActive)} href={portalPath(user?.role)}
+                className="py-3 px-10 hover:bg-secondary transition-all duration-500 hover:text-white">
+                My account
+              </Link>
+              <button onClick={() => { setIsActive(!isActive); handleLogout(); }}
+                className="flex text-left py-3 px-10 hover:bg-secondary transition-all duration-500 hover:text-white cursor-pointer">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link onClick={() => setIsActive(!isActive)} href="/signin"
+                className="flex items-center gap-2 py-3 px-10 hover:bg-secondary transition-all duration-500 hover:text-white">
+                <FaUserCircle size={20} />
+                Sign in
+              </Link>
+              <Link onClick={() => setIsActive(!isActive)} href="/signup"
+                className="py-3 px-10 hover:bg-secondary transition-all duration-500 hover:text-white">
+                Sign up
+              </Link>
+            </>
+          )}
+        </div>
         <ul className=" w-full items-start justify-end border-t-3  text-white flex flex-col   ">
           {nav_items.map((item, index) => (
             <li key={index} className=' flex flex-col w-full  cursor-pointer last:hidden relative   text-white text-base   '>
