@@ -11,7 +11,7 @@ import { FaCalendarAlt, FaClock, FaPlus } from 'react-icons/fa';
 import { FaMapLocationDot } from 'react-icons/fa6';
 import { cooking_gallery } from 'config/page';
 import Title from 'utils/Title';
-import CookingSlideModal from 'app/components/CookingSlideModal';
+import CookingSlideModal from 'app/(main)/components/CookingSlideModal';
 
 const CurrentEvents = () => {
     const [isOpen, setIsOpen] = useState(false);

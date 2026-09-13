@@ -104,7 +104,7 @@ const VerifyEmailContent = () => {
                             />
                         </div>
                         <input disabled={!validInput || verifying} type="submit" value={verifying ? "Verifying.." : "Verify email"}
-                            className={`${validInput ? "bg-secondary-hover text-white cursor-pointer hover:bg-secondary" : "bg-primary-hover cursor-not-allowed"} p-2 text-secondary
+                            className={`${validInput ? " text-white cursor-pointer bg-secondary" : "bg-amber-200 cursor-not-allowed"} p-2 text-secondary
                                   text-xl font-semibold rounded`} />
                     </form>
                     <button

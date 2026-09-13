@@ -1,4 +1,4 @@
-import AboutContent from 'app/components/AboutContent';
+import AboutContent from 'app/(main)/components/AboutContent';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

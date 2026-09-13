@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import Home from "./pages/Home"
+import Home from "../pages/Home"
 import ScrollToTopBtn from "utils/ScrollToTopBtn"
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return <main className="h-full flex w-full">
     <Home />
-     <ScrollToTopBtn/>
+    <ScrollToTopBtn />
   </main>
 }
 

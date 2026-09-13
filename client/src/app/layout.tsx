@@ -1,35 +1,9 @@
 import ScrollToTopBtn from "utils/ScrollToTopBtn";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
-// import FloatingContact from "./components/FloatingContact";
-import FaqChatbot from "./components/FaqChatbot";
+
 import "./styles/globals.css"
 import ScrollToTop from "utils/ScrollToTop";
-import { GoogleTranslateProvider, LanguageOption } from './components/GoogleTranslateProvider';
-import FloatingContact from "./components/FloatingContact";
 import { ReduxProvider } from "./redux/provider";
-import ClientToaster from "./components/ClientToaster";
 
-const availableLanguages: LanguageOption[] = [
-  { value: "en|en", label: "English" },
-  { value: "en|zh-CN", label: "中文 (Mandarin)" },
-  { value: "en|yue", label: "廣東話 (Cantonese)" },
-  { value: "en|fr", label: "Français" },
-  { value: "en|hi", label: "हिंदी" },
-  { value: "en|bn", label: "বাংলা" },
-  { value: "en|gu", label: "ગુજરાતી" },
-  { value: "en|kn", label: "ಕನ್ನಡ" },
-  { value: "en|ko", label: "한국어" },
-  { value: "en|ml", label: "മലയാളം" },
-  { value: "en|mr", label: "मराठी" },
-  { value: "en|or", label: "ଓଡିଆ" },
-  { value: "en|pa", label: "ਪੰਜਾਬੀ" },
-  { value: "en|sd", label: "سنڌي" },
-  { value: "en|ta", label: "தமிழ்" },
-  { value: "en|te", label: "తెలుగు" },
-  { value: "en|ur", label: "اردو" },
-  { value: "en|vi", label: "Tiếng Việt" },
-];
 
 export const metadata = {
   metadataBase: new URL("https://healthuau.com.au"),
@@ -69,18 +43,11 @@ export default function RootLayout({
         <meta name="google-site-verification" content="oQduANhC4p2tTm9WVBh4u6G4YPVV7ZBkPvxHL7MMXMg" />
       </head>
       <body className="relative flex mx-auto px-0 flex-col min-h-screen w-full" suppressHydrationWarning>
-        <GoogleTranslateProvider pageLanguage="en" availableLanguages={availableLanguages}>
           <ReduxProvider>
-          <Header />
-          {children}
-          <Footer />
-          <ScrollToTop />
-          <ScrollToTopBtn />
-          <FloatingContact />
-          <FaqChatbot />
-          <ClientToaster/>
+            {children}
+            <ScrollToTop />
+            <ScrollToTopBtn />
           </ReduxProvider>
-        </GoogleTranslateProvider>
       </body>
     </html>
   );

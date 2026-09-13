@@ -13,7 +13,7 @@ import wheelchair from "assets/images/sil-houses/wheelchiar.png"
 import map from "assets/images/sil-images/54A _belmore_street.png"
 import Title from 'utils/Title'
 import { fadeIn } from 'app/variants';
-import SlideModal from 'app/components/SlideModal'
+import SlideModal from 'app/(main)/components/SlideModal'
 
 
 export const propertyData = {

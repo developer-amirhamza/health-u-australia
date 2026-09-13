@@ -5,8 +5,9 @@ import Link from "next/link";
 import { BsChatDotsFill } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoSend } from "react-icons/io5";
-import { faqEntries } from "../data/faq";
-import { matchFaq } from "../../utils/faqMatcher";
+import { faqEntries } from "app/data/faq";
+import { matchFaq } from "utils/faqMatcher";
+
 
 interface Message {
   role: "user" | "bot";

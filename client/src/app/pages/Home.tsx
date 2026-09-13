@@ -1,12 +1,11 @@
 
-import About from "app/components/About"
-import Choose from "app/components/Choose"
-import Hero from "app/components/Hero"
-import NewsLetter from "app/components/NewsLetter"
-import Service from "app/components/Service"
-import Testimonials from "app/components/Testimonials"
-import UpcomingEvents from "app/components/UpcomingEvents"
-import ScrollToTopBtn from "utils/ScrollToTopBtn"
+import About from "app/(main)/components/About"
+import Choose from "app/(main)/components/Choose"
+import Hero from "app/(main)/components/Hero"
+import NewsLetter from "app/(main)/components/NewsLetter"
+import Service from "app/(main)/components/Service"
+import Testimonials from "app/(main)/components/Testimonials"
+import UpcomingEvents from "app/(main)/components/UpcomingEvents"
 
 
 const Home = () => {

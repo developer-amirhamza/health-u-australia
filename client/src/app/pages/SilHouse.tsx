@@ -7,10 +7,10 @@ import { TiTick } from 'react-icons/ti';
 import { sil_house, sil_house_details, sil_houses } from 'config/page'
 import Button from 'utils/Button'
 import Title from 'utils/Title'
-import SlideModal from 'app/components/SlideModal'
 import { motion } from 'framer-motion'
 import { fadeIn } from 'app/variants';
 import Link from 'next/link'
+import SlideModal from 'app/(main)/components/SlideModal';
 
 
 const SilHouse = () => {
