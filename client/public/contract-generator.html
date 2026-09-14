@@ -132,6 +132,13 @@ h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.01em}
 .pfx span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:13.5px;pointer-events:none}
 .pfx input{padding-left:22px}
 
+.sigpad{position:relative;width:100%;max-width:360px;height:130px;border:1px solid var(--line);
+  border-radius:var(--r-sm);background:#fff;touch-action:none;overflow:hidden}
+.sigpad canvas{width:100%;height:100%;display:block;cursor:crosshair}
+.sigpad .sigpad-ph{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+  font-size:11px;color:#c7cbd3;pointer-events:none;font-style:italic}
+.sigpad[data-empty="false"] .sigpad-ph{display:none}
+
 .note{
   display:flex;gap:9px;padding:10px 12px;border-radius:var(--r-sm);font-size:12.3px;
   line-height:1.5;margin-top:14px;
@@ -210,6 +217,7 @@ table.rt td.tot{color:var(--brand-ink)}
 .doc .sigline{margin:16px 0 0;display:flex;gap:10px;align-items:flex-end}
 .doc .sigline span{font-weight:600;min-width:96px}
 .doc .sigline i{flex:1;border-bottom:1px solid #6b7280;height:15px;display:block}
+.doc .sigline img.sigimg{flex:1;max-height:44px;border-bottom:1px solid #6b7280;object-fit:contain;object-position:left bottom}
 .doc .fill{border-bottom:1px solid #6b7280;display:inline-block;min-width:190px}
 .doc .ftr{margin-top:28px;padding-top:9px;border-top:1px solid #d7dbe2;
   font-family:var(--font);font-size:8pt;color:#7a8090;display:flex;justify-content:space-between}
@@ -379,6 +387,30 @@ table.ed tbody tr.lvl-start td{border-top:1px solid var(--line)}
     <section class="view active" id="viewBuild">
       <div class="pane-form">
         <div class="form-inner" id="formInner"></div>
+        <!-- Static (not rebuilt by renderForm), so a drawn signature survives
+             the form re-rendering when other fields change. -->
+        <div style="padding:0 24px 20px">
+          <div class="sec">
+            <div class="sec-h" style="cursor:default">
+              <span class="sec-n">S</span>
+              <span class="sec-t">Signatures<span class="sec-sub">Sign on screen, or leave blank to sign the printed/PDF copy by hand</span></span>
+            </div>
+            <div class="sec-b">
+              <div class="grid">
+                <div class="f wide">
+                  <label id="sigLabelEmployee">Employee signature</label>
+                  <div class="sigpad" data-role="employee" data-empty="true"><canvas></canvas><span class="sigpad-ph">Sign here</span></div>
+                  <button type="button" class="lnk sigpad-clear" data-role="employee" style="margin-top:6px">Clear</button>
+                </div>
+                <div class="f wide">
+                  <label>Signed for Health U by</label>
+                  <div class="sigpad" data-role="signatory" data-empty="true"><canvas></canvas><span class="sigpad-ph">Sign here</span></div>
+                  <button type="button" class="lnk sigpad-clear" data-role="signatory" style="margin-top:6px">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="missing-bar" id="uniBar" style="display:none;background:var(--brand-soft-2);border-color:#d3e8e6;color:var(--brand-ink)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg>
           <span id="uniTxt"></span>
@@ -545,6 +577,7 @@ const DEFAULTS = {
   noticePeriod:"1 month",
   restraintMonths:"3",
   signatoryName:"", signatoryTitle:"",
+  employeeSignature:"", signatorySignature:"",
   ftBasis:"fulltime",
   // contractor
   cEntity:"", cABN:"", cGST:"Not registered for GST",
@@ -1426,17 +1459,22 @@ function renderHTML(blocks, forWord){
           return s + `</li>`;
         }).join("") + `</ol>`);
         break;
-      case "accept":
+      case "accept": {
+        const eSig = state.data.employeeSignature;
+        const sSig = state.data.signatorySignature;
         out.push(`<div class="sig"><h4>${esc(bl.heading)}</h4><p>${htmlText(bl.body)}</p>`
-          + `<div class="sigline"><span>Signed:</span><i></i></div>`
+          + `<div class="sigline"><span>Signed:</span>`
+          + (eSig ? `<img class="sigimg" src="${eSig}" alt="Signature">` : `<i></i>`) + `</div>`
           + `<div class="sigline"><span>Print name:</span><i></i></div>`
           + `<div class="sigline"><span>Date:</span><i></i></div>`
           + (bl.signatory ? `<p style="margin-top:22px">Offered on behalf of ${esc(COMPANY.name)}:</p>`
-              + `<div class="sigline"><span>Signed:</span><i></i></div>`
+              + `<div class="sigline"><span>Signed:</span>`
+              + (sSig ? `<img class="sigimg" src="${sSig}" alt="Signature">` : `<i></i>`) + `</div>`
               + `<p style="margin-top:8px">${htmlText(ph(bl.signatory.name,"Name"))}`
               + (bl.signatory.title? `<br>${htmlText(bl.signatory.title)}`:"") + `</p>` : "")
           + `</div>`);
         break;
+      }
       case "footer":
         out.push(`<div class="ftr"><span>${esc(bl.left)}</span><span>${esc(COMPANY.name)}</span></div>`);
         break;
@@ -2079,6 +2117,8 @@ function renderForm(){
   });
   $("#formInner").innerHTML = html.join("");
   wireForm();
+  const sigLabel = $("#sigLabelEmployee");
+  if(sigLabel) sigLabel.textContent = state.type === "contractor" ? "Contractor signature" : "Employee signature";
 }
 
 function fieldHTML(f){
@@ -3274,6 +3314,71 @@ async function downloadWord(){
   }catch(e){ console.error(e); toast("Could not build the Word file", "err"); }
 }
 
+/* ---------- signature pads ----------
+   Two on-screen canvases (employee/contractor + Health U signatory). Live
+   outside #formInner (see the static markup above it) so a drawn signature
+   isn't wiped out whenever renderForm() rebuilds the schema-driven fields.
+   Drawing writes a PNG data URL straight into state.data, so it's already
+   part of what "Submit" sends and needs no extra wiring there. */
+const sigPads = {};
+function setupSignaturePad(role){
+  const wrap = $(`.sigpad[data-role="${role}"]`);
+  const canvas = wrap.querySelector("canvas");
+  const ratio = window.devicePixelRatio || 1;
+  const rect = wrap.getBoundingClientRect();
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#171717";
+  let drawing = false, drawn = false;
+  const pos = e=>{ const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  canvas.addEventListener("pointerdown", e=>{
+    drawing = true; drawn = true;
+    wrap.dataset.empty = "false";
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener("pointermove", e=>{
+    if(!drawing) return;
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y); ctx.stroke();
+  });
+  const end = ()=>{
+    if(!drawing) return;
+    drawing = false;
+    if(drawn) state.data[role+"Signature"] = canvas.toDataURL("image/png");
+    renderPreview();
+  };
+  canvas.addEventListener("pointerup", end);
+  canvas.addEventListener("pointerleave", end);
+  sigPads[role] = { canvas, ctx, wrap };
+}
+function clearSignaturePad(role){
+  const p = sigPads[role];
+  if(!p) return;
+  p.ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+  p.wrap.dataset.empty = "true";
+  state.data[role+"Signature"] = "";
+  renderPreview();
+}
+function initSignaturePads(){
+  setupSignaturePad("employee");
+  setupSignaturePad("signatory");
+  $$(".sigpad-clear").forEach(b=> b.onclick = ()=> clearSignaturePad(b.dataset.role));
+}
+// Called after a wholesale state.data reset (Clear / Load example), since
+// those don't touch the canvases themselves, only the state they read from.
+function resetSignaturePadsVisual(){
+  ["employee","signatory"].forEach(role=>{
+    const p = sigPads[role];
+    if(p){ p.ctx.clearRect(0, 0, p.canvas.width, p.canvas.height); p.wrap.dataset.empty = "true"; }
+  });
+}
+
 /* ---------- submit to admin panel ----------
    Saves the current contract (type + full field data, plus the rendered
    document HTML) to the Health U admin panel, so the admin can view it,
@@ -3352,15 +3457,16 @@ function boot(){
   $("#btnPdf").onclick = downloadPDF;
   $("#btnWord").onclick = downloadWord;
   $("#btnSubmit").onclick = submitContract;
+  initSignaturePads();
   $("#btnSample").onclick = ()=>{
     Object.assign(state.data, DEFAULTS, SAMPLE);
     state.type = "casual";
-    renderForm(); renderPreview(); toast("Example loaded");
+    renderForm(); renderPreview(); resetSignaturePadsVisual(); toast("Example loaded");
   };
   $("#btnClear").onclick = async ()=>{
     if(!(await askConfirm("Start a new contract?", "This clears every field on the form.", "Clear the form", "Keep editing", true))) return;
     state.data = Object.assign({}, DEFAULTS, {letterDate: todayISO()});
-    renderForm(); renderPreview(); toast("Cleared");
+    renderForm(); renderPreview(); resetSignaturePadsVisual(); toast("Cleared");
   };
   const openImport = ()=>{ $("#importModal").hidden = false; setTimeout(()=>$("#importText").focus(), 40); };
   $("#btnImport").onclick = openImport;

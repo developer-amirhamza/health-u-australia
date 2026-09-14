@@ -72,6 +72,7 @@ const docStyles = `
 .hu-contract-doc .doc .sigline{margin:16px 0 0;display:flex;gap:10px;align-items:flex-end}
 .hu-contract-doc .doc .sigline span{font-weight:600;min-width:96px}
 .hu-contract-doc .doc .sigline i{flex:1;border-bottom:1px solid #6b7280;height:15px;display:block}
+.hu-contract-doc .doc .sigline img.sigimg{flex:1;max-height:44px;border-bottom:1px solid #6b7280;object-fit:contain;object-position:left bottom}
 .hu-contract-doc .doc .fill{border-bottom:1px solid #6b7280;display:inline-block;min-width:190px}
 .hu-contract-doc .doc .ftr{margin-top:28px;padding-top:9px;border-top:1px solid #d7dbe2;font-family:var(--font);font-size:8pt;color:#7a8090;display:flex;justify-content:space-between}
 .hu-contract-doc .doc .ph{background:#fdf1e8;border-bottom:1px dashed var(--accent);color:var(--accent);padding:0 2px;border-radius:2px;font-style:italic}
