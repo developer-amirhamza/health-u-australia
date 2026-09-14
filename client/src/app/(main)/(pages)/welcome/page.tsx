@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { Metadata } from 'next'
-import WelcomeContent from 'app/components/WelcomeContent'
+import WelcomeContent from 'app/(main)/components/WelcomeContent'
 
 export const metadata: Metadata = {
   title: 'Welcome',

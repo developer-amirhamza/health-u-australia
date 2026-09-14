@@ -1,6 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import ServiceAgreementForm from 'app/components/ServiceAgreementForm'
+import ServiceAgreementForm from 'app/(main)/components/ServiceAgreementForm'
 
 export const metadata: Metadata = {
   title: 'Service Agreement Tool',

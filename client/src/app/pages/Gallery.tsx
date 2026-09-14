@@ -4,7 +4,7 @@ import PageBanner from 'utils/PageBanner'
 import { gallery_images, sil_property } from 'config/page'
 import Image from 'next/image'
 import { FaPlus } from 'react-icons/fa'
-import SlideModal from 'app/components/SlideModal'
+import SlideModal from 'app/(main)/components/SlideModal'
 import Title from 'utils/Title';
 import { motion } from 'framer-motion'
 import { fadeIn } from 'app/variants'

@@ -1,5 +1,5 @@
 
-import SnapForm from 'app/components/SnapForm';
+import SnapForm from 'app/(main)/components/SnapForm';
 import Referral from 'app/pages/Referral'
 import { Metadata } from 'next'
 import React from 'react'

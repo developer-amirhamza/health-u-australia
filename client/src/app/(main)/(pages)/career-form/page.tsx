@@ -1,4 +1,4 @@
-import CareerSnapForm from 'app/components/CareerSnapForm'
+import CareerSnapForm from 'app/(main)/components/CareerSnapForm'
 import React from 'react'
 import { Metadata } from 'next'
 
