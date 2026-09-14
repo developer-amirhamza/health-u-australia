@@ -354,7 +354,7 @@ const ServiceAgreementForm = () => {
         </div>
       </div>
 
-      <div ref={printRef} className="bg-white">
+      <div ref={printRef} className="bg-white px-8 ">
       {/* Document header */}
       <div className="flex flex-col items-center text-center gap-3 mb-6">
         <Image src={logo} alt="Health U logo" className="w-40 h-auto" />
