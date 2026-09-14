@@ -10,7 +10,7 @@ import { ChangeEvent, FormEvent, useState } from 'react'
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FaEnvelope, FaLock, FaRegEye, FaRegEyeSlash } from 'react-icons/fa6';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
 import Image from 'next/image';
@@ -28,7 +28,6 @@ const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch<AppDispatch>()
     const router = useRouter()
-    const {user} = useSelector((state:any) => state.userSlice);
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({
@@ -51,13 +50,14 @@ const SignIn = () => {
                 // Store tokens in localStorage
                 localStorage.setItem("accessToken", response?.data?.data?.accessToken);
                 localStorage.setItem("refreshToken", response?.data?.data?.refreshToken);
-                // Merge the guest cart (identified by the cartToken cookie) into
-                // this account BEFORE re-fetching, so items added while logged
-                // out aren't lost. Failure here must never block the login.
 
                 dispatch(fetchUser())
                 setFormData(initialFormData);
-                router.push(portalPath(user.role));
+                // Use the role from this response, not Redux — dispatching
+                // fetchUser() above doesn't update the store until its request
+                // resolves, so reading `user` from useSelector here would still
+                // be last render's (signed-out) value and crash on `.role`.
+                router.push(portalPath(response?.data?.data?.user?.role));
             }
         } catch (error: any) {
             if (error?.response?.data?.data?.code === "EMAIL_NOT_VERIFIED") {
