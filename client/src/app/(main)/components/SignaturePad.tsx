@@ -98,6 +98,7 @@ const SignaturePad = ({ value, onChange, label, error }: SignaturePadProps) => {
       <button
         type="button"
         onClick={clear}
+        data-pdf-hide="true"
         className="print:hidden self-start text-xs font-semibold text-primary hover:underline cursor-pointer"
       >
         Clear signature

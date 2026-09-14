@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { SummeryApi } from 'app/common/SummeryApi';
@@ -120,8 +121,16 @@ const AdminServiceAgreementsPage = () => {
     return (
         <div className="container mx-auto p-4 py-12">
             <div className="flex justify-between items-center my-6">
-                <h1 className="text-2xl font-bold">Service Agreements</h1>
-                <span className="text-sm text-gray-500">{agreements.length} agreement{agreements.length !== 1 ? 's' : ''}</span>
+                <div className="flex items-center gap-3">
+                    <h1 className="text-2xl font-bold">Service Agreements</h1>
+                    <span className="text-sm text-gray-500">{agreements.length} agreement{agreements.length !== 1 ? 's' : ''}</span>
+                </div>
+                <Link
+                    href="/admin/service-agreement-tool"
+                    className="text-sm font-semibold text-white bg-primary hover:bg-secondary transition-colors duration-300 rounded-full px-5 py-2.5"
+                >
+                    + New Agreement
+                </Link>
             </div>
 
             <div className="flex flex-wrap gap-3 mb-6">

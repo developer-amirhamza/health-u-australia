@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { errorHandler } from '../utils/errorHandler.js';
+import { sendEmail } from '../config/sendEmail.js';
+import agreementSubmittedTemplate from '../utils/agreementSubmittedTemplate.js';
 
 interface AuthRequest extends Request {
   userId?: string;
@@ -149,6 +151,25 @@ export const createServiceAgreement = async (req: AuthRequest, res: Response) =>
     if (req.userId) data.createdById = req.userId;
 
     const agreement = await prisma.serviceAgreement.create({ data });
+
+    if (req.userId) {
+      const submitter = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: { email: true, firstName: true },
+      });
+      if (submitter?.email) {
+        await sendEmail({
+          sendTo: submitter.email,
+          subject: 'Service Agreement Submitted - Health U Australia',
+          html: agreementSubmittedTemplate({
+            firstName: submitter.firstName || 'there',
+            participantName: agreement.participantName,
+            quoteNumber: agreement.quoteNumber || undefined,
+          }),
+        }).catch((err) => console.error('Service agreement confirmation email failed:', err.message));
+      }
+    }
+
     return errorHandler(res, 201, 'Service agreement saved', false, agreement);
   } catch (error: any) {
     return errorHandler(res, 500, error.message || 'Internal server error');

@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useForm, useFieldArray, useWatch, Controller, type SubmitHandler } from 'react-hook-form'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
@@ -225,6 +225,7 @@ const ServiceAgreementForm = () => {
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const [saving, setSaving] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
+  const printRef = useRef<HTMLDivElement>(null)
 
   const watchedItems = useWatch({ control, name: 'items' })
   const applyGst = useWatch({ control, name: 'applyGst' })
@@ -251,10 +252,50 @@ const ServiceAgreementForm = () => {
   const gstAmount = applyGst ? subtotal * 0.1 : 0
   const grandTotal = subtotal + gstAmount
 
+  // Renders the printable content (everything inside `printRef`) to a
+  // multi-page PDF and triggers a direct file download — no browser print
+  // dialog involved. html2canvas-pro (rather than plain html2canvas) is
+  // required here because the form uses Tailwind v4's default palette
+  // utility classes (e.g. `neutral-300`), which resolve to `oklch()` colors
+  // that the unmaintained html2canvas can't parse.
+  const downloadPdf = async (values: FormValues) => {
+    if (!printRef.current) return
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import('html2canvas-pro'),
+      import('jspdf'),
+    ])
+    const canvas = await html2canvas(printRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      ignoreElements: (el) => el.getAttribute('data-pdf-hide') === 'true',
+    })
+    const imgData = canvas.toDataURL('image/jpeg', 0.95)
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const imgWidth = pageWidth
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    let heightLeft = imgHeight
+    let position = 0
+
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight)
+    heightLeft -= pageHeight
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+    }
+
+    const safeName = (values.participantName || 'Participant').trim().replace(/[^a-z0-9]+/gi, '-')
+    pdf.save(`Service-Agreement-${safeName}.pdf`)
+  }
+
   // Saves the agreement (create on first submit, update on subsequent ones)
-  // so it shows up in the admin's Service Agreements list, then still opens
-  // the print dialog either way — a save failure shouldn't block staff from
-  // getting their PDF.
+  // so it shows up in the admin's Service Agreements list, then downloads
+  // the PDF either way — a save failure shouldn't block staff from getting
+  // their PDF.
   const onDownload: SubmitHandler<FormValues> = async (values) => {
     try {
       setSaving(true)
@@ -272,18 +313,16 @@ const ServiceAgreementForm = () => {
     } finally {
       setSaving(false)
     }
-    window.print()
+    try {
+      await downloadPdf(values)
+    } catch (error) {
+      console.error(error)
+      toast.error('Could not generate the PDF')
+    }
   }
 
   return (
     <form onSubmit={handleSubmit(onDownload)} className="container mx-auto max-w-5xl pb-24">
-      <style jsx global>{`
-        @media print {
-          header, footer, .fixed { display: none !important; }
-          body { background: #fff !important; }
-        }
-      `}</style>
-
       {/* Action bar */}
       <div className="print:hidden sticky top-0 z-40 -mx-5 sm:-mx-10 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur border-b border-neutral-200 px-5 sm:px-10 py-3">
         <p className="text-sm text-secondary-text">
@@ -315,6 +354,7 @@ const ServiceAgreementForm = () => {
         </div>
       </div>
 
+      <div ref={printRef} className="bg-white">
       {/* Document header */}
       <div className="flex flex-col items-center text-center gap-3 mb-6">
         <Image src={logo} alt="Health U logo" className="w-40 h-auto" />
@@ -777,7 +817,7 @@ const ServiceAgreementForm = () => {
                 <th className="p-2 font-semibold">Weeks</th>
                 <th className="p-2 font-semibold">Line Total</th>
                 <th className="p-2 font-semibold min-w-[160px]">Notes</th>
-                <th className="p-2 print:hidden"></th>
+                <th className="p-2 print:hidden" data-pdf-hide="true"></th>
               </tr>
             </thead>
             <tbody>
@@ -803,7 +843,7 @@ const ServiceAgreementForm = () => {
                   <td className="p-1.5 text-center whitespace-nowrap">{computedRows[index]?.weeks ?? 0}</td>
                   <td className="p-1.5 text-right whitespace-nowrap font-semibold">{money(computedRows[index]?.lineTotal ?? 0)}</td>
                   <td className="p-1.5"><input className={smallInputCls} {...register(`items.${index}.notes` as const)} /></td>
-                  <td className="p-1.5 print:hidden">
+                  <td className="p-1.5 print:hidden" data-pdf-hide="true">
                     <button
                       type="button"
                       onClick={() => remove(index)}
@@ -822,6 +862,7 @@ const ServiceAgreementForm = () => {
         <button
           type="button"
           onClick={() => append({ ...emptyItem })}
+          data-pdf-hide="true"
           className="print:hidden self-start text-sm font-semibold text-white bg-secondary hover:bg-primary transition-colors duration-300 rounded-full px-5 py-2 w-fit"
         >
           + Add support item
@@ -886,6 +927,7 @@ const ServiceAgreementForm = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <div className="print:hidden flex justify-end mt-10">
