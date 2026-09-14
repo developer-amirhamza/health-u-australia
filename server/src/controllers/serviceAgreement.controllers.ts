@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { errorHandler } from '../utils/errorHandler.js';
 import { sendEmail } from '../config/sendEmail.js';
 import agreementSubmittedTemplate from '../utils/agreementSubmittedTemplate.js';
+import serviceAgreementPdfTemplate from '../utils/serviceAgreementPdfTemplate.js';
 
 interface AuthRequest extends Request {
   userId?: string;
@@ -211,6 +212,37 @@ export const updateServiceAgreement = async (req: Request, res: Response) => {
 
     const updated = await prisma.serviceAgreement.update({ where: { id }, data });
     return errorHandler(res, 200, 'Service agreement updated', false, updated);
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Emails the client-facing PDF (generated on the tool's frontend from the
+// filled-in form) straight to the participant. Not tied to a saved
+// ServiceAgreement record — staff can send a copy without saving first.
+export const sendServiceAgreementPdf = async (req: AuthRequest, res: Response) => {
+  try {
+    const { toEmail, participantName, pdfBase64 } = req.body;
+    if (!toEmail || !EMAIL_RE.test(String(toEmail))) {
+      return errorHandler(res, 400, 'A valid recipient email is required');
+    }
+    if (!pdfBase64) {
+      return errorHandler(res, 400, 'PDF data is required');
+    }
+
+    const buffer = Buffer.from(String(pdfBase64), 'base64');
+    const safeName = String(participantName || 'Participant').trim().replace(/[^a-z0-9]+/gi, '-');
+
+    await sendEmail({
+      sendTo: toEmail,
+      subject: 'Your NDIS Service Agreement - Health U Australia',
+      html: serviceAgreementPdfTemplate({ participantName: participantName || 'there' }),
+      attachments: [{ filename: `Service-Agreement-${safeName}.pdf`, content: buffer }],
+    });
+
+    return errorHandler(res, 200, 'Service agreement emailed to the client', false, null);
   } catch (error: any) {
     return errorHandler(res, 500, error.message || 'Internal server error');
   }

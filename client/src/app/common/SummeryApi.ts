@@ -88,4 +88,5 @@ export const SummeryApi = {
     createServiceAgreement: { url: "/api/service-agreements/create", method: "post" },
     updateServiceAgreement: { url: "/api/service-agreements/update", method: "put" },
     deleteServiceAgreement: { url: "/api/service-agreements/delete", method: "delete" },
+    sendServiceAgreementPdf: { url: "/api/service-agreements/send-pdf", method: "post" },
 };
