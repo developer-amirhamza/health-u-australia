@@ -15,9 +15,12 @@ app.use(cors({
     origin:clientOrigins,
 }))
 
-app.use(express.json());
+// 20mb (rather than Express's 100kb default) so the Service Agreement Tool
+// can post a generated PDF as base64 JSON to be emailed to the client.
+app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({
     extended:true,
+    limit: "20mb",
 }));
 app.use(cookieParser());
 app.use(morgan("dev"));

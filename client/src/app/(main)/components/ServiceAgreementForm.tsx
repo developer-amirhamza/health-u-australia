@@ -221,10 +221,11 @@ const YesNo = ({
 )
 
 const ServiceAgreementForm = () => {
-  const { register, control, handleSubmit, watch, reset } = useForm<FormValues>({ defaultValues })
+  const { register, control, handleSubmit, watch, reset, getValues } = useForm<FormValues>({ defaultValues })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const [saving, setSaving] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
+  const [sendingToClient, setSendingToClient] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
   const watchedItems = useWatch({ control, name: 'items' })
@@ -253,13 +254,12 @@ const ServiceAgreementForm = () => {
   const grandTotal = subtotal + gstAmount
 
   // Renders the printable content (everything inside `printRef`) to a
-  // multi-page PDF and triggers a direct file download — no browser print
-  // dialog involved. html2canvas-pro (rather than plain html2canvas) is
+  // multi-page PDF. html2canvas-pro (rather than plain html2canvas) is
   // required here because the form uses Tailwind v4's default palette
   // utility classes (e.g. `neutral-300`), which resolve to `oklch()` colors
   // that the unmaintained html2canvas can't parse.
-  const downloadPdf = async (values: FormValues) => {
-    if (!printRef.current) return
+  const buildPdf = async () => {
+    if (!printRef.current) return null
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import('html2canvas-pro'),
       import('jspdf'),
@@ -288,8 +288,7 @@ const ServiceAgreementForm = () => {
       heightLeft -= pageHeight
     }
 
-    const safeName = (values.participantName || 'Participant').trim().replace(/[^a-z0-9]+/gi, '-')
-    pdf.save(`Service-Agreement-${safeName}.pdf`)
+    return pdf
   }
 
   // Saves the agreement (create on first submit, update on subsequent ones)
@@ -314,10 +313,47 @@ const ServiceAgreementForm = () => {
       setSaving(false)
     }
     try {
-      await downloadPdf(values)
+      const pdf = await buildPdf()
+      if (!pdf) return
+      const safeName = (values.participantName || 'Participant').trim().replace(/[^a-z0-9]+/gi, '-')
+      pdf.save(`Service-Agreement-${safeName}.pdf`)
     } catch (error) {
       console.error(error)
       toast.error('Could not generate the PDF')
+    }
+  }
+
+  // Emails the same PDF straight to the participant, at the address entered
+  // under Contact Details (section 12).
+  const sendToClient = async () => {
+    const values = getValues()
+    const toEmail = values.contactEmail?.trim()
+    if (!toEmail) {
+      toast.error("Add the participant's email under Contact Details (section 12) first")
+      return
+    }
+    try {
+      setSendingToClient(true)
+      const pdf = await buildPdf()
+      if (!pdf) return
+      const pdfBase64 = pdf.output('datauristring').split(',')[1]
+      const response = await Axios({
+        ...SummeryApi.sendServiceAgreementPdf,
+        data: {
+          toEmail,
+          participantName: values.participantName,
+          pdfBase64,
+        },
+      })
+      if (response.data?.success) {
+        toast.success(`Sent to ${toEmail}`)
+      } else {
+        toast.error(response.data?.message || 'Could not send the PDF')
+      }
+    } catch (error) {
+      AxiosToastError(error)
+    } finally {
+      setSendingToClient(false)
     }
   }
 
@@ -338,11 +374,12 @@ const ServiceAgreementForm = () => {
           </button>
           <button
             type="button"
-            disabled
-            title="Sending will be enabled once this tool is connected to the backend"
-            className="text-white text-sm font-semibold px-5 py-2.5 rounded-full bg-neutral-300 cursor-not-allowed"
+            onClick={sendToClient}
+            disabled={sendingToClient}
+            title="Emails the PDF to the participant's address from Contact Details (section 12)"
+            className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-secondary hover:bg-primary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Send to client (coming soon)
+            {sendingToClient ? 'Sending…' : 'Send to client'}
           </button>
           <button
             type="submit"
