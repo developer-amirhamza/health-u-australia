@@ -89,4 +89,10 @@ export const SummeryApi = {
     updateServiceAgreement: { url: "/api/service-agreements/update", method: "put" },
     deleteServiceAgreement: { url: "/api/service-agreements/delete", method: "delete" },
     sendServiceAgreementPdf: { url: "/api/service-agreements/send-pdf", method: "post" },
+
+    // ── Contract Generator (submitted from the static /contract-generator.html tool) ──
+    getContracts: { url: "/api/contracts", method: "get" },
+    getContractById: { url: "/api/contracts/single", method: "get" },
+    deleteContract: { url: "/api/contracts/delete", method: "delete" },
+    sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
 };

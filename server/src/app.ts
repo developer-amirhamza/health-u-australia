@@ -7,6 +7,7 @@ import userRouter from "./routes/user.route.js";
 import { clientOrigins } from "./config/clientUrl.js";
 import scBillingRouter from "./routes/scBilling.route.js"
 import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
+import contractRouter from "./routes/contract.route.js"
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(helmet({
 app.use("/api/user/", userRouter);
 app.use("/api/sc-billing", scBillingRouter);
 app.use("/api/service-agreements", serviceAgreementRouter);
+app.use("/api/contracts", contractRouter);
 
 
 
