@@ -162,6 +162,13 @@ model ServiceAgreement {
   providerSignatureName     String  @default("")
   providerSignedDate        String  @default("")
 
+  // Set when staff email the participant a link to review and sign the
+  // agreement themselves (see /service-agreement/sign). Kept (not cleared)
+  // once signed, so a re-visited link can still show "already signed"
+  // instead of "invalid link".
+  signingToken          String?   @unique
+  signingTokenExpiresAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

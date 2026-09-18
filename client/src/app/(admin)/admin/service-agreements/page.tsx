@@ -18,6 +18,7 @@ interface AgreementRow {
     managementType: string;
     createdAt: string;
     updatedAt: string;
+    signingToken?: string | null;
     createdBy?: { id: string; firstName: string; lastName: string | null } | null;
 }
 
@@ -101,6 +102,20 @@ const AdminServiceAgreementsPage = () => {
         } catch (error) { AxiosToastError(error); } finally { setActionLoading(null); }
     };
 
+    const handleSendSignatureRequest = async (id: string) => {
+        try {
+            setActionLoading(id);
+            const response = await Axios({ ...SummeryApi.sendSignatureRequest, data: { id } });
+            if (response.data?.success) {
+                toast.success(response.data.message || 'Signature request sent');
+                setAgreements(prev => prev.map(a => (a.id === id ? { ...a, signingToken: 'pending' } : a)));
+                setSelected(prev => (prev && prev.id === id ? { ...prev, signingToken: 'pending' } : prev));
+            } else {
+                toast.error(response.data?.message || 'Could not send the signature request');
+            }
+        } catch (error) { AxiosToastError(error); } finally { setActionLoading(null); }
+    };
+
     const handleDelete = async (id: string, name: string) => {
         if (!window.confirm(`Delete the service agreement for "${name}"? This cannot be undone.`)) return;
         try {
@@ -169,6 +184,11 @@ const AdminServiceAgreementsPage = () => {
                                         <span className={`inline-block text-xs font-semibold rounded border px-2 py-1 ${STATUS_BADGE[a.status] ?? STATUS_BADGE.DRAFT}`}>
                                             {a.status}
                                         </span>
+                                        {a.status !== 'SIGNED' && a.signingToken && (
+                                            <span className="ml-1 inline-block text-xs font-semibold rounded border px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
+                                                Awaiting Signature
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                         {formatDate(a.agreementStartDate)} – {formatDate(a.agreementEndDate)}
@@ -213,7 +233,18 @@ const AdminServiceAgreementsPage = () => {
                                             {selected.status}
                                         </span>
                                     </div>
-                                    <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
+                                    <div className="flex items-center gap-3">
+                                        {selected.status !== 'SIGNED' && selected.status !== 'ARCHIVED' && (
+                                            <button
+                                                disabled={actionLoading === selected.id}
+                                                onClick={() => handleSendSignatureRequest(selected.id)}
+                                                className="text-sm font-semibold text-white bg-secondary hover:bg-primary transition-colors duration-300 rounded-full px-4 py-1.5 disabled:opacity-50"
+                                            >
+                                                {actionLoading === selected.id ? 'Sending…' : selected.signingToken ? 'Resend Signature Request' : 'Send for Signature'}
+                                            </button>
+                                        )}
+                                        <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
+                                    </div>
                                 </div>
 
                                 <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm mb-6">
