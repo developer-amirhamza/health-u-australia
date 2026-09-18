@@ -91,6 +91,20 @@ type FormValues = {
   providerSignedDate: string
 }
 
+interface ServiceAgreementFormProps {
+  // 'edit' (default): the admin fills in the agreement, signs as the
+  // provider, and sends it on. 'sign': a participant opened this from the
+  // emailed link — everything is read-only except their own signature.
+  mode?: 'edit' | 'sign'
+  // Pre-fills the form in 'sign' mode with the agreement the admin already
+  // saved. Ignored in 'edit' mode (which always starts blank).
+  initialData?: Partial<FormValues>
+  // The signing token from the emailed link — required in 'sign' mode.
+  token?: string
+  // Called after the participant's signature is submitted successfully.
+  onSigned?: () => void
+}
+
 const emptyItem: SupportItem = {
   itemCode: '',
   itemName: '',
@@ -220,12 +234,16 @@ const YesNo = ({
   />
 )
 
-const ServiceAgreementForm = () => {
-  const { register, control, handleSubmit, watch, reset, getValues } = useForm<FormValues>({ defaultValues })
+const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: ServiceAgreementFormProps) => {
+  const { register, control, handleSubmit, watch, reset, getValues } = useForm<FormValues>({
+    defaultValues: initialData ? { ...defaultValues, ...initialData } : defaultValues,
+  })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const [saving, setSaving] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
   const [sendingToClient, setSendingToClient] = useState(false)
+  const [sendingSignatureRequest, setSendingSignatureRequest] = useState(false)
+  const [submittingSignature, setSubmittingSignature] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
   const watchedItems = useWatch({ control, name: 'items' })
@@ -357,41 +375,126 @@ const ServiceAgreementForm = () => {
     }
   }
 
+  // Saves the agreement (same as onDownload), then emails the participant a
+  // link to review it and add their own signature — replacing the old flow
+  // where the admin drew the participant's signature on their behalf.
+  const sendForSignature = async () => {
+    const values = getValues()
+    const toEmail = values.contactEmail?.trim()
+    if (!toEmail) {
+      toast.error("Add the participant's email under Contact Details (section 12) first")
+      return
+    }
+    try {
+      setSendingSignatureRequest(true)
+      const response = savedId
+        ? await Axios({ ...SummeryApi.updateServiceAgreement, data: { id: savedId, ...values } })
+        : await Axios({ ...SummeryApi.createServiceAgreement, data: values })
+      if (!response.data?.success) {
+        toast.error(response.data?.message || 'Could not save the agreement')
+        return
+      }
+      const id = savedId ?? response.data?.data?.id
+      if (!savedId && id) setSavedId(id)
+      if (!id) {
+        toast.error('Could not determine the saved agreement to send')
+        return
+      }
+      const sigResponse = await Axios({ ...SummeryApi.sendSignatureRequest, data: { id } })
+      if (sigResponse.data?.success) {
+        toast.success(`Signature request sent to ${toEmail}`)
+      } else {
+        toast.error(sigResponse.data?.message || 'Could not send the signature request')
+      }
+    } catch (error) {
+      AxiosToastError(error)
+    } finally {
+      setSendingSignatureRequest(false)
+    }
+  }
+
+  // 'sign' mode's submit handler — only the participant's own signature
+  // fields are sent; the backend rejects anything else through this route.
+  const onSubmitSignature: SubmitHandler<FormValues> = async (values) => {
+    if (!token) return
+    try {
+      setSubmittingSignature(true)
+      const response = await Axios({
+        ...SummeryApi.submitParticipantSignature,
+        data: {
+          token,
+          participantSignature: values.participantSignature,
+          participantSignatureName: values.participantSignatureName,
+          participantSignedDate: values.participantSignedDate,
+          agreementExplained: values.agreementExplained,
+        },
+      })
+      if (response.data?.success) {
+        toast.success('Thank you — your signature has been submitted')
+        onSigned?.()
+      } else {
+        toast.error(response.data?.message || 'Could not submit your signature')
+      }
+    } catch (error) {
+      AxiosToastError(error)
+    } finally {
+      setSubmittingSignature(false)
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit(onDownload)} className="container mx-auto max-w-5xl pb-24">
+    <form onSubmit={handleSubmit(mode === 'sign' ? onSubmitSignature : onDownload)} className="container mx-auto max-w-5xl pb-24">
       {/* Action bar */}
       <div className="print:hidden sticky top-0 z-40 -mx-5 sm:-mx-10 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur border-b border-neutral-200 px-5 sm:px-10 py-3">
-        <p className="text-sm text-secondary-text">
-          Fill in the agreement below, then download a client-ready PDF.
-        </p>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => reset(defaultValues)}
-            className="text-sm font-semibold text-secondary-text hover:text-primary transition-colors cursor-pointer"
-          >
-            Reset form
-          </button>
-          <button
-            type="button"
-            onClick={sendToClient}
-            disabled={sendingToClient}
-            title="Emails the PDF to the participant's address from Contact Details (section 12)"
-            className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-secondary hover:bg-primary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {sendingToClient ? 'Sending…' : 'Send to client'}
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Saving…' : 'Save & Download PDF'}
-          </button>
-        </div>
+        {mode === 'sign' ? (
+          <p className="text-sm text-secondary-text">
+            Please review the agreement below, then add your signature at the end to confirm your consent.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-secondary-text">
+              Fill in the agreement below, then send it to the participant to sign, or download a client-ready PDF.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => reset(defaultValues)}
+                className="text-sm font-semibold text-secondary-text hover:text-primary transition-colors cursor-pointer"
+              >
+                Reset form
+              </button>
+              <button
+                type="button"
+                onClick={sendForSignature}
+                disabled={sendingSignatureRequest}
+                title="Emails the participant a link to review this agreement and add their own signature"
+                className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-secondary hover:bg-primary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {sendingSignatureRequest ? 'Sending…' : 'Send for Signature'}
+              </button>
+              <button
+                type="button"
+                onClick={sendToClient}
+                disabled={sendingToClient}
+                title="Emails the PDF to the participant's address from Contact Details (section 12)"
+                className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-secondary hover:bg-primary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {sendingToClient ? 'Sending…' : 'Send to client'}
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="text-white cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Saving…' : 'Save & Download PDF'}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div ref={printRef} className="bg-white px-10">
+      <fieldset disabled={mode === 'sign'} className="contents border-0 p-0 m-0">
       {/* Document header */}
       <div className="flex flex-col items-center text-center gap-3 mb-6">
         <Image src={logo} alt="Health U logo" className="w-40 h-auto" />
@@ -915,66 +1018,103 @@ const ServiceAgreementForm = () => {
           <p className="text-lg font-bold text-secondary-text">Grand Total: <span className="text-primary">{money(grandTotal)}</span></p>
         </div>
       </div>
+      </fieldset>
 
       {/* 14. Signatures */}
       <h2 className={sectionTitleCls}>14. Agreement Signatures</h2>
       <div className={cardCls}>
         <p className={staticTextCls}>The parties understand and agree to the terms and conditions of this Service Agreement.</p>
-        <label className={checkboxRowCls}>
-          <input type="checkbox" {...register('agreementExplained', { required: true })} />
-          This Service Agreement has been explained to me using a language, mode or method that I understand <Req />
-        </label>
+        {mode === 'sign' ? (
+          <label className={checkboxRowCls}>
+            <input type="checkbox" {...register('agreementExplained', { required: true })} />
+            This Service Agreement has been explained to me using a language, mode or method that I understand <Req />
+          </label>
+        ) : (
+          <p className="text-sm text-neutral-500 italic">
+            The participant will confirm this, and add their own signature below, once you send this agreement to them for signature.
+          </p>
+        )}
 
         <div className="grid sm:grid-cols-2 gap-8 mt-4">
           <div className="flex flex-col gap-4">
-            <Controller
-              name="participantSignature"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <SignaturePad label="Signature of Participant / Participant Representative *" value={field.value} onChange={field.onChange} />
-              )}
-            />
-            <div>
-              <label className={labelCls}>Name of Participant / Participant Representative <Req /></label>
-              <input className={inputCls} {...register('participantSignatureName', { required: true })} />
-            </div>
-            <div>
-              <label className={labelCls}>Signed Date <Req /></label>
-              <input type="date" className={inputCls} {...register('participantSignedDate', { required: true })} />
-            </div>
+            {mode === 'sign' ? (
+              <>
+                <Controller
+                  name="participantSignature"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <SignaturePad label="Signature of Participant / Participant Representative *" value={field.value} onChange={field.onChange} />
+                  )}
+                />
+                <div>
+                  <label className={labelCls}>Name of Participant / Participant Representative <Req /></label>
+                  <input className={inputCls} {...register('participantSignatureName', { required: true })} />
+                </div>
+                <div>
+                  <label className={labelCls}>Signed Date <Req /></label>
+                  <input type="date" className={inputCls} {...register('participantSignedDate', { required: true })} />
+                </div>
+              </>
+            ) : (
+              <div className="rounded border border-dashed border-neutral-300 bg-neutral-50 p-5 text-sm text-neutral-600">
+                Signature of Participant / Participant Representative — collected when you send this agreement for signature.
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
-            <Controller
-              name="providerSignature"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <SignaturePad label="Signature of Provider's Authorised Person *" value={field.value} onChange={field.onChange} />
-              )}
-            />
-            <div>
-              <label className={labelCls}>Name of Provider&apos;s Authorised Person <Req /></label>
-              <input className={inputCls} {...register('providerSignatureName', { required: true })} />
-            </div>
-            <div>
-              <label className={labelCls}>Signed Date <Req /></label>
-              <input type="date" className={inputCls} {...register('providerSignedDate', { required: true })} />
-            </div>
+            {mode === 'sign' ? (
+              <div className="rounded border border-neutral-300 bg-neutral-50 p-5 text-sm text-neutral-600">
+                <p className="font-semibold text-secondary-text">Signature of Provider&apos;s Authorised Person</p>
+                <p className="mt-1">
+                  {watch('providerSignatureName') || '—'}
+                  {watch('providerSignedDate') ? ` · ${watch('providerSignedDate')}` : ''}
+                </p>
+              </div>
+            ) : (
+              <>
+                <Controller
+                  name="providerSignature"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <SignaturePad label="Signature of Provider's Authorised Person *" value={field.value} onChange={field.onChange} />
+                  )}
+                />
+                <div>
+                  <label className={labelCls}>Name of Provider&apos;s Authorised Person <Req /></label>
+                  <input className={inputCls} {...register('providerSignatureName', { required: true })} />
+                </div>
+                <div>
+                  <label className={labelCls}>Signed Date <Req /></label>
+                  <input type="date" className={inputCls} {...register('providerSignedDate', { required: true })} />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
       </div>
 
       <div className="print:hidden flex justify-end mt-10">
-        <button
-          type="submit"
-          disabled={saving}
-          className="text-white cursor-pointer text-lg font-semibold px-8 py-3.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {saving ? 'Saving…' : 'Save & Download PDF'}
-        </button>
+        {mode === 'sign' ? (
+          <button
+            type="submit"
+            disabled={submittingSignature}
+            className="text-white cursor-pointer text-lg font-semibold px-8 py-3.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {submittingSignature ? 'Submitting…' : 'Submit Signature'}
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={saving}
+            className="text-white cursor-pointer text-lg font-semibold px-8 py-3.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saving…' : 'Save & Download PDF'}
+          </button>
+        )}
       </div>
     </form>
   )

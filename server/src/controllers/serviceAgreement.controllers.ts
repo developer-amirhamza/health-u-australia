@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { prisma } from '../lib/prisma.js';
 import { errorHandler } from '../utils/errorHandler.js';
 import { sendEmail } from '../config/sendEmail.js';
+import { primaryClientUrl } from '../config/clientUrl.js';
 import agreementSubmittedTemplate from '../utils/agreementSubmittedTemplate.js';
 import serviceAgreementPdfTemplate from '../utils/serviceAgreementPdfTemplate.js';
+import serviceAgreementSignatureRequestTemplate from '../utils/serviceAgreementSignatureRequestTemplate.js';
+import serviceAgreementSignedTemplate from '../utils/serviceAgreementSignedTemplate.js';
 
 interface AuthRequest extends Request {
   userId?: string;
@@ -80,6 +84,9 @@ export const getServiceAgreements = async (req: Request, res: Response) => {
         agreementEndDate: true,
         quoteNumber: true,
         managementType: true,
+        // Not the signature image itself (large base64) — just enough to
+        // show an "Awaiting signature" indicator on the list.
+        signingToken: true,
         createdAt: true,
         updatedAt: true,
         createdBy: { select: { id: true, firstName: true, lastName: true } },
@@ -212,6 +219,117 @@ export const updateServiceAgreement = async (req: Request, res: Response) => {
 
     const updated = await prisma.serviceAgreement.update({ where: { id }, data });
     return errorHandler(res, 200, 'Service agreement updated', false, updated);
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
+// Emails the participant a link to review the agreement and add their own
+// signature (see /service-agreement/sign), instead of the admin capturing
+// it on the participant's behalf.
+export const sendSignatureRequest = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.body;
+    if (!id) return errorHandler(res, 400, 'Agreement ID is required');
+    const agreement = await prisma.serviceAgreement.findUnique({ where: { id } });
+    if (!agreement) return errorHandler(res, 404, 'Service agreement not found');
+    if (!agreement.contactEmail) {
+      return errorHandler(res, 400, "This agreement has no participant email under Contact Details");
+    }
+
+    const signingToken = crypto.randomBytes(32).toString('hex');
+    const signingTokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await prisma.serviceAgreement.update({
+      where: { id },
+      data: { signingToken, signingTokenExpiresAt },
+    });
+
+    const signUrl = `${primaryClientUrl}/service-agreement/sign?token=${signingToken}`;
+    await sendEmail({
+      sendTo: agreement.contactEmail,
+      subject: 'Please sign your NDIS Service Agreement - Health U Australia',
+      html: serviceAgreementSignatureRequestTemplate({
+        participantRepName: agreement.participantRepName || 'there',
+        signUrl,
+      }),
+    });
+
+    return errorHandler(res, 200, `Signature request sent to ${agreement.contactEmail}`, false, null);
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
+// PUBLIC (no auth) — the participant opens this via the emailed link.
+export const getServiceAgreementByToken = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+    if (!token) return errorHandler(res, 400, 'Signing token is required');
+    const agreement = await prisma.serviceAgreement.findUnique({ where: { signingToken: String(token) } });
+    if (!agreement) return errorHandler(res, 404, 'Invalid or expired signing link');
+    if (agreement.signingTokenExpiresAt && agreement.signingTokenExpiresAt.getTime() < Date.now()) {
+      return errorHandler(res, 400, 'This signing link has expired. Please contact Health U Australia for a new one.');
+    }
+
+    const { createdById, signingToken, signingTokenExpiresAt, ...safeAgreement } = agreement;
+    return errorHandler(res, 200, 'Service agreement retrieved', false, {
+      agreement: safeAgreement,
+      alreadySigned: Boolean(agreement.participantSignature),
+    });
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
+// PUBLIC (no auth) — records only the participant's own signature fields;
+// nothing else about the agreement can be changed through this endpoint.
+export const submitParticipantSignature = async (req: Request, res: Response) => {
+  try {
+    const { token, participantSignature, participantSignatureName, participantSignedDate, agreementExplained } = req.body;
+    if (!token) return errorHandler(res, 400, 'Signing token is required');
+    if (!participantSignature || !participantSignatureName || !participantSignedDate) {
+      return errorHandler(res, 400, 'Signature, name and date are required');
+    }
+
+    const agreement = await prisma.serviceAgreement.findUnique({ where: { signingToken: String(token) } });
+    if (!agreement) return errorHandler(res, 404, 'Invalid or expired signing link');
+    if (agreement.signingTokenExpiresAt && agreement.signingTokenExpiresAt.getTime() < Date.now()) {
+      return errorHandler(res, 400, 'This signing link has expired. Please contact Health U Australia for a new one.');
+    }
+    if (agreement.participantSignature) {
+      return errorHandler(res, 400, 'This agreement has already been signed');
+    }
+
+    const status = deriveStatus({ participantSignature, providerSignature: agreement.providerSignature });
+    const updated = await prisma.serviceAgreement.update({
+      where: { id: agreement.id },
+      data: {
+        participantSignature,
+        participantSignatureName,
+        participantSignedDate,
+        agreementExplained: Boolean(agreementExplained),
+        status,
+      },
+    });
+
+    if (agreement.createdById) {
+      const creator = await prisma.user.findUnique({
+        where: { id: agreement.createdById },
+        select: { email: true, firstName: true },
+      });
+      if (creator?.email) {
+        await sendEmail({
+          sendTo: creator.email,
+          subject: 'Service Agreement Signed - Health U Australia',
+          html: serviceAgreementSignedTemplate({
+            firstName: creator.firstName || 'there',
+            participantName: agreement.participantName,
+          }),
+        }).catch((err) => console.error('Signed-notification email failed:', err.message));
+      }
+    }
+
+    return errorHandler(res, 200, 'Thank you — your signature has been submitted', false, updated);
   } catch (error: any) {
     return errorHandler(res, 500, error.message || 'Internal server error');
   }
