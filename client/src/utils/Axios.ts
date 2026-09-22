@@ -8,7 +8,8 @@ import axios from "axios";
 
 const Axios = axios.create({
     baseURL:baseUrl,
-    withCredentials:true
+    withCredentials:true,
+    timeout: 30000
 });
 
 
