@@ -443,7 +443,7 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
   }
 
   return (
-    <form onSubmit={handleSubmit(mode === 'sign' ? onSubmitSignature : onDownload)} className="container mx-auto max-w-5xl pb-24">
+    <form onSubmit={handleSubmit(mode === 'sign' ? onSubmitSignature : onDownload)} className="container mx-auto max-w-8xl pb-24">
       {/* Action bar */}
       <div className="print:hidden sticky top-0 z-40 -mx-5 sm:-mx-10 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur border-b border-neutral-200 px-5 sm:px-10 py-3">
         {mode === 'sign' ? (
@@ -941,22 +941,22 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
           </div>
         </div>
 
-        <div className="overflow-x-auto -mx-5 sm:-mx-8 mt-2">
-          <table className="min-w-[1100px] w-full border-collapse text-sm">
+        <div className="overflow-x-scroll -mx-5 sm:-mx-8 mt-2">
+          <table className="min-w-[1100px] w-full my-5 border-collapse text-sm">
             <thead>
               <tr className="bg-[#1F3864] text-white text-left">
-                <th className="p-2 font-semibold">Item Code</th>
-                <th className="p-2 font-semibold min-w-[220px]">Item Name</th>
-                <th className="p-2 font-semibold">Unit Price</th>
-                <th className="p-2 font-semibold">Frequency</th>
-                <th className="p-2 font-semibold">Day</th>
-                <th className="p-2 font-semibold">Hours/Service</th>
-                <th className="p-2 font-semibold">Qty/Period</th>
-                <th className="p-2 font-semibold">Start Date</th>
-                <th className="p-2 font-semibold">End Date</th>
-                <th className="p-2 font-semibold">Weeks</th>
-                <th className="p-2 font-semibold">Line Total</th>
-                <th className="p-2 font-semibold min-w-[160px]">Notes</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Item Code</th>
+                <th className="p-2 font-semibold min-w-[220px] text-center">Item Name</th>
+                <th className="py-2 font-semibold min-w-30 text-center ">Unit Price</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Frequency</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Day</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Hours/Service</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Qty/Period</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Start Date</th>
+                <th className="py-2 font-semibold min-w-30 text-center">End Date</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Weeks</th>
+                <th className="py-2 font-semibold min-w-30 text-center">Line Total</th>
+                <th className="p-2 font-semibold text-center min-w-[160px]">Notes</th>
                 <th className="p-2 print:hidden" data-pdf-hide="true"></th>
               </tr>
             </thead>
