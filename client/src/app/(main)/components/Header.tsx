@@ -122,7 +122,7 @@ const Header = () => {
               <li key={index} className=' py-2 px-3 cursor-pointer last:hidden relative transition-all duration-500 text-center flex font-medium focus-within:text-primary  hover:text-primary text-base group  '>
                 <Nav path={item?.path} label={item?.label} />
                 {item?.options &&
-                  <ul className="absolute bg-secondary top-12  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
+                  <ul className="absolute bg-secondary top-full  text-neutral-900 flex-col w-full min-w-56 hidden transition-all duration-500  group-hover:flex ">
                     {item?.options.map((itm, idx) => (
                       <Link href={itm.path} key={idx}
                         className='flex text-start hover:bg-primary hover:text-white py-3 cursor-pointer px-5 font-medium transition-all duration-300  '>
@@ -180,7 +180,7 @@ const Header = () => {
         </nav>
       </div>
       {/* mobile  menu */}
-      <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all w-full ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
+      <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
                 ${isActive ? "left-0" : "-left-122"}
           `} >
         <p className="text-4xl font-bold text-center text-white">Menu </p>
