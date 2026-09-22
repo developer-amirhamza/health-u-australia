@@ -30,11 +30,20 @@ interface SupportItem {
 
 interface AgreementDetail extends AgreementRow {
     participantRepName: string;
-    contactAddress: string; contactPhone: string; contactEmail: string;
+    livesAlone: string; supportsProvided: string[];
     planManagerName: string; planManagerEmail: string;
-    orgContactName: string; orgPhone: string; orgEmail: string;
+    cancellationPolicyAcknowledged: boolean;
+    consentInfoConfidential: boolean; consentChangeAnytime: boolean;
+    consentMedication: string; consentMoneyManagement: string;
+    consentPhotosService: string; consentPhotosMedia: string; consentPublishFeedback: string;
+    contactAddress: string; contactPhone: string; contactEmail: string;
+    hasAlternativeContact: string; altRelationship: string[];
+    altContactName: string; altContactNumber: string; altContactEmail: string;
+    orgContactName: string; orgPhone: string; orgEmail: string; orgPostalAddress: string;
+    quoteDate: string; planStartDate: string; planEndDate: string;
     preparedBy: string; contactPerson: string; applyGst: boolean;
     items: SupportItem[];
+    agreementExplained: boolean;
     participantSignature: string; participantSignatureName: string; participantSignedDate: string;
     providerSignature: string; providerSignatureName: string; providerSignedDate: string;
 }
@@ -62,6 +71,7 @@ const AdminServiceAgreementsPage = () => {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [selected, setSelected] = useState<AgreementDetail | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     const fetchAgreements = async () => {
         try {
@@ -133,6 +143,119 @@ const AdminServiceAgreementsPage = () => {
         try { return format(new Date(dateStr), 'dd MMM yyyy'); } catch { return dateStr; }
     };
 
+    const yesNo = (v: boolean) => (v ? 'Yes' : 'No');
+
+    // Export every field of every agreement currently loaded (i.e. matching the
+    // active search/status filters) to a real .xlsx workbook — one sheet with
+    // the full agreement record, one with every support item (linked back to
+    // its agreement). The list endpoint only returns a summary, so each
+    // agreement's full detail is fetched first. xlsx is imported dynamically
+    // so it never weighs down the main bundle.
+    const handleExportAll = async () => {
+        if (agreements.length === 0) return;
+        try {
+            setExporting(true);
+            const details = await Promise.all(
+                agreements.map(async (a) => {
+                    const response = await Axios({ ...SummeryApi.getServiceAgreementById, params: { id: a.id } });
+                    if (!response.data?.success) throw new Error(response.data?.message || `Failed to load "${a.participantName}"`);
+                    return response.data.data as AgreementDetail;
+                })
+            );
+
+            const XLSX = await import('xlsx');
+
+            const agreementRows = details.map((d) => ({
+                'Participant Name': d.participantName || '',
+                'NDIS Number': d.participantNdisNumber || '',
+                'Representative Name': d.participantRepName || '',
+                'Status': d.status,
+                'Awaiting Signature': yesNo(Boolean(d.signingToken) && d.status !== 'SIGNED'),
+                'Agreement Start Date': d.agreementStartDate || '',
+                'Agreement End Date': d.agreementEndDate || '',
+                'Lives Alone': d.livesAlone || '',
+                'Supports Provided': (d.supportsProvided || []).join(', '),
+                'Management Type': MANAGEMENT_LABEL[d.managementType] ?? d.managementType ?? '',
+                'Plan Manager Name': d.planManagerName || '',
+                'Plan Manager Email': d.planManagerEmail || '',
+                'Cancellation Policy Acknowledged': yesNo(Boolean(d.cancellationPolicyAcknowledged)),
+                'Consent - Info Confidential': yesNo(Boolean(d.consentInfoConfidential)),
+                'Consent - Change Anytime': yesNo(Boolean(d.consentChangeAnytime)),
+                'Consent - Medication': d.consentMedication || '',
+                'Consent - Money Management': d.consentMoneyManagement || '',
+                'Consent - Photos (Service)': d.consentPhotosService || '',
+                'Consent - Photos (Media)': d.consentPhotosMedia || '',
+                'Consent - Publish Feedback': d.consentPublishFeedback || '',
+                'Contact Address': d.contactAddress || '',
+                'Contact Phone': d.contactPhone || '',
+                'Contact Email': d.contactEmail || '',
+                'Has Alternative Contact': d.hasAlternativeContact || '',
+                'Alt Contact Relationship': (d.altRelationship || []).join(', '),
+                'Alt Contact Name': d.altContactName || '',
+                'Alt Contact Number': d.altContactNumber || '',
+                'Alt Contact Email': d.altContactEmail || '',
+                'Org Contact Name': d.orgContactName || '',
+                'Org Phone': d.orgPhone || '',
+                'Org Email': d.orgEmail || '',
+                'Org Postal Address': d.orgPostalAddress || '',
+                'Quote Number': d.quoteNumber || '',
+                'Quote Date': d.quoteDate || '',
+                'Plan Start Date': d.planStartDate || '',
+                'Plan End Date': d.planEndDate || '',
+                'Prepared By': d.preparedBy || '',
+                'Contact Person': d.contactPerson || '',
+                'Apply GST': yesNo(Boolean(d.applyGst)),
+                'Support Items Count': (d.items || []).length,
+                'Agreement Explained': yesNo(Boolean(d.agreementExplained)),
+                'Participant Signed': yesNo(Boolean(d.participantSignature)),
+                'Participant Signature Name': d.participantSignatureName || '',
+                'Participant Signed Date': d.participantSignedDate || '',
+                'Provider Signed': yesNo(Boolean(d.providerSignature)),
+                'Provider Signature Name': d.providerSignatureName || '',
+                'Provider Signed Date': d.providerSignedDate || '',
+                'Created By': d.createdBy ? `${d.createdBy.firstName} ${d.createdBy.lastName ?? ''}`.trim() : '',
+                'Created At': d.createdAt ? format(new Date(d.createdAt), 'dd MMM yyyy HH:mm') : '',
+                'Updated At': d.updatedAt ? format(new Date(d.updatedAt), 'dd MMM yyyy HH:mm') : '',
+                'Agreement ID': d.id,
+            }));
+
+            const itemRows = details.flatMap((d) =>
+                (d.items || []).map((item) => ({
+                    'Participant Name': d.participantName || '',
+                    'Quote Number': d.quoteNumber || '',
+                    'Item Code': item.itemCode || '',
+                    'Item Name': item.itemName || '',
+                    'Unit Price': Number(item.unitPrice) || 0,
+                    'Frequency': item.frequency || '',
+                    'Day Of Week': item.dayOfWeek || '',
+                    'Hours Per Service': Number(item.hoursPerService) || 0,
+                    'Qty Per Period': Number(item.qtyPerPeriod) || 0,
+                    'Line Total': (Number(item.unitPrice) || 0) * (Number(item.hoursPerService) || 0) * (Number(item.qtyPerPeriod) || 0),
+                    'Start Date': item.startDate || '',
+                    'End Date': item.endDate || '',
+                    'Notes': item.notes || '',
+                    'Agreement ID': d.id,
+                }))
+            );
+
+            const wb = XLSX.utils.book_new();
+            const agreementsWs = XLSX.utils.json_to_sheet(agreementRows);
+            agreementsWs['!cols'] = Object.keys(agreementRows[0] || {}).map(() => ({ wch: 20 }));
+            XLSX.utils.book_append_sheet(wb, agreementsWs, 'Agreements');
+
+            const itemsWs = XLSX.utils.json_to_sheet(itemRows);
+            itemsWs['!cols'] = Object.keys(itemRows[0] || {}).map(() => ({ wch: 18 }));
+            XLSX.utils.book_append_sheet(wb, itemsWs, 'Support Items');
+
+            XLSX.writeFile(wb, `service-agreements-export-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+            toast.success(`Exported ${agreementRows.length} agreement${agreementRows.length !== 1 ? 's' : ''}`);
+        } catch (error) {
+            AxiosToastError(error);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="container mx-auto p-4 py-12">
             <div className="flex justify-between items-center my-6">
@@ -140,12 +263,18 @@ const AdminServiceAgreementsPage = () => {
                     <h1 className="text-2xl font-bold">Service Agreements</h1>
                     <span className="text-sm text-gray-500">{agreements.length} agreement{agreements.length !== 1 ? 's' : ''}</span>
                 </div>
-                <Link
-                    href="/admin/service-agreement-tool"
-                    className="text-sm font-semibold text-white bg-primary hover:bg-secondary transition-colors duration-300 rounded-full px-5 py-2.5"
-                >
-                    + New Agreement
-                </Link>
+                <div className="flex items-center gap-3">
+                    <button onClick={handleExportAll} disabled={exporting || loading || agreements.length === 0}
+                        className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2.5 rounded-full disabled:opacity-50">
+                        {exporting ? 'Exporting…' : '⬇ Export to Excel'}
+                    </button>
+                    <Link
+                        href="/admin/service-agreement-tool"
+                        className="text-sm font-semibold text-white bg-primary hover:bg-secondary transition-colors duration-300 rounded-full px-5 py-2.5"
+                    >
+                        + New Agreement
+                    </Link>
+                </div>
             </div>
 
             <div className="flex flex-wrap gap-3 mb-6">
