@@ -263,7 +263,7 @@ const AdminContractsPage = () => {
             {/* Detail modal */}
             {(selected || detailLoading) && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
-                    <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
                         {detailLoading || !selected ? (
                             <div className="text-center py-12 text-gray-500">Loading...</div>
                         ) : (
