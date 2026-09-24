@@ -47,19 +47,19 @@ export default function LanguageSelector({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 h-[34px] px-4 rounded text-sm font-semibold text-white transition-colors duration-200 ${buttonClassName}`}
+        className={`flex items-center gap-2 h-8.5 sm:px-4 px-2  rounded text-sm font-semibold text-white transition-colors duration-200 ${buttonClassName}`}
       >
         <span>{selected.label}</span>
         {isOpen ? <IoCaretUpSharp size={12} /> : <IoCaretDownSharp size={12} />}
       </button>
       {isOpen && (
-        <div className="absolute z-[999] left-0 mt-2 w-auto min-w-[140px] max-h-[220px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+        <div className="absolute z-999 left-0 mt-2 w-auto min-w-35 max-h-55 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
           {availableLanguages.map((lang) => (
             <button
               type="button"
               key={lang.value}
               onClick={() => handleSelect(lang)}
-              className={`block w-full text-left px-4 py-2 text-sm whitespace-nowrap hover:bg-blue-50 ${
+              className={`block w-full text-left sm:px-4 py-2 text-sm whitespace-nowrap hover:bg-blue-50 ${
                 lang.value === selected.value ? "bg-blue-50 text-[#0078d4] font-medium" : "text-gray-700"
               }`}
             >
