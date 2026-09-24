@@ -111,9 +111,9 @@ const Header = () => {
         {/* Logo and Language Selector */}
         <div className="flex items-center gap-4">
           <Link href="/" className="max-h-full ">
-            <Image src={logo} alt='Health U logo' className='h-auto sm:w-36  max-sm:pl-2 w-32 ' />
+            <Image src={logo} alt='Health U logo' className='h-auto sm:w-36  max-sm:pl-2 w-38 ' />
           </Link>
-          <LanguageSelector buttonClassName="bg-secondary rounded-full hover:bg-primary transition-colors duration-300" />
+          <LanguageSelector buttonClassName="bg-secondary rounded-full hover:bg-primary transition-colors duration-300  " />
         </div>
         {/* desktop menu */}
         <nav className='w-full flex mx-auto justify-end'>
@@ -173,14 +173,14 @@ const Header = () => {
             </ul>
           </div>
           <Link className='bg-primary sm:text-lg text-base uppercase text-white font-semibold
-                rounded-full  px-4 py-2  hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
+                rounded-full  sm:px-4 sm:py-2 text-center items-center px-2 py-1 hover:bg-secondary transition-all duration-300' href={"/referral"}>Referral</Link>
           <button onClick={() => setIsActive(!isActive)} className='text-secondary text-4xl z-100 px-4 cursor-pointer lg:hidden '>
             {isActive ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
         </nav>
       </div>
       {/* mobile  menu */}
-      <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all w-full ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
+      <nav className={`absolute h-full top-0 bottom-0 bg-neutral-800 lg:hidden pt-10 z-95 transition-all ease-initial duration-700 min-w-94 min-h-screen flex flex-col gap-2
                 ${isActive ? "left-0" : "-left-122"}
           `} >
         <p className="text-4xl font-bold text-center text-white">Menu </p>
