@@ -15,10 +15,10 @@ const Hero = () => {
                         NDIS support providers committed to enhancing your health and well-being by assisting you according to your preferences and enabling you to live independently
                     </p>
                     <div className="flex items-center justify-start gap-5 ">
-                        <button className="bg-primary text-white text-lg uppercase font-semibold px-8 py-5 rounded-full hover:bg-secondary transition-colors duration-300  ">
+                        <button className="bg-primary text-white text-lg uppercase font-semibold sm:px-8 sm:py-5 px-3 py-2 rounded-full hover:bg-secondary transition-colors duration-300  ">
                             <Link href={""}>Contact Us </Link>
                         </button>
-                        <button className="bg-secondary text-white text-lg uppercase font-semibold px-8 py-5 rounded-full hover:bg-primary transition-colors duration-300  ">
+                        <button className="bg-secondary text-white text-lg uppercase font-semibold sm:px-8 sm:py-5 px-3 py-2  rounded-full hover:bg-primary transition-colors duration-300  ">
                             <Link href={""}>0481 707 758</Link>
                         </button>
                     </div>
