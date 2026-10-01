@@ -4,6 +4,7 @@ import FloatingContact from "./components/FloatingContact";
 import Footer from "./components/Footer";
 import { GoogleTranslateProvider, LanguageOption } from "./components/GoogleTranslateProvider";
 import Header from "./components/Header";
+import AccessibilityMenu from "./components/AccessibilityMenu";
 
 
 const availableLanguages: LanguageOption[] = [
@@ -44,6 +45,7 @@ export default function MainLayout({
             <FaqChatbot />
             <ClientToaster />
         </GoogleTranslateProvider>
+        <AccessibilityMenu />
       </div>
   );
 }
