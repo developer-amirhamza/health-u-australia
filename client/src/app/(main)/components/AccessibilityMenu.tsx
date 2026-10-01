@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import { RiAccessibilityLine } from "react-icons/ri";
 
 
 export default function AccessibilityMenu() {
@@ -12,7 +12,7 @@ export default function AccessibilityMenu() {
   const [highlightLinks, setHighlightLinks] = useState(false);
   const [textSpacing, setTextSpacing] = useState(false);
 
-  
+
 
   /* Function to toggle bigger text */
   const changeTextSize = (direction: "increase" | "decrease") => {
@@ -72,20 +72,20 @@ const toggleTextSpacing = () => {
 
   /* Render the Accessibility Menu */
   return (
-  <div className="fixed bottom-5 left-5 z-50">
+  <div className="fixed bottom-10 left-5 z-50">
 
     {/* Accessibility options */}
 {menuOpen && (
-  <div className="mb-2 flex flex-col gap-2 bg-white p-3 rounded-lg shadow-lg min-w-56">
+  <div className="mb-2 flex flex-col gap-2 bg-white p-3 rounded-lg shadow-lg min-w-36">
 
     {/* Text Size controls */}
-    <div className="flex flex-row items-center justify-between gap-3 w-full">
+    <div className="flex flex-row items-center justify-between gap-1.5 w-full">
       <button
         type="button"
         onClick={() => changeTextSize("decrease")}
         disabled={textSizeLevel === 0}
         aria-label="Decrease text size"
-        className="w-10 h-10 shrink-0 rounded-full bg-primary text-white font-bold disabled:opacity-40"
+        className="w-9 h-9 shrink-0 rounded-full bg-primary text-white font-bold disabled:opacity-40"
       >
         −
       </button>
@@ -99,7 +99,7 @@ const toggleTextSpacing = () => {
         onClick={() => changeTextSize("increase")}
         disabled={textSizeLevel === 3}
         aria-label="Increase text size"
-        className="w-10 h-10 shrink-0 rounded-full bg-primary text-white font-bold disabled:opacity-40"
+        className="w-9 h-9 shrink-0 rounded-full bg-primary text-white font-bold disabled:opacity-40"
       >
         +
       </button>
@@ -110,7 +110,7 @@ const toggleTextSpacing = () => {
       type="button"
       onClick={toggleHighContrast}
       aria-pressed={highContrast}
-      className="bg-primary text-white px-5 py-3 rounded-full font-medium transition-opacity hover:opacity-90"
+      className="bg-primary text-white px-3 py-2 rounded-full font-medium transition-opacity hover:opacity-90"
     >
       {highContrast ? "Normal Contrast" : "High Contrast"}
     </button>
@@ -120,7 +120,7 @@ const toggleTextSpacing = () => {
       type="button"
       onClick={toggleHighlightLinks}
       aria-pressed={highlightLinks}
-      className="bg-primary text-white px-5 py-3 rounded-full font-medium transition-opacity hover:opacity-90"
+      className="bg-primary text-white px-3 py-2 rounded-full font-medium transition-opacity hover:opacity-90"
     >
       {highlightLinks ? "Normal Links" : "Highlight Links"}
     </button>
@@ -130,7 +130,7 @@ const toggleTextSpacing = () => {
       type="button"
       onClick={toggleTextSpacing}
       aria-pressed={textSpacing}
-      className="bg-primary text-white px-5 py-3 rounded-full font-medium transition-opacity hover:opacity-90"
+      className="bg-primary text-white px-3 py-2 rounded-full font-medium transition-opacity hover:opacity-90"
     >
       {textSpacing ? "Normal Spacing" : "Text Spacing"}
     </button>
@@ -154,18 +154,12 @@ const toggleTextSpacing = () => {
     flex items-center justify-center
     hover:scale-105
     transition-transform">
-      <img
-       src="/accessibility.png"
-       alt="Accessibility options"
-       width={34}
-       height={34}
-       className="object-contain"
-      />
+      <RiAccessibilityLine size={40} color="white" />
     </button>
 
   </div>
 );
-  
-    
-  
+
+
+
 }
