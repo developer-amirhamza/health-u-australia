@@ -218,6 +218,7 @@ export const nav_items = [
             { label: "Past Events", path: "/past-events" },
         ]
     },
+    { label: "Feedback", path: "/participant-feedback/" },
     { label: "Career", path: "/career/" },
     { label: "Contact Us", path: "/contact-us/" },
     { label: "Referral", path: "/referral/" },
