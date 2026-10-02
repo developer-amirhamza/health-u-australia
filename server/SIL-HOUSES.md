@@ -7,20 +7,22 @@ read properties at `/sil-house` and `/sil-house/:id`.
 
 ## Setup
 
-From `server`, with `DATABASE_URL` configured for the intended database:
+For local PostgreSQL development, see [LOCAL-DATABASE.md](LOCAL-DATABASE.md).
+From `server`:
 
 ```sh
 npm install
-npm run setup:sil-houses
+npm run db:local:setup
 npm run build
 npm run test:sil-houses
 ```
 
-Run setup before deploying the client. This project has no baseline Prisma
-migration history, so the setup SQL adds only the SIL tables and imports the
-four existing listings. It does not reset or alter other tables. A setup marker
-prevents subsequent runs from restoring deleted listings or overwriting edits.
-The Prisma model is included for future schema management.
+Prisma migrations now create the full application schema and import the four
+existing listings into a new database. A setup marker prevents subsequent runs
+from restoring deleted listings or overwriting edits. The older additive
+`setup:sil-houses` SQL remains available for databases predating these migrations;
+it is not needed after `db:local:setup`. See the local database guide before
+adopting the initial migration on any existing populated remote database.
 
 The client uses the existing `NEXT_PUBLIC_BACKEND_API_URL`. Uploaded images use
 the existing Cloudinary settings (`CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`,

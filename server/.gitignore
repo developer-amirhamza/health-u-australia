@@ -4,3 +4,7 @@ package-lock.json
 dist
 
 /src/generated/prisma
+
+# Local database, generated credentials and logs
+.env.local
+.local/
