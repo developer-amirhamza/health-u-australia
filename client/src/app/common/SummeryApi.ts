@@ -7,6 +7,10 @@ export const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL
 
 export const SummeryApi = {
 
+    silHouses: { url: '/api/sil-houses', method: 'get' },
+    createSilHouse: { url: '/api/sil-houses', method: 'post' },
+    uploadSilHouseImage: { url: '/api/sil-houses/images', method: 'post' },
+
     verifyEmail: {
         url: "/api/user/verify-email",
         method: "post",

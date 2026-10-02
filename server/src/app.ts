@@ -1,3 +1,4 @@
+import './config/env.js';
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -8,6 +9,7 @@ import { clientOrigins } from "./config/clientUrl.js";
 import scBillingRouter from "./routes/scBilling.route.js"
 import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
 import contractRouter from "./routes/contract.route.js"
+import silHouseRouter from "./routes/silHouse.route.js";
 
 
 const app = express();
@@ -34,6 +36,7 @@ app.use("/api/user/", userRouter);
 app.use("/api/sc-billing", scBillingRouter);
 app.use("/api/service-agreements", serviceAgreementRouter);
 app.use("/api/contracts", contractRouter);
+app.use("/api/sil-houses", silHouseRouter);
 
 
 
