@@ -9,6 +9,7 @@ import scBillingRouter from "./routes/scBilling.route.js"
 import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
 import contractRouter from "./routes/contract.route.js"
 import contentRouter from "./routes/content.route.js";
+import imageRouter from "./routes/image.route.js";
 
 const app = express();
 app.use(cors({
@@ -35,6 +36,7 @@ app.use("/api/sc-billing", scBillingRouter);
 app.use("/api/service-agreements", serviceAgreementRouter);
 app.use("/api/contracts", contractRouter);
 app.use("/api/content", contentRouter);
+app.use("/api/image", imageRouter);
 
 
 

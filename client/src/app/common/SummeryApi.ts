@@ -98,4 +98,10 @@ export const SummeryApi = {
     getContractById: { url: "/api/contracts/single", method: "get" },
     deleteContract: { url: "/api/contracts/delete", method: "delete" },
     sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
+
+    // ── CMS Content Management (admin-managed website content; public read access) ──
+    getContent: { url: "/api/content", method: "get" },
+    createContent: { url: "/api/content", method: "post" },
+    updateContent: { url: "/api/content", method: "put" },
+    deleteContent: { url: "/api/content", method: "delete" },
 };

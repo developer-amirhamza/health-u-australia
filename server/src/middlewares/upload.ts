@@ -34,3 +34,24 @@ export const uploadAvatarImage = (req: Request, res: Response, next: NextFunctio
         next();
     });
 };
+
+// CMS content image upload.
+// Reuses the existing image upload configuration but expects
+// the multipart field name "image" instead of "avatar".
+export const uploadContentImage = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    avatarUpload.single("image")(req, res, (err: unknown) => {
+        if (err instanceof multer.MulterError) {
+            return errorHandler(res, 400, err.message, true);
+        }
+
+        if (err instanceof Error) {
+            return errorHandler(res, 400, err.message, true);
+        }
+
+        next();
+    });
+};
