@@ -28,6 +28,7 @@ model User {
   lastName               String?
   serviceAgreements      ServiceAgreement[]
   contracts              Contract[]
+  trainingResources      TrainingResource[]
 }
 
 // A participant's support-coordination NDIS plan: budget, billing rates and
@@ -209,4 +210,29 @@ model Contract {
 
   @@index([employeeName])
   @@index([status])
+}
+
+// A single linked training or resource entry on the public /training page.
+// `category` groups entries into the page's sections ("REQUIRED_TRAINING",
+// "COMMISSION_RESOURCE", "KNOWLEDGE_RESPONSIBILITY") — a plain string, like
+// User.role and Contract.status elsewhere in this schema, rather than a DB
+// enum, so the admin panel can manage it without a migration.
+model TrainingResource {
+  id String @id @default(dbgenerated("gen_random_uuid()"))
+
+  category    String
+  title       String
+  description String @default("")
+  link        String
+
+  order       Int     @default(0)
+  isPublished Boolean @default(true)
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
 }
