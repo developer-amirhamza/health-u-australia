@@ -10,6 +10,7 @@ import scBillingRouter from "./routes/scBilling.route.js"
 import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
 import contractRouter from "./routes/contract.route.js"
 import silHouseRouter from "./routes/silHouse.route.js";
+import trainingResourceRouter from "./routes/trainingResource.route.js"
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/sc-billing", scBillingRouter);
 app.use("/api/service-agreements", serviceAgreementRouter);
 app.use("/api/contracts", contractRouter);
 app.use("/api/sil-houses", silHouseRouter);
+app.use("/api/training-resources", trainingResourceRouter);
 
 
 

@@ -102,4 +102,10 @@ export const SummeryApi = {
     getContractById: { url: "/api/contracts/single", method: "get" },
     deleteContract: { url: "/api/contracts/delete", method: "delete" },
     sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
+    // ── Training resources (public /training page + its admin CRUD panel) ──
+    getPublicTrainingResources: { url: "/api/training-resources/public", method: "get" },
+    getTrainingResources: { url: "/api/training-resources", method: "get" },
+    createTrainingResource: { url: "/api/training-resources/create", method: "post" },
+    updateTrainingResource: { url: "/api/training-resources/update", method: "put" },
+    deleteTrainingResource: { url: "/api/training-resources/delete", method: "delete" },
 };

@@ -113,3 +113,32 @@ iframe {
   display: flex;
   gap: 10px;
 }
+
+/* Accessibility classes I added this*/
+html[data-accessibility-text-size="1"] {
+  font-size: 110%;
+}
+
+html[data-accessibility-text-size="2"] {
+  font-size: 120%;
+}
+
+html[data-accessibility-text-size="3"] {
+  font-size: 130%;
+}
+.accessibility-high-contrast {
+  filter: contrast(150%);
+}
+.accessibility-highlight-links a {
+   text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+  background-color: #ffff99 !important;
+  color: #0b22f3 !important;
+}
+
+.accessibility-text-spacing {
+  letter-spacing: 0.05em;
+  word-spacing: 0.3em;
+  line-height: 1.6;
+}
