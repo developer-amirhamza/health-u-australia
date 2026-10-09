@@ -6,8 +6,6 @@
       "dom.iterable",
       "esnext"
     ],
-    "ignoreDeprecations": "5.0",
-    "baseUrl": "src/",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,6 +18,9 @@
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
+      "*": [
+        "./src/*"
+      ],
       "@/*": [
         "./src/*"
       ]

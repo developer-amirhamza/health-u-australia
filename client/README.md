@@ -38,3 +38,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## SIL house address suggestions
+
+The admin Add SIL House address field suggests Australian addresses through [Photon](https://github.com/komoot/photon), an open source search service using OpenStreetMap data. No API key is needed. The field remains editable when an address is missing from OpenStreetMap or the public Photon service is unavailable. Requests wait until typing pauses, and the public service may limit heavy use; self-host Photon if usage grows.

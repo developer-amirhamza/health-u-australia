@@ -12,6 +12,45 @@ type HouseForm = Omit<SilHouse, 'id' | 'legacyPath'>;
 const emptyForm: HouseForm = { address: '', image: '', bedrooms: 0, bathrooms: 0, parking: 0, accessible: false, description: '', gallery: [], sortOrder: 0 };
 const inputClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white';
 const buttonClass = 'rounded-lg px-4 py-2 bg-[#1a1a18] text-white disabled:opacity-50';
+type PhotonFeature = { properties: { osm_id?: number; housenumber?: string; street?: string; name?: string; city?: string; state?: string; postcode?: string; country?: string } };
+
+function formatAddress({ properties: p }: PhotonFeature) {
+  const street = [p.housenumber, p.street || p.name].filter(Boolean).join(' ');
+  return [street, p.city, p.state, p.postcode, p.country].filter(Boolean).join(', ');
+}
+
+function AddressSuggestions({ value, onChange }: { value: string; onChange: (address: string) => void }) {
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const query = value.trim();
+    if (!open || query.length < 2) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({ q: query, countrycode: 'AU', lat: '-33.815', lon: '151.1', limit: '6', layer: 'house' });
+        const response = await fetch(`https://photon.komoot.io/api?${params}`, { signal: controller.signal });
+        if (!response.ok) throw new Error('Address search unavailable');
+        const data: { features: PhotonFeature[] } = await response.json();
+        setSuggestions([...new Set(data.features.map(formatAddress).filter(Boolean))]);
+      } catch { if (!controller.signal.aborted) setSuggestions([]); }
+    }, 600);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [value, open]);
+
+  return <div className="relative">
+    <label className="block">Address
+      <input required maxLength={300} autoComplete="off" className={inputClass} value={value}
+        onChange={event => { onChange(event.target.value); setOpen(true); setSuggestions([]); }}
+        onFocus={() => setOpen(true)} onBlur={() => window.setTimeout(() => setOpen(false), 150)} />
+    </label>
+    {open && suggestions.length > 0 && <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg" aria-label="Address suggestions">
+      {suggestions.map(address => <li key={address}><button type="button" className="block w-full px-3 py-2 text-left hover:bg-gray-100 focus:bg-gray-100" onMouseDown={event => event.preventDefault()} onClick={() => { onChange(address); setOpen(false); setSuggestions([]); }}>{address}</button></li>)}
+    </ul>}
+    <p className="mt-1 text-xs text-gray-500">Suggestions from <a href="https://photon.komoot.io/" target="_blank" rel="noreferrer" className="underline">Photon</a> and OpenStreetMap. You can also type an address manually.</p>
+  </div>;
+}
 
 export default function AdminSilHouses() {
   const [houses, setHouses] = useState<SilHouse[]>([]);
@@ -107,7 +146,7 @@ export default function AdminSilHouses() {
         <form onSubmit={save} className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 space-y-5">
           <h2 className="text-xl font-semibold">{editing ? 'Edit SIL House' : 'Add SIL House'}</h2>
           <fieldset disabled={busy || uploading} className="space-y-5 disabled:opacity-60">
-            <label className="block">Address<input required maxLength={300} className={inputClass} value={form.address} onChange={event => change('address', event.target.value)} /></label>
+            <AddressSuggestions value={form.address} onChange={address => change('address', address)} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {(['bedrooms', 'bathrooms', 'parking', 'sortOrder'] as const).map(key => <label key={key} className="block">{{ bedrooms: 'Bedrooms', bathrooms: 'Bathrooms', parking: 'Parking spaces', sortOrder: 'Display order' }[key]}<input required type="number" min={0} max={key === 'sortOrder' ? 10000 : 100} step={1} className={inputClass} value={Number.isNaN(form[key]) ? '' : form[key]} onChange={event => change(key, event.target.valueAsNumber)} /></label>)}
             </div>

@@ -47,7 +47,9 @@ const SilHouse = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {houses.map((item) => (
                                 <Link href={silHousePath(item)} key={item.id} className="flex flex-col border-[0.5px] cursor-pointer hover:scale-105 duration-300 transition-all border-secondary-text overflow-hidden rounded shadow-2xl border-dotted  ">
-                                    <Image src={item.image} alt='sil-house' width={600} height={450} className='w-full h-auto' />
+                                    <div className="relative w-full aspect-[4/3] overflow-hidden">
+                                        <Image src={item.image} alt={item.address} fill sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw" className="object-cover" />
+                                    </div>
                                     <div className="flex flex-col items-center p-4 justify-center">
                                         <div className="flex flex-col items-center justify-center gap-1 ">
                                             <h3 className="text-2xl font-semibold text-secondary-text"> {item.address} </h3>
