@@ -1,6 +1,5 @@
-import React from 'react'
 import { Metadata } from 'next'
-import GrannyFlatClient from './GrannyFlatClient'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: "Ryde NDIS Granny Flat – SIL Housing",
@@ -8,9 +7,7 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  return (
-    <GrannyFlatClient />
-  )
+  redirect('/sil-house/sil-granny-flat')
 }
 
 export default page

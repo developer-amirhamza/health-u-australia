@@ -22,7 +22,7 @@ try {
   try {
     await prisma.$transaction(async tx => {
       const house = await tx.silHouse.create({ data: {
-        address: 'Local database verification', image: '/sil-houses/belmore.png',
+        address: 'Local database verification', image: originalHouses[0].image,
         bedrooms: 1, bathrooms: 1, parking: 0,
       } });
       const updated = await tx.silHouse.update({ where: { id: house.id }, data: { bedrooms: 2 } });

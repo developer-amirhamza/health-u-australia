@@ -27,14 +27,16 @@ adopting the initial migration on any existing populated remote database.
 The client uses the existing `NEXT_PUBLIC_BACKEND_API_URL`. Uploaded images use
 the existing Cloudinary settings (`CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`,
 `CLOUDINARY_API_SECRET_KEY`), or admins may provide HTTPS image URLs directly.
-The original four cover images and 42 gallery photos are provided under
-`client/public/sil-houses`. The gallery migration fills the original listings
-only when their galleries are empty.
+The original four cover images and 42 gallery photos are stored in Cloudinary.
+The URL migration fills fresh databases with their Cloudinary links without
+overwriting edited listings. Duplicate copies in `client/public/sil-houses`
+have been removed. New uploads go to Cloudinary, and manually entered image
+links must use HTTPS.
 
 Every listing links to a database-backed `/sil-house/:id` detail page with a
 photo hero, property information, gallery, features and enquiry links. The
-original static property pages remain available at their existing URLs. Card
-links use the database-backed pages so admin changes appear when opened.
+original property URLs redirect to those same database-backed pages, so they
+use the current Cloudinary images and show admin changes.
 
 The controller is `src/controllers/silHouse.controllers.ts`. Routes are in
 `src/routes/silHouse.route.ts`. `npm run test:sil-houses` checks validation;

@@ -2,7 +2,6 @@ export class SilHouseValidationError extends Error {}
 
 export function isImageUrl(value: unknown): value is string {
   if (typeof value !== 'string' || value.length > 2048) return false;
-  if (/^\/sil-houses\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+$/.test(value) && !value.split('/').includes('..')) return true;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && !url.username && !url.password;
