@@ -1,6 +1,5 @@
-import React from 'react'
 import { Metadata } from 'next'
-import NormanhurstClient from './NormanhurstClient'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: "Normanhurst NDIS Accessible Housing",
@@ -8,9 +7,7 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  return (
-    <NormanhurstClient />
-  )
+  redirect('/sil-house/sil-normanhurst')
 }
 
 export default page

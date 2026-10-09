@@ -7,6 +7,10 @@ export const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL
 
 export const SummeryApi = {
 
+    silHouses: { url: '/api/sil-houses', method: 'get' },
+    createSilHouse: { url: '/api/sil-houses', method: 'post' },
+    uploadSilHouseImage: { url: '/api/sil-houses/images', method: 'post' },
+
     verifyEmail: {
         url: "/api/user/verify-email",
         method: "post",
@@ -98,7 +102,6 @@ export const SummeryApi = {
     getContractById: { url: "/api/contracts/single", method: "get" },
     deleteContract: { url: "/api/contracts/delete", method: "delete" },
     sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
-
     // ── Training resources (public /training page + its admin CRUD panel) ──
     getPublicTrainingResources: { url: "/api/training-resources/public", method: "get" },
     getTrainingResources: { url: "/api/training-resources", method: "get" },

@@ -15,9 +15,9 @@ const Title:React.FC<Type> = ({title1="",title2="",className=""}) => {
     hover:{width:"100%", transition:{duration:0.5}}
   };
   return (
-    <motion.div variants={parentVariant} initial="initial" whileHover="hover" className={`grid gap-2 py-3  w-full ${className}`}>
+    <motion.div variants={parentVariant} initial="initial" whileHover="hover" className={`grid gap-2 py-3 w-full ${className}`}>
         <h2 className="text-[32px] font-bold ">{title1} <span className="text-secondary">{title2}</span></h2>
-        <motion.div variants={childVariant} style={{width:"56px"}}  className=' h-0.75 bg-primary items-center flex  ' />
+        <motion.div variants={childVariant} style={{width:"56px"}}  className='h-0.75 bg-primary items-center flex' />
     </motion.div>
   )
 }

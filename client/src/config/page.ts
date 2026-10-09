@@ -117,7 +117,7 @@ import innovation from "assets/images/infographic/innovation.png";
 import integrity from "assets/images/infographic/integrity.png";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUsersGear } from "react-icons/fa6";
-import { HiOutlineDocumentText, HiOutlineDocumentDuplicate } from "react-icons/hi2";
+import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineHome } from "react-icons/hi2";
 
 
 
@@ -129,6 +129,11 @@ export const adminNavItems = [
         label: "Dashboard",
         path: "/admin",
         icon: AiFillDashboard,
+    },
+    {
+        label: "SIL Houses",
+        path: "/admin/sil-houses",
+        icon: HiOutlineHome,
     },
     // {
     //     label: "Team Tasks",

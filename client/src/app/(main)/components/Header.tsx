@@ -7,7 +7,7 @@ import { nav_items } from 'config/page';
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoCaretDownSharp, IoCaretUpSharp } from 'react-icons/io5';
 
-import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaSearch, FaEnvelope, FaPhoneAlt, FaUserCircle } from 'react-icons/fa';
+import { FaFacebookF, FaInstagramSquare, FaLinkedinIn, FaEnvelope, FaPhoneAlt, FaUserCircle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { li } from 'framer-motion/client';
 import LanguageSelector from './LanguageSelector';
@@ -20,6 +20,7 @@ import { portalPath } from 'utils/roles';
 import { SummeryApi } from 'app/common/SummeryApi';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
+import SiteSearchForm from './SiteSearchForm';
 
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
@@ -84,12 +85,7 @@ const Header = () => {
           </div>
           {/* search bar */}
           <div className="flex items-center justify-center w-full relative">
-            <input type="text" name="search" id="search"
-              className='outline-none border border-white px-5 py-1.5 w-full flex rounded-full '
-            />
-            <div className=" absolute right-0 border-l px-2.5 py-2 ">
-              <FaSearch size={22} />
-            </div>
+            <SiteSearchForm />
           </div>
           {/* social icons */}
           <ul className='flex flex-wrap w-full gap-10 items-center justify-end text-white py-1.5 ' >
