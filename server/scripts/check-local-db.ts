@@ -13,6 +13,12 @@ try {
     prisma.user.count(), prisma.scPlan.count(), prisma.scTimeEntry.count(),
     prisma.serviceAgreement.count(), prisma.contract.count(), prisma.silHouse.count(),
   ]);
+  const originalHouses = await prisma.silHouse.findMany({
+    where: { id: { in: ['sil-belmore', 'sil-bowden', 'sil-normanhurst', 'sil-granny-flat'] } },
+  });
+  assert.equal(originalHouses.length, 4, 'All four original listings must be present');
+  assert.ok(originalHouses.every(house => house.image && house.gallery.length > 0), 'Original listings need cover and gallery photos');
+  assert.equal(originalHouses.find(house => house.id === 'sil-belmore')?.accessible, true, 'Belmore must show the accessible sign');
   try {
     await prisma.$transaction(async tx => {
       const house = await tx.silHouse.create({ data: {

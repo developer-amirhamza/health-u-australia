@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import Axios from 'utils/Axios';
@@ -21,6 +21,18 @@ export default function AdminSilHouses() {
   const [editing, setEditing] = useState<SilHouse | null>(null);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<'order' | 'address'>('order');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const filteredHouses = useMemo(() => {
+    const search = query.trim().toLocaleLowerCase();
+    return houses.filter(house => house.address.toLocaleLowerCase().includes(search)).sort((a, b) =>
+      sort === 'address' ? a.address.localeCompare(b.address) :
+      a.sortOrder - b.sortOrder || a.address.localeCompare(b.address));
+  }, [houses, query, sort]);
+  const pageCount = Math.max(1, Math.ceil(filteredHouses.length / pageSize));
+  const visibleHouses = filteredHouses.slice((Math.min(page, pageCount) - 1) * pageSize, Math.min(page, pageCount) * pageSize);
 
   async function load() {
     setLoading(true);
@@ -94,7 +106,6 @@ export default function AdminSilHouses() {
       {form ? (
         <form onSubmit={save} className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 space-y-5">
           <h2 className="text-xl font-semibold">{editing ? 'Edit SIL House' : 'Add SIL House'}</h2>
-          {editing?.legacyPath && <p className="text-sm text-gray-600">This listing links to its existing property page. Its original page content is preserved.</p>}
           <fieldset disabled={busy || uploading} className="space-y-5 disabled:opacity-60">
             <label className="block">Address<input required maxLength={300} className={inputClass} value={form.address} onChange={event => change('address', event.target.value)} /></label>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -104,15 +115,15 @@ export default function AdminSilHouses() {
             <label className="block">Cover image URL<input required maxLength={2048} className={inputClass} placeholder="https://..." value={form.image} onChange={event => change('image', event.target.value)} /></label>
             <label className="block text-sm">Or upload cover image (JPEG, PNG or WebP, up to 5 MB)<input type="file" accept="image/jpeg,image/png,image/webp" className="block mt-2" onChange={event => { void upload(event.target.files?.[0], 'image'); event.target.value = ''; }} /></label>
             {form.image && <img src={form.image} alt="Cover preview" className="h-40 max-w-full object-contain rounded" />}
-            {!editing?.legacyPath && <>
+            <>
               <label className="block">Description<textarea rows={6} maxLength={20000} className={inputClass} value={form.description} onChange={event => change('description', event.target.value)} /></label>
               <div className="space-y-3">
                 <p>Gallery images ({form.gallery.length}/30)</p>
-                {form.gallery.map((url, index) => <div key={index} className="flex gap-2 items-center"><input aria-label={`Gallery image ${index + 1} URL`} required type="url" maxLength={2048} className={inputClass} value={url} onChange={event => change('gallery', form.gallery.map((item, i) => i === index ? event.target.value : item))} /><button type="button" className="text-red-700 underline" onClick={() => change('gallery', form.gallery.filter((_, i) => i !== index))}>Remove</button></div>)}
+                {form.gallery.map((url, index) => <div key={index} className="flex gap-2 items-center"><input aria-label={`Gallery image ${index + 1} URL`} required type="text" maxLength={2048} className={inputClass} value={url} onChange={event => change('gallery', form.gallery.map((item, i) => i === index ? event.target.value : item))} /><button type="button" className="text-red-700 underline" onClick={() => change('gallery', form.gallery.filter((_, i) => i !== index))}>Remove</button></div>)}
                 <button type="button" className="underline" disabled={form.gallery.length >= 30} onClick={() => change('gallery', [...form.gallery, ''])}>Add image URL</button>
                 <label className="block text-sm">Or upload a gallery image<input type="file" accept="image/jpeg,image/png,image/webp" disabled={form.gallery.length >= 30} className="block mt-2" onChange={event => { void upload(event.target.files?.[0], 'gallery'); event.target.value = ''; }} /></label>
               </div>
-            </>}
+            </>
           </fieldset>
           {uploading && <p role="status">Uploading image...</p>}
           <div className="flex gap-3"><button type="submit" className={buttonClass} disabled={busy || uploading}>{busy ? 'Saving...' : 'Save SIL House'}</button><button type="button" className="border rounded-lg px-4 py-2" disabled={busy || uploading} onClick={() => { setForm(null); setEditing(null); }}>Cancel</button></div>
@@ -120,10 +131,19 @@ export default function AdminSilHouses() {
       ) : loading ? <p role="status">Loading SIL houses...</p> : loadError ? (
         <div role="alert">Unable to load SIL houses. <button className="underline" onClick={load}>Try again</button></div>
       ) : houses.length === 0 ? <p>No SIL houses yet. Add a house to display it on the public page.</p> : (
+        <div className="space-y-4">
+        <div className="flex flex-wrap items-end gap-4">
+          <label className="block flex-1 min-w-56">Search properties<input type="search" className={inputClass} value={query} onChange={event => { setQuery(event.target.value); setPage(1); }} placeholder="Search by address" /></label>
+          <label className="block">Sort by<select className={inputClass} value={sort} onChange={event => { setSort(event.target.value as typeof sort); setPage(1); }}><option value="order">Display order</option><option value="address">Address</option></select></label>
+          <p className="text-sm text-gray-600 pb-2">{filteredHouses.length} of {houses.length} properties</p>
+        </div>
         <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
           <table className="w-full text-left"><thead className="bg-gray-50"><tr><th className="p-4">Property</th><th className="p-4">Features</th><th className="p-4">Order</th><th className="p-4">Actions</th></tr></thead><tbody>
-            {houses.map(house => <tr key={house.id} className="border-t border-gray-200"><td className="p-4"><div className="flex gap-3 items-center"><img src={house.image} alt="" className="w-20 h-16 object-cover rounded" /><span>{house.address}</span></div></td><td className="p-4 text-sm">{house.bedrooms} bedrooms · {house.bathrooms} bathrooms · {house.parking} parking{house.accessible && <span className="block">Fully Accessible</span>}</td><td className="p-4">{house.sortOrder}</td><td className="p-4"><div className="flex gap-4"><Link className="underline" href={silHousePath(house)} target="_blank" rel="noreferrer">View</Link><button className="underline" disabled={busy} onClick={() => { setEditing(house); setForm({ address: house.address, image: house.image, bedrooms: house.bedrooms, bathrooms: house.bathrooms, parking: house.parking, accessible: house.accessible, description: house.description, gallery: [...house.gallery], sortOrder: house.sortOrder }); }}>Edit</button><button className="text-red-700 underline" disabled={busy} onClick={() => remove(house)}>Delete</button></div></td></tr>)}
+            {visibleHouses.map(house => <tr key={house.id} className="border-t border-gray-200"><td className="p-4"><div className="flex gap-3 items-center"><img src={house.image} alt="" className="w-20 h-16 object-cover rounded" /><span>{house.address}</span></div></td><td className="p-4 text-sm">{house.bedrooms} bedrooms · {house.bathrooms} bathrooms · {house.parking} parking{house.accessible && <span className="block">Fully Accessible</span>}</td><td className="p-4">{house.sortOrder}</td><td className="p-4"><div className="flex gap-4"><Link className="underline" href={silHousePath(house)} target="_blank" rel="noreferrer">View</Link><button className="underline" disabled={busy} onClick={() => { setEditing(house); setForm({ address: house.address, image: house.image, bedrooms: house.bedrooms, bathrooms: house.bathrooms, parking: house.parking, accessible: house.accessible, description: house.description, gallery: [...house.gallery], sortOrder: house.sortOrder }); }}>Edit</button><button className="text-red-700 underline" disabled={busy} onClick={() => remove(house)}>Delete</button></div></td></tr>)}
           </tbody></table>
+        </div>
+        {filteredHouses.length === 0 && <p>No properties match your search.</p>}
+        {pageCount > 1 && <div className="flex items-center justify-end gap-3"><button className="underline disabled:opacity-40" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Previous</button><span>Page {Math.min(page, pageCount)} of {pageCount}</span><button className="underline disabled:opacity-40" disabled={page >= pageCount} onClick={() => setPage(value => value + 1)}>Next</button></div>}
         </div>
       )}
     </div>

@@ -27,15 +27,16 @@ adopting the initial migration on any existing populated remote database.
 The client uses the existing `NEXT_PUBLIC_BACKEND_API_URL`. Uploaded images use
 the existing Cloudinary settings (`CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`,
 `CLOUDINARY_API_SECRET_KEY`), or admins may provide HTTPS image URLs directly.
-The original four cover images are also provided under `client/public/sil-houses`.
+The original four cover images and 42 gallery photos are provided under
+`client/public/sil-houses`. The gallery migration fills the original listings
+only when their galleries are empty.
 
-Existing listings keep their original property-page links. Their bespoke detail
-pages and all general SIL page text remain unchanged. New properties receive a
-detail page showing their cover, address, room counts, accessibility, description,
-gallery and enquiry links. Deleting a listing removes its public card; original
-static property pages are retained at their existing URLs.
+Every listing links to a database-backed `/sil-house/:id` detail page with a
+photo hero, property information, gallery, features and enquiry links. The
+original static property pages remain available at their existing URLs. Card
+links use the database-backed pages so admin changes appear when opened.
 
 The controller is `src/controllers/silHouse.controllers.ts`. Routes are in
-`src/routes/silHouse.route.ts`. Tests exercise validation, authorization, CRUD,
-missing records and empty lists using an in-memory Prisma substitute; they do
-not touch the configured database.
+`src/routes/silHouse.route.ts`. `npm run test:sil-houses` checks validation;
+`npm run db:check` exercises database create, read, update and delete inside
+a rolled-back transaction.
