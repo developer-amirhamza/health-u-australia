@@ -6,5 +6,6 @@ dist
 /src/generated/prisma
 
 # Local database, generated credentials and logs
-.env.local
+.env*
+!.env.example
 .local/
