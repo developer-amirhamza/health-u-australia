@@ -8,20 +8,20 @@ datasource db {
 }
 
 model SilHouse {
-  id           String   @id @default(uuid())
-  address      String
-  image        String
-  bedrooms     Int
-  bathrooms    Int
-  parking      Int
-  accessible   Boolean  @default(false)
-  description  String   @default("")
-  gallery      String[] @default([])
+  id          String   @id @default(uuid())
+  address     String
+  image       String
+  bedrooms    Int
+  bathrooms   Int
+  parking     Int
+  accessible  Boolean  @default(false)
+  description String   @default("")
+  gallery     String[] @default([])
   // Existing property pages retain their original content and URLs.
-  legacyPath   String?  @unique
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  legacyPath  String?  @unique
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // Tracks the one-time import so deployment cannot restore deleted listings.
@@ -51,21 +51,7 @@ model User {
   serviceAgreements       ServiceAgreement[]
   contracts               Contract[]
   contentPosts            ContentPost[]
-  status                 String?             @default("ACTIVE")
-  avatar                 String?
-  mobile                 String?
-  last_login_date        DateTime?           @db.Timestamp(6)
-  refresh_token          String?
-  forgot_password_otp    String?
-  forgot_password_expire DateTime?           @db.Timestamp(6)
-  createdAt              DateTime?           @default(now()) @db.Timestamp(6)
-  updatedAt              DateTime?           @default(now()) @db.Timestamp(6)
-  role                   String?             @default("USER")
-  firstName              String?
-  lastName               String?
-  serviceAgreements      ServiceAgreement[]
-  contracts              Contract[]
-  trainingResources      TrainingResource[]
+  trainingResources       TrainingResource[]
 }
 
 // A participant's support-coordination NDIS plan: budget, billing rates and
@@ -256,9 +242,16 @@ model ContentPost {
   images      String[] @default([])
   order       Int      @default(0)
   isPublished Boolean  @default(true)
-
   createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pageKey])
+  @@index([title])
+}
+
 // A single linked training or resource entry on the public /training page.
 // `category` groups entries into the page's sections ("REQUIRED_TRAINING",
 // "COMMISSION_RESOURCE", "KNOWLEDGE_RESPONSIBILITY") — a plain string, like
@@ -281,7 +274,5 @@ model TrainingResource {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([pageKey])
-  @@index([title])
   @@index([category])
 }
