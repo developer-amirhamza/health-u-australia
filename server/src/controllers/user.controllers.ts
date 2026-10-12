@@ -227,7 +227,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
             await sendEmail({
                 sendTo: email,
-                subject: "Reset your Health U Shop password",
+                subject: "Reset your Health U Australia password",
                 html: forgotPasswordTemplate({ firstName: user.firstName || "there", otp }),
             }).catch((err) => console.error("Forgot-password email failed:", err.message));
         }
