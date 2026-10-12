@@ -71,7 +71,7 @@ const SignUp = async (req: Request, res: Response) => {
         let emailFailed = false;
         const emailResult = await sendEmail({
             sendTo: email,
-            subject: "Verify your email - Bestiee",
+            subject: "Verify your email - Health U Australia",
             html: verifyEmailTemplate({
                 firstName,
                 otp,
@@ -183,7 +183,7 @@ export const resendVerificationEmail = async (req: AuthRequest, res: Response) =
             });
             await sendEmail({
                 sendTo: user.email,
-                subject: "Verify your email - Bestiee",
+                subject: "Verify your email - Health U Australia",
                 html: verifyEmailTemplate({
                     firstName: user.firstName || "there",
                     otp,

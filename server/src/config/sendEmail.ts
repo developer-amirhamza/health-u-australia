@@ -9,11 +9,6 @@ dotenv.config();
 // Preferred path: standard SMTP via nodemailer — works with Postmark, SMTP2GO,
 // SES, SendGrid, Brevo, or any other provider. Switching providers is a .env
 // change only:
-//   SMTP_HOST=smtp.postmarkapp.com
-//   SMTP_PORT=587
-//   SMTP_USER=<username / API token>
-//   SMTP_PASS=<password / API token>
-//   EMAIL_FROM="Aidble Care <hello@aidble.com.au>"
 //
 // Fallback: if SMTP_* is not configured, the existing Resend integration is
 // used (RESEND_API_KEY), so nothing breaks during migration.
@@ -33,7 +28,7 @@ interface Type {
     attachments?: Attachment[];
 }
 
-const FROM = process.env.EMAIL_FROM || "Bestiee <hello@mybestiee.com.au>";
+const FROM = process.env.EMAIL_FROM || "Health U Australia <hello@bestiee.com>";
 const useSmtp = Boolean(process.env.SMTP_HOST);
 
 // Reuse a single pooled SMTP connection across sends.

@@ -30,12 +30,27 @@ model SilHouseSetup {
 }
 
 model User {
-  id                     String              @id @default(dbgenerated("gen_random_uuid()"))
-  email                  String              @unique
-  password               String
-  verify_email           Boolean?            @default(false)
-  verify_email_otp       String?
+  id                      String             @id @default(dbgenerated("gen_random_uuid()"))
+  email                   String             @unique
+  password                String
+  verify_email            Boolean?           @default(false)
+  verify_email_otp        String?
   verify_email_otp_expire DateTime?          @db.Timestamp(6)
+  status                  String?            @default("ACTIVE")
+  avatar                  String?
+  mobile                  String?
+  last_login_date         DateTime?          @db.Timestamp(6)
+  refresh_token           String?
+  forgot_password_otp     String?
+  forgot_password_expire  DateTime?          @db.Timestamp(6)
+  createdAt               DateTime?          @default(now()) @db.Timestamp(6)
+  updatedAt               DateTime?          @default(now()) @db.Timestamp(6)
+  role                    String?            @default("USER")
+  firstName               String?
+  lastName                String?
+  serviceAgreements       ServiceAgreement[]
+  contracts               Contract[]
+  contentPosts            ContentPost[]
   status                 String?             @default("ACTIVE")
   avatar                 String?
   mobile                 String?
@@ -77,9 +92,6 @@ model ScPlan {
   updatedAt      DateTime      @updatedAt
   entries        ScTimeEntry[]
 }
-
-
-
 
 // A single logged support-coordination time entry (support or travel),
 // billed against its plan's rate/travelRate. Deleting a plan with entries
@@ -124,11 +136,11 @@ model ServiceAgreement {
   createdBy   User?   @relation(fields: [createdById], references: [id])
 
   // 1. Parties
-  participantName    String
+  participantName       String
   participantNdisNumber String
-  participantRepName String
-  agreementStartDate String
-  agreementEndDate   String
+  participantRepName    String
+  agreementStartDate    String
+  agreementEndDate      String
 
   // 3 & 4. Schedule of supports / responsibilities
   supportsProvided String[] @default([])
@@ -152,38 +164,38 @@ model ServiceAgreement {
   consentPublishFeedback  String  @default("")
 
   // 12. Contact details
-  contactAddress       String
-  contactPhone         String
-  contactEmail         String @default("")
-  hasAlternativeContact String @default("")
-  altRelationship      String[] @default([])
-  altContactName       String   @default("")
-  altContactNumber     String   @default("")
-  altContactEmail      String   @default("")
+  contactAddress        String
+  contactPhone          String
+  contactEmail          String   @default("")
+  hasAlternativeContact String   @default("")
+  altRelationship       String[] @default([])
+  altContactName        String   @default("")
+  altContactNumber      String   @default("")
+  altContactEmail       String   @default("")
 
-  orgContactName    String @default("Health U Australia")
-  orgPhone          String @default("")
-  orgEmail          String @default("")
-  orgPostalAddress  String @default("")
+  orgContactName   String @default("Health U Australia")
+  orgPhone         String @default("")
+  orgEmail         String @default("")
+  orgPostalAddress String @default("")
 
   // 13. Schedule of supports / quote
-  quoteNumber    String  @default("")
-  quoteDate      String  @default("")
-  planStartDate  String  @default("")
-  planEndDate    String  @default("")
-  preparedBy     String  @default("")
-  contactPerson  String  @default("")
-  applyGst       Boolean @default(false)
-  items          Json    @default("[]")
+  quoteNumber   String  @default("")
+  quoteDate     String  @default("")
+  planStartDate String  @default("")
+  planEndDate   String  @default("")
+  preparedBy    String  @default("")
+  contactPerson String  @default("")
+  applyGst      Boolean @default(false)
+  items         Json    @default("[]")
 
   // 14. Signatures
-  agreementExplained      Boolean @default(false)
+  agreementExplained       Boolean @default(false)
   participantSignature     String  @default("")
   participantSignatureName String  @default("")
   participantSignedDate    String  @default("")
-  providerSignature         String  @default("")
-  providerSignatureName     String  @default("")
-  providerSignedDate        String  @default("")
+  providerSignature        String  @default("")
+  providerSignatureName    String  @default("")
+  providerSignedDate       String  @default("")
 
   // Set when staff email the participant a link to review and sign the
   // agreement themselves (see /service-agreement/sign). Kept (not cleared)
@@ -234,6 +246,19 @@ model Contract {
   @@index([status])
 }
 
+model ContentPost {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  pageKey     String
+  section     String?
+  title       String
+  slug        String?
+  body        Json?
+  images      String[] @default([])
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
 // A single linked training or resource entry on the public /training page.
 // `category` groups entries into the page's sections ("REQUIRED_TRAINING",
 // "COMMISSION_RESOURCE", "KNOWLEDGE_RESPONSIBILITY") — a plain string, like
@@ -256,5 +281,7 @@ model TrainingResource {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([pageKey])
+  @@index([title])
   @@index([category])
 }
