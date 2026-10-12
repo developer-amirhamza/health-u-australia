@@ -1,10 +1,13 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PageBanner from 'utils/PageBanner'
 import Image from 'next/image'
 
 import { TiTick } from 'react-icons/ti';
-import { sil_house, sil_house_details, sil_houses } from 'config/page'
+import { sil_house, sil_house_details } from 'config/page'
+import { SilHouse as SilHouseRecord, silHouseFeatures, silHousePath } from 'app/data/silHouses';
+import { SummeryApi } from 'app/common/SummeryApi';
+import Axios from 'utils/Axios';
 import Button from 'utils/Button'
 import Title from 'utils/Title'
 import { motion } from 'framer-motion'
@@ -16,24 +19,42 @@ import SlideModal from 'app/(main)/components/SlideModal';
 const SilHouse = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentId, setCurrentId] = useState(0);
+    const [houses, setHouses] = useState<SilHouseRecord[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
+
+    const loadHouses = async () => {
+        setLoading(true);
+        setLoadError(false);
+        try {
+            const response = await Axios({ ...SummeryApi.silHouses });
+            setHouses(response.data.data);
+        } catch { setLoadError(true); }
+        finally { setLoading(false); }
+    };
+
+    useEffect(() => { void loadHouses(); }, []);
 
     return (
         <div className="flex flex-col  items-center w-full h-full ">
             <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
                 <div className="flex flex-col items-center justify-center gap-10 ">
                     <h1 className="text-primary text-4xl font-bold uppercase ">Our SIL House Properties </h1>
+                    {loading && <p role="status">Loading properties...</p>}
+                    {loadError && <div role="alert">Unable to load properties. <button type="button" className="underline" onClick={loadHouses}>Try again</button></div>}
+                    {!loading && !loadError && houses.length === 0 && <p>No properties are currently listed.</p>}
                     <div className="flex">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {sil_houses.map((item, index) => (
-                                <Link href={item.path} key={index} className="flex flex-col border-[0.5px] cursor-pointer hover:scale-105 duration-300 transition-all border-secondary-text overflow-hidden rounded shadow-2xl border-dotted  ">
-                                    <Image src={item.image} alt='sil-house' className=' ' />
+                            {houses.map((item) => (
+                                <Link href={silHousePath(item)} key={item.id} className="flex flex-col border-[0.5px] cursor-pointer hover:scale-105 duration-300 transition-all border-secondary-text overflow-hidden rounded shadow-2xl border-dotted  ">
+                                    <Image src={item.image} alt='sil-house' width={600} height={450} className='w-full h-auto' />
                                     <div className="flex flex-col items-center p-4 justify-center">
                                         <div className="flex flex-col items-center justify-center gap-1 ">
                                             <h3 className="text-2xl font-semibold text-secondary-text"> {item.address} </h3>
                                     {/* <span className="text-xl text-secondary-text font-medium">{item.address} </span> */}
                                         </div>
                                         <div className="flex items-center justify-center gap-3  w-full h-full">
-                                            {item.features.map((itm, idx) => (
+                                            {silHouseFeatures(item).map((itm, idx) => (
                                                 <div key={idx} className="flex flex-col justify-center items-center gap-2">
                                                     <Image src={itm.icon} alt='icon' />
                                                     <h3 className="text-sm text-center">{itm.label} </h3>

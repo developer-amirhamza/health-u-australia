@@ -79,7 +79,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt } from "react-icons/md";
+import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt, MdSchool } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -118,6 +118,7 @@ import integrity from "assets/images/infographic/integrity.png";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUsersGear } from "react-icons/fa6";
 import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineUserGroup } from "react-icons/hi2";
+import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineHome } from "react-icons/hi2";
 
 
 
@@ -129,6 +130,11 @@ export const adminNavItems = [
         label: "Dashboard",
         path: "/admin",
         icon: AiFillDashboard,
+    },
+    {
+        label: "SIL Houses",
+        path: "/admin/sil-houses",
+        icon: HiOutlineHome,
     },
     // {
     //     label: "Team Tasks",
@@ -169,6 +175,9 @@ export const adminNavItems = [
         label: "Community Participation",
         icon: HiOutlineUserGroup,
         path: "/admin/community-participation",
+        label: "Training",
+        icon: MdSchool,
+        path: "/admin/training",
     },
 ]
 
@@ -225,6 +234,7 @@ export const nav_items = [
     },
     { label: "Feedback", path: "/participant-feedback/" },
     { label: "Career", path: "/career/" },
+    { label: "Training", path: "/training/" },
     { label: "Contact Us", path: "/contact-us/" },
     { label: "Referral", path: "/referral/" },
 ]

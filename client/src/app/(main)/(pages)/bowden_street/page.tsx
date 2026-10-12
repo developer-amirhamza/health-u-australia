@@ -1,6 +1,5 @@
-import React from 'react'
 import { Metadata } from 'next'
-import BowdenStreetClient from './BowdenStreetClient'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: "Bowden Street Ryde – NDIS SIL Housing",
@@ -8,9 +7,7 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  return (
-    <BowdenStreetClient />
-  )
+  redirect('/sil-house/sil-bowden')
 }
 
 export default page

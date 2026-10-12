@@ -1,9 +1,8 @@
+import './config/env.js';
 import app from "./app.js"
-import dotenv from "dotenv"
 import type { Request, Response } from "express"
 import { prisma } from "./lib/prisma.js";
 
-dotenv.config()
 
 
 
@@ -17,15 +16,25 @@ app.get("/", (req: Request, res: Response)=>{
 })
 
 
-app.listen(PORT, '0.0.0.0',()=>{
-    console.log(`The server is running at http://0.0.0.0:${PORT}`)
-})
 
 
 async function main() {
- console.log("Database successfully connected!")
+    await prisma.$connect();
+    console.log('Database successfully connected!');
+    const server = app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
+        console.log(`The server is running at http://localhost:${PORT}`);
+    });
+    const shutdown = () => {
+        server.close(() => { void prisma.$disconnect().then(() => process.exit(0)); });
+    };
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
 }
 
-main().finally(() => prisma.$disconnect());
+main().catch(async () => {
+    console.error('Unable to connect to the database. Check DATABASE_URL and start PostgreSQL.');
+    await prisma.$disconnect();
+    process.exit(1);
+});
 
 

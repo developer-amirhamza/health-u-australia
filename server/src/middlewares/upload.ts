@@ -19,6 +19,24 @@ const avatarUpload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+const silImageUpload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+            return cb(new Error('Use a JPEG, PNG or WebP image'));
+        }
+        cb(null, true);
+    },
+});
+
+export const uploadSilImage = (req: Request, res: Response, next: NextFunction) => {
+    silImageUpload.single('image')(req, res, (err: unknown) => {
+        if (err instanceof Error) return errorHandler(res, 400, err.message);
+        next();
+    });
+};
+
 // multer's own errors (bad file type, too large, ...) surface via a callback,
 // not a thrown exception, so a plain `.single(...)` in the route would fall
 // through to Express's default HTML error page instead of this API's usual

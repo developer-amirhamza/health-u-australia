@@ -1,3 +1,4 @@
+import './config/env.js';
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -10,6 +11,9 @@ import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
 import contractRouter from "./routes/contract.route.js"
 import contentRouter from "./routes/content.route.js";
 import imageRouter from "./routes/image.route.js";
+import silHouseRouter from "./routes/silHouse.route.js";
+import trainingResourceRouter from "./routes/trainingResource.route.js"
+
 
 const app = express();
 app.use(cors({
@@ -37,6 +41,9 @@ app.use("/api/service-agreements", serviceAgreementRouter);
 app.use("/api/contracts", contractRouter);
 app.use("/api/content", contentRouter);
 app.use("/api/image", imageRouter);
+app.use("/api/sil-houses", silHouseRouter);
+app.use("/api/training-resources", trainingResourceRouter);
+
 
 
 
