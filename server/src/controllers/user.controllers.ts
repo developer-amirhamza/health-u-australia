@@ -71,7 +71,7 @@ const SignUp = async (req: Request, res: Response) => {
         let emailFailed = false;
         const emailResult = await sendEmail({
             sendTo: email,
-            subject: "Verify your email - Bestiee",
+            subject: "Verify your email - Health U Australia",
             html: verifyEmailTemplate({
                 firstName,
                 otp,
@@ -183,7 +183,7 @@ export const resendVerificationEmail = async (req: AuthRequest, res: Response) =
             });
             await sendEmail({
                 sendTo: user.email,
-                subject: "Verify your email - Bestiee",
+                subject: "Verify your email - Health U Australia",
                 html: verifyEmailTemplate({
                     firstName: user.firstName || "there",
                     otp,
@@ -227,7 +227,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
             await sendEmail({
                 sendTo: email,
-                subject: "Reset your Health U Shop password",
+                subject: "Reset your Health U Australia password",
                 html: forgotPasswordTemplate({ firstName: user.firstName || "there", otp }),
             }).catch((err) => console.error("Forgot-password email failed:", err.message));
         }

@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import BowdenStreetClient from './BowdenStreetClient'
 
 export const metadata: Metadata = {
   title: "Bowden Street Ryde – NDIS SIL Housing",
@@ -7,7 +8,8 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  redirect('/sil-house/sil-bowden')
+  // redirect('/sil-house/sil-bowden')
+  return <BowdenStreetClient/>
 }
 
 export default page

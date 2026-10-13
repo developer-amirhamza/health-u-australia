@@ -9,6 +9,8 @@ import { clientOrigins } from "./config/clientUrl.js";
 import scBillingRouter from "./routes/scBilling.route.js"
 import serviceAgreementRouter from "./routes/serviceAgreement.route.js"
 import contractRouter from "./routes/contract.route.js"
+import contentRouter from "./routes/content.route.js";
+import imageRouter from "./routes/image.route.js";
 import silHouseRouter from "./routes/silHouse.route.js";
 import trainingResourceRouter from "./routes/trainingResource.route.js"
 
@@ -37,6 +39,8 @@ app.use("/api/user/", userRouter);
 app.use("/api/sc-billing", scBillingRouter);
 app.use("/api/service-agreements", serviceAgreementRouter);
 app.use("/api/contracts", contractRouter);
+app.use("/api/content", contentRouter);
+app.use("/api/image", imageRouter);
 app.use("/api/sil-houses", silHouseRouter);
 app.use("/api/training-resources", trainingResourceRouter);
 

@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import NormanhurstClient from './NormanhurstClient'
 
 export const metadata: Metadata = {
   title: "Normanhurst NDIS Accessible Housing",
@@ -7,7 +8,10 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  redirect('/sil-house/sil-normanhurst')
+  // redirect('/sil-house/sil-normanhurst')
+  return(
+    <NormanhurstClient/>
+  )
 }
 
 export default page
