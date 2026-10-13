@@ -17,7 +17,7 @@ export interface SilHouse {
   sortOrder: number;
 }
 
-export const silHousePath = (house: SilHouse) => `/sil-house/${house.id}`;
+export const silHousePath = (house: SilHouse) => house.legacyPath || `/sil-house/${encodeURIComponent(house.id)}`;
 
 export const silHouseFeatures = (house: SilHouse) => [
   { label: `${house.bedrooms} Bedrooms`, icon: bed },
@@ -25,3 +25,4 @@ export const silHouseFeatures = (house: SilHouse) => [
   { label: `${house.parking} Parking Spaces`, icon: car },
   ...(house.accessible ? [{ label: 'Fully Accessible', icon: wheelchair }] : []),
 ];
+
