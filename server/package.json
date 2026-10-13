@@ -16,6 +16,7 @@
     "db:status": "node scripts/prisma-local.mjs migrate status",
     "db:check": "tsx scripts/check-local-db.ts",
     "setup:sil-houses": "prisma db execute --file prisma/sql/sil-houses.sql",
+    "seed:original-sil-houses": "node scripts/seed-original-sil-houses.mjs",
     "test:sil-houses": "tsx --test tests/silHouse.test.ts",
     "postinstall": "prisma generate",
     "build": "prisma generate && tsc",
