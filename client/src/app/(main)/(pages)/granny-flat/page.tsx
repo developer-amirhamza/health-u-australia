@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import GrannyFlatClient from './GrannyFlatClient'
 
 export const metadata: Metadata = {
   title: "Ryde NDIS Granny Flat – SIL Housing",
@@ -7,7 +8,10 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  redirect('/sil-house/sil-granny-flat')
+  // redirect('/sil-house/sil-granny-flat')
+   return (
+    <GrannyFlatClient />
+  )
 }
 
 export default page

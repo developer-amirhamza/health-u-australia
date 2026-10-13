@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import BelmoreStreetClient from './BelmoreStreetClient'
 
 export const metadata: Metadata = {
   title: "Belmore Street Ryde – NDIS SIL Housing",
@@ -7,7 +8,8 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-  redirect('/sil-house/sil-belmore')
+  // redirect('/sil-house/sil-belmore')
+  return <BelmoreStreetClient/>
 }
 
 export default page
