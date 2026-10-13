@@ -115,4 +115,11 @@ export const SummeryApi = {
     createTrainingResource: { url: "/api/training-resources/create", method: "post" },
     updateTrainingResource: { url: "/api/training-resources/update", method: "put" },
     deleteTrainingResource: { url: "/api/training-resources/delete", method: "delete" },
+
+    // ── Participant Handbook (public /participant-handbook page + its admin CRUD panel) ──
+    getPublicHandbookSections: { url: "/api/handbook-sections/public", method: "get" },
+    getHandbookSections: { url: "/api/handbook-sections", method: "get" },
+    createHandbookSection: { url: "/api/handbook-sections/create", method: "post" },
+    updateHandbookSection: { url: "/api/handbook-sections/update", method: "put" },
+    deleteHandbookSection: { url: "/api/handbook-sections/delete", method: "delete" },
 };

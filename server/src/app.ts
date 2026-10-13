@@ -13,6 +13,7 @@ import contentRouter from "./routes/content.route.js";
 import imageRouter from "./routes/image.route.js";
 import silHouseRouter from "./routes/silHouse.route.js";
 import trainingResourceRouter from "./routes/trainingResource.route.js"
+import handbookSectionRouter from "./routes/handbookSection.route.js";
 
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/content", contentRouter);
 app.use("/api/image", imageRouter);
 app.use("/api/sil-houses", silHouseRouter);
 app.use("/api/training-resources", trainingResourceRouter);
+app.use("/api/handbook-sections", handbookSectionRouter);
 
 
 

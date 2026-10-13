@@ -10,8 +10,8 @@ dotenv.config();
 // SES, SendGrid, Brevo, or any other provider. Switching providers is a .env
 // change only:
 //
-// Fallback: if SMTP_* is not configured, the existing Resend integration is
-// used (RESEND_API_KEY), so nothing breaks during migration.
+// Fallback: if SMTP_* is not configured, or an SMTP send fails, the Resend
+// integration (RESEND_API_KEY) sends the email instead.
 //
 // NOTE: whichever provider you use, the sending domain must be verified there
 // (SPF + DKIM DNS records) or customer inboxes will reject the mail.
@@ -29,6 +29,9 @@ interface Type {
 }
 
 const FROM = process.env.EMAIL_FROM || "Health U Australia <hello@bestiee.com>";
+// Each provider can only send from domains verified with it, so Resend gets
+// its own sender address.
+const RESEND_FROM = process.env.RESEND_FROM || FROM;
 const useSmtp = Boolean(process.env.SMTP_HOST);
 
 // Reuse a single pooled SMTP connection across sends.
@@ -45,43 +48,52 @@ const transporter = useSmtp
       })
     : null;
 
-const resend = !useSmtp && process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// Resend is both the provider when SMTP isn't configured and the backup when
+// an SMTP send fails (e.g. the SMTP account is suspended or deactivated).
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-if (!useSmtp && !process.env.RESEND_API_KEY) {
+if (!useSmtp && !resend) {
     console.warn("Email: neither SMTP_HOST nor RESEND_API_KEY configured — emails will fail.");
 }
+
+const sendViaResend = async ({ sendTo, subject, html, attachments }: Type) => {
+    const { data, error } = await resend!.emails.send({
+        from: RESEND_FROM,
+        to: sendTo,
+        subject,
+        html,
+        ...(attachments && attachments.length > 0 ? { attachments } : {}),
+    });
+    if (error) {
+        // Surface the failure instead of swallowing it — callers already
+        // handle rejections (.catch / try-catch).
+        throw new Error(error.message || "Resend send failed");
+    }
+    return data;
+};
 
 export const sendEmail = async ({ sendTo, subject, html, attachments }: Type) => {
     try {
         if (transporter) {
-            const info = await transporter.sendMail({
-                from: FROM,
-                to: sendTo,
-                subject,
-                html,
-                attachments: attachments?.map((a) => ({
-                    filename: a.filename,
-                    content: a.content,
-                })),
-            });
-            return info;
+            try {
+                const info = await transporter.sendMail({
+                    from: FROM,
+                    to: sendTo,
+                    subject,
+                    html,
+                    attachments: attachments?.map((a) => ({
+                        filename: a.filename,
+                        content: a.content,
+                    })),
+                });
+                return info;
+            } catch (smtpError: any) {
+                if (!resend) throw smtpError;
+                console.warn(`Email: SMTP send failed (${smtpError.message}) — retrying with Resend.`);
+            }
         }
 
-        if (resend) {
-            const { data, error } = await resend.emails.send({
-                from: FROM,
-                to: sendTo,
-                subject,
-                html,
-                ...(attachments && attachments.length > 0 ? { attachments } : {}),
-            });
-            if (error) {
-                // Surface the failure instead of swallowing it — callers already
-                // handle rejections (.catch / try-catch).
-                throw new Error(error.message || "Resend send failed");
-            }
-            return data;
-        }
+        if (resend) return await sendViaResend({ sendTo, subject, html, attachments });
 
         throw new Error("No email provider configured (set SMTP_* or RESEND_API_KEY)");
     } catch (error: any) {
