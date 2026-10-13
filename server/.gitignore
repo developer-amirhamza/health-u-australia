@@ -8,3 +8,4 @@ dist
 # Local database, generated credentials and logs
 .env.local
 .local/
+.env*
