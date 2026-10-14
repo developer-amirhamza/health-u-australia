@@ -102,6 +102,9 @@ export const SummeryApi = {
     getContractById: { url: "/api/contracts/single", method: "get" },
     deleteContract: { url: "/api/contracts/delete", method: "delete" },
     sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
+    sendContractSignatureRequest: { url: "/api/contracts/send-signature-request", method: "post" },
+    getContractByToken: { url: "/api/contracts/sign", method: "get" },
+    submitEmployeeSignature: { url: "/api/contracts/sign", method: "post" },
 
     // ── CMS Content Management (admin-managed website content; public read access) ──
     getContent: { url: "/api/content", method: "get" },

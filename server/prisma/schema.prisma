@@ -223,8 +223,18 @@ model Contract {
   data Json @default("{}")
 
   // The tool's own rendered contract document (renderHTML(buildDoc())),
-  // captured at submission time.
+  // captured at submission time. When the employee signs via the emailed
+  // link, their signature, name and date are written into it.
   documentHtml String @default("")
+
+  // Set when staff email the employee a link to review and sign the
+  // contract themselves (see /contract/sign). Kept (not cleared) once
+  // signed, so a re-visited link can still show "already signed".
+  employeeSignature     String    @default("")
+  employeeSignatureName String    @default("")
+  employeeSignedDate    String    @default("")
+  signingToken          String?   @unique
+  signingTokenExpiresAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

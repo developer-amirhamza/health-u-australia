@@ -558,6 +558,8 @@ const TYPES = {
 const isEmp = t => t !== "contractor";
 // Fixed-term inherits its leave / hours behaviour from the chosen basis
 function basis(){ return state.type === "fixedterm" ? (state.data.ftBasis || "fulltime") : state.type; }
+// full-time on a fixed annual salary: the letter states the salary and package only, no Award pay point
+function isSalaried(){ return state.type !== "contractor" && basis() === "fulltime" && state.data.ftPay === "salary"; }
 
 const DEFAULTS = {
   docRef:"HU043.01",
@@ -568,7 +570,8 @@ const DEFAULTS = {
   startDate:"", endDate:"",
   level:"1", payPoint:"1",
   superRate:"12", kmAllowance:"0.99",
-  ptHours:"", ptRoster:"", ftSalary:"",
+  ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award",
+  homeVisit:"",
   hoursCasual:"Upon agreement",
   payFrequency:"Wednesday weekly",
   rosterPolicy:"Rosters are subject to change\nNo shift is guaranteed unless written in the contract\nRotations will occur to support fairness and skill mix\nManagement reserves the discretion to adjust",
@@ -737,6 +740,7 @@ function schema(){
   if(t === "contractor") return schemaContractor();
   const fx = t === "fixedterm", B = basis();
   const casual = t==="casual", pt = B==="parttime", ft = B==="fulltime";
+  const salaried = isSalaried();
   return [
     { n:1, t:"Letter details", sub:"Reference and date", open:true, fields:[
       {k:"docRef", l:"Document reference", ph:"HU043.01", half:true},
@@ -758,6 +762,8 @@ function schema(){
       {k:"location", l:"Location on appointment", wide:true},
       {k:"reportingTo", l:"Reporting to", type:"textarea", wide:true,
         hint:"One manager per line — name then title"},
+      {k:"homeVisit", l:"Participant home visit", ph:"e.g. When required", wide:true,
+        hint:"Optional — leave blank to leave it out of the letter"},
       ...(fx ? [{k:"ftBasis", l:"Employment basis", type:"select", wide:true,
         opts:[{v:"fulltime",t:"Full-time — 38 hours per week"},{v:"parttime",t:"Part-time — guaranteed hours"}],
         hint:"Determines hours, leave accrual and pay display"}] : []),
@@ -766,15 +772,19 @@ function schema(){
         hint: fx ? "The contract ends on this date without further notice"
                  : "Leave blank for ongoing employment"}
     ]},
-    { n:4, t:"Classification and pay", sub:"SCHADS Award", open:true, fields:[
-      {k:"classCode", l:"Award pay point", type:"select", wide:true, dyn:"classCode",
-        hint:"Exactly as listed in the Health U pay schedule \u2014 this sets every rate below"},
+    { n:4, t:"Classification and pay", sub: salaried ? "Fixed annual salary" : "SCHADS Award", open:true, fields:[
+      ...(ft ? [{k:"ftPay", l:"Pay basis", type:"select", wide:true,
+        opts:[{v:"award",t:"Award pay point"},{v:"salary",t:"Fixed annual salary \u2014 no pay point"}],
+        hint:"A fixed salary leaves the classification, pay point and hourly rates out of the letter"}] : []),
+      ...(salaried ? [] : [{k:"classCode", l:"Award pay point", type:"select", wide:true, dyn:"classCode",
+        hint:"Exactly as listed in the Health U pay schedule \u2014 this sets every rate below"}]),
       {k:"superRate", l:"Superannuation rate", type:"number", step:"0.1", suffix:"%", half:true,
         hint:"Guarantee rate is 12% from 1 July 2025"},
       {k:"kmAllowance", l:"Vehicle allowance", type:"number", step:"0.01", money:true, half:true,
         hint:"Per kilometre"},
-      ...(ft ? [{k:"ftSalary", l:"Annual salary", type:"number", money:true, wide:true,
-        hint:"Leave blank to use the Award annual equivalent shown below"}] : []),
+      ...(ft ? [{k:"ftSalary", l:"Annual salary", type:"number", money:true, wide:true, req:salaried,
+        hint: salaried ? "Base salary per annum. The letter adds super to show the total package"
+                       : "Leave blank to use the Award annual equivalent shown below"}] : []),
       ...(pt ? [
         {k:"ptHours", l:"Guaranteed hours per week", type:"number", step:"0.5", half:true, req:true},
         {k:"ptRoster", l:"Agreed roster pattern", type:"textarea", wide:true, req:true,
@@ -783,9 +793,9 @@ function schema(){
       ...(casual ? [{k:"hoursCasual", l:"Hours of work", wide:true}] : []),
       ...(casual ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
         hint:"Casual contracts only — lifts every rate: weekday, weekend, public holiday and shift. The letter shows the rates only, never the pay point"}] : []),
-      {k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
+      ...(salaried ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
         opts:[{v:"no",t:"Leave out of the letter"},{v:"yes",t:"Show in the letter"}],
-        hint:"They are always visible in the Rate table tab"},
+        hint:"They are always visible in the Rate table tab"}]),
       {k:"payFrequency", l:"Payment frequency", half:true},
       {k:"rosterPolicy", l:"Roster policy", type:"textarea", wide:true, hint:"One point per line"}
     ]},
@@ -881,6 +891,7 @@ function buildDoc(){
   const nm = ph(d.fullName, "Employee full name");
   const pos = ph(d.positionTitle, "Position title");
   const supPct = R ? R.superPct : parseFloat(d.superRate||12);
+  const salaried = isSalaried();
   const restraint = ph(d.restraintMonths, "Restraint months");
   const probM = ph(d.probationMonths, "Probation months");
   const b = [];
@@ -904,6 +915,7 @@ function buildDoc(){
   const rows = [];
   rows.push(["Position", [P(pos)]]);
   rows.push(["Location on Appointment", [P(ph(d.location,"Location"))]]);
+  if(String(d.homeVisit||"").trim()) rows.push(["Participant Home Visit", [P(d.homeVisit.trim())]]);
   rows.push(["Reporting to", (lines(d.reportingTo).length? lines(d.reportingTo):[ph("","Reporting manager")]).map(x=>P(x,{tight:true}))]);
 
   const dates = d.startDate
@@ -911,6 +923,14 @@ function buildDoc(){
     : ph("", "Start date");
   rows.push([d.endDate ? "Contract start and end date" : "Commencement date", [P(dates)]]);
 
+  if(salaried){
+    // fixed annual salary: no classification, pay point or hourly rates — just salary and package
+    const sal = parseFloat(d.ftSalary);
+    rows.push(["Base Salary", isNaN(sal) ? [P(ph("", "Annual salary"))] : [
+      P(`Base ${money0(sal)} per annum plus ${supPct}% super`),
+      P(`Total package ${money(sal * (1 + supPct/100))} per annum`)
+    ]]);
+  } else {
   rows.push(["Classification", [P(
     `The Employee is classified under the ${AWARD.awardName} as: ${AWARD.streamLabel} – Level ${L}, `
     + `Pay Point ${PP} (Level ${LPP}). This classification applies to all hours worked, regardless of the day or type of shift. `
@@ -967,6 +987,7 @@ function buildDoc(){
     + `This rate is reviewed regularly and may increase in future financial years. Your superannuation contributions will `
     + `automatically adjust to reflect any such changes.`, {b:true}));
   rows.push([ft ? "Salary" : "Base Salary", payCell]);
+  }
 
   rows.push(["Allowance", [P(money(parseFloat(d.kmAllowance||0)) + " / Kilometre")]]);
 
@@ -979,11 +1000,13 @@ function buildDoc(){
       P("Agreed pattern of hours:"),
       ...(rp.length? rp.map(x=>P(x,{tight:true})) : [P(ph("","Agreed roster pattern"))])
     ]]);
+  } else if(salaried){
+    rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week`)]]);
   } else {
     rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week, plus reasonable additional hours as required.`)]]);
   }
 
-  rows.push(["Roster Policy", (lines(d.rosterPolicy).length? lines(d.rosterPolicy):[ph("","Roster policy")]).map(x=>P(x,{tight:true}))]);
+  if(!salaried) rows.push(["Roster Policy", (lines(d.rosterPolicy).length? lines(d.rosterPolicy):[ph("","Roster policy")]).map(x=>P(x,{tight:true}))]);
   rows.push(["Payment Frequency", [P(ph(d.payFrequency,"Payment frequency"))]]);
   rows.push(["Status", [P(fx ? `${T.status} (${pt?"part-time":"full-time"} basis)` : T.status)]]);
   b.push({k:"table", rows:rows});
@@ -2142,12 +2165,15 @@ function fieldHTML(f){
       });
     }
     if(f.dyn === "classCode"){
+      // each employment type sees only its own rates: casual lists the loaded casual hourly
+      const casual = state.type === "casual";
       opts = [];
       Object.keys(state.award.weekly).forEach(L=>{
         state.award.weekly[L].forEach((wk,i)=>{
           const pp = i + 1, hr = r2(wk / state.award.hoursPerWeek);
+          const shown = casual ? r2(hr * state.award.penalties.casual.weekday) : hr;
           opts.push({ v:L+"."+pp,
-                      t:classLabel(L,pp)+"   ("+L+"."+pp+")   \u2014   "+money(hr)+" / hour" });
+                      t:classLabel(L,pp)+"   ("+L+"."+pp+")   \u2014   "+money(shown)+" / hour"+(casual?" casual":"") });
         });
       });
       v = state.data.level + "." + state.data.payPoint;
@@ -2194,6 +2220,7 @@ function secExtra(n){
     </div>`;
   }
   if(n !== 4) return "";
+  if(isSalaried()) return "";   // fixed salary: no Award pay point, so no rate readout
   if(state.type === "contractor"){
     return `<div class="note note-warn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg>
@@ -2296,7 +2323,7 @@ function wireForm(){
         const n = payPointsFor(el.value);
         if(+state.data.payPoint > n) state.data.payPoint = "1";
         renderForm();
-      } else if(el.dataset.k === "ftBasis" || el.dataset.k === "incChoice"){
+      } else if(el.dataset.k === "ftBasis" || el.dataset.k === "incChoice" || el.dataset.k === "ftPay"){
         renderForm();          // these change which fields are shown
       } else if(["payPoint","superRate"].includes(el.dataset.k)){
         // replace only the derived rate readout, so focus stays in the field
@@ -2358,6 +2385,9 @@ function renderPreview(){
 function renderRates(){
   const A = state.award;
   const P = A.penalties.permanent, C = A.penalties.casual;
+  // the table follows the selected contract type: casual sees only casual rates,
+  // every other type only the full-time / part-time (permanent) rates
+  const casual = state.type === "casual";
   const rows = [];
   Object.keys(A.weekly).forEach(L=>{
     A.weekly[L].forEach((pre,i)=>{
@@ -2366,22 +2396,25 @@ function renderRates(){
         <td class="lbl">${i===0?"Level "+L:""}</td>
         <td class="pp">Pay point ${i+1}</td>
         <td><input type="number" step="0.01" data-lvl="${L}" data-pp="${i}" value="${pre.toFixed(2)}"></td>
+        ${casual ? `
+        <td class="der">${money(r2(hourly*C.weekday))}</td>
+        <td class="der">${money(r2(hourly*C.saturday))}</td>
+        <td class="der">${money(r2(hourly*C.sunday))}</td>
+        <td class="der">${money(r2(hourly*C.publicHoliday))}</td>
+        <td class="der">${money(r2(hourly*C.afternoon))}</td>
+        <td class="der">${money(r2(hourly*C.night))}</td>` : `
         <td class="der">${money(hourly)}</td>
         <td class="der">${money(r2(hourly*P.saturday))}</td>
         <td class="der">${money(r2(hourly*P.sunday))}</td>
         <td class="der">${money(r2(hourly*P.publicHoliday))}</td>
         <td class="der">${money(r2(hourly*P.afternoon))}</td>
-        <td class="der">${money(r2(hourly*P.night))}</td>
-        <td class="der sep">${money(r2(hourly*C.weekday))}</td>
-        <td class="der">${money(r2(hourly*C.saturday))}</td>
-        <td class="der">${money(r2(hourly*C.sunday))}</td>
-        <td class="der">${money(r2(hourly*C.publicHoliday))}</td>
+        <td class="der">${money(r2(hourly*P.night))}</td>`}
       </tr>`);
     });
   });
 
   $("#ratesInner").innerHTML = `
-    <h2>Award rate table</h2>
+    <h2>Award rate table — ${casual ? "casual" : "full-time &amp; part-time"}</h2>
     <div class="sub">Every generated contract reads its pay rates from here. Weekly rates come from the
       Health U pay schedule; everything else is calculated. Edit a weekly rate and all derived figures update
       immediately.</div>
@@ -2395,17 +2428,17 @@ function renderRates(){
         <div class="kv">
           <div class="f"><label>Effective from</label><input data-a="effectiveFrom" value="${esc(A.effectiveFrom)}"></div>
           <div class="f"><label>Ordinary hours per week</label><input data-a="hoursPerWeek" type="number" step="0.5" value="${A.hoursPerWeek}"></div>
-          <div class="f"><label>Casual loading</label><input data-a="penalties.casual.weekday" type="number" step="0.01" value="${A.penalties.casual.weekday}"><div class="hint">Multiplier — 1.25 = base + 25%</div></div>
+          ${casual ? `<div class="f"><label>Casual loading</label><input data-a="penalties.casual.weekday" type="number" step="0.01" value="${A.penalties.casual.weekday}"><div class="hint">Multiplier — 1.25 = base + 25%</div></div>
           <div class="f"><label>Casual Saturday</label><input data-a="penalties.casual.saturday" type="number" step="0.01" value="${A.penalties.casual.saturday}"></div>
           <div class="f"><label>Casual Sunday</label><input data-a="penalties.casual.sunday" type="number" step="0.01" value="${A.penalties.casual.sunday}"></div>
           <div class="f"><label>Casual public holiday</label><input data-a="penalties.casual.publicHoliday" type="number" step="0.01" value="${A.penalties.casual.publicHoliday}"></div>
+          <div class="f"><label>Casual afternoon shift</label><input data-a="penalties.casual.afternoon" type="number" step="0.001" value="${A.penalties.casual.afternoon}"></div>
+          <div class="f"><label>Casual night shift</label><input data-a="penalties.casual.night" type="number" step="0.001" value="${A.penalties.casual.night}"></div>` : `
           <div class="f"><label>Permanent Saturday</label><input data-a="penalties.permanent.saturday" type="number" step="0.01" value="${A.penalties.permanent.saturday}"></div>
           <div class="f"><label>Permanent Sunday</label><input data-a="penalties.permanent.sunday" type="number" step="0.01" value="${A.penalties.permanent.sunday}"></div>
           <div class="f"><label>Permanent public holiday</label><input data-a="penalties.permanent.publicHoliday" type="number" step="0.01" value="${A.penalties.permanent.publicHoliday}"></div>
           <div class="f"><label>Afternoon shift</label><input data-a="penalties.permanent.afternoon" type="number" step="0.001" value="${A.penalties.permanent.afternoon}"><div class="hint">1.125 = base + 12.5%</div></div>
-          <div class="f"><label>Night shift</label><input data-a="penalties.permanent.night" type="number" step="0.001" value="${A.penalties.permanent.night}"><div class="hint">1.15 = base + 15%</div></div>
-          <div class="f"><label>Casual afternoon shift</label><input data-a="penalties.casual.afternoon" type="number" step="0.001" value="${A.penalties.casual.afternoon}"></div>
-          <div class="f"><label>Casual night shift</label><input data-a="penalties.casual.night" type="number" step="0.001" value="${A.penalties.casual.night}"></div>
+          <div class="f"><label>Night shift</label><input data-a="penalties.permanent.night" type="number" step="0.001" value="${A.penalties.permanent.night}"><div class="hint">1.15 = base + 15%</div></div>`}
         </div>
         <div class="note note-warn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg>
@@ -2415,7 +2448,7 @@ function renderRates(){
       </div>
     </div>
 
-    ${Object.keys(A.incentives||{}).length ? `<div class="card">
+    ${casual && Object.keys(A.incentives||{}).length ? `<div class="card">
       <div class="card-h"><b>Incentive pay points</b><span class="sp"></span>
         <span class="badge">Casual rates</span></div>
       <div class="card-b flush">
@@ -2453,12 +2486,10 @@ function renderRates(){
         <table class="ed">
           <thead>
             <tr class="grp"><th colspan="3"></th>
-              <th colspan="6">Full-time &amp; part-time</th>
-              <th colspan="4" class="sep">Casual (includes 25% loading)</th></tr>
+              <th colspan="6">${casual ? "Casual (includes 25% loading)" : "Full-time &amp; part-time"}</th></tr>
             <tr>
               <th>Level</th><th>Pay point</th><th>Weekly rate</th>
-              <th>Hourly</th><th>Saturday</th><th>Sunday</th><th>Public hol.</th><th>Afternoon</th><th>Night</th>
-              <th class="sep">Weekday</th><th>Saturday</th><th>Sunday</th><th>Public hol.</th>
+              <th>${casual ? "Weekday" : "Hourly"}</th><th>Saturday</th><th>Sunday</th><th>Public hol.</th><th>Afternoon</th><th>Night</th>
             </tr>
           </thead>
           <tbody>${rows.join("")}</tbody>
