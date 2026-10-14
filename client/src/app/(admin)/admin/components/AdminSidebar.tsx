@@ -20,8 +20,9 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
     return (
         <div className={`flex flex-col w-full h-full bg-[#1a1a18] ${!activeSidebar ? "flex" : "max-sm:hidden"}`}>
             {/* Brand */}
-            <Link href="/admin" className="px-6 py-5 border-b border-white/10 block">
-                <span className="font-serif text-xl text-white">Health U Australia</span>
+            <Link href="/admin" className="px-4 py-5 border-b border-white/10 block overflow-hidden">
+                <span className={`${activeSidebar ? "block" : "hidden"} font-serif text-xl text-white`}>Health U Australia</span>
+                <span className={`${activeSidebar ? "hidden" : "block"} font-serif text-xl text-white text-center`}>HU</span>
                 <span className={`${activeSidebar ? "block" : "hidden"} text-[10px] uppercase tracking-[0.2em] text-[#c9b89a] mt-1`}>
                     Admin Dashboard
                 </span>

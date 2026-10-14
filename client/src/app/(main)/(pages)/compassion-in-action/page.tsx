@@ -1,6 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next';
-import Compassion from 'app/pages/Compassion';
+import Compassion from './CompassionView';
 
 
 export const metadata : Metadata = {

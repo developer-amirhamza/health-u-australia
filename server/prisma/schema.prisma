@@ -24,6 +24,12 @@ model SilHouse {
   updatedAt   DateTime @updatedAt
 }
 
+model ManagedPage {
+  slug      String   @id
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
 // Tracks the one-time import so deployment cannot restore deleted listings.
 model SilHouseSetup {
   id String @id

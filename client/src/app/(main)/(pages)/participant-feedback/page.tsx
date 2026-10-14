@@ -1,7 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import PageBanner from 'utils/PageBanner'
-import ParticipantFeedback from 'app/pages/ParticipantFeedback'
+import ParticipantFeedback from './FeedbackView'
 
 export const metadata: Metadata = {
   title: "Participant Feedback & Complaints",
@@ -11,7 +10,6 @@ export const metadata: Metadata = {
 const page = () => {
   return (
     <div className="flex flex-col w-full h-full">
-      <PageBanner title='Participant Feedback' path='/participant-feedback' />
       <ParticipantFeedback />
     </div>
   )

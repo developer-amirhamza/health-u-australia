@@ -117,6 +117,7 @@ import innovation from "assets/images/infographic/innovation.png";
 import integrity from "assets/images/infographic/integrity.png";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUsersGear } from "react-icons/fa6";
+import { FaAccessibleIcon, FaHeart, FaCommentDots } from "react-icons/fa";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineHome } from "react-icons/hi2";
 
@@ -136,6 +137,9 @@ export const adminNavItems = [
         path: "/admin/sil-houses",
         icon: HiOutlineHome,
     },
+    { label: "NDIS Page", path: "/admin/ndis", icon: FaAccessibleIcon },
+    { label: "Compassion Page", path: "/admin/compassion-in-action", icon: FaHeart },
+    { label: "Feedback Page", path: "/admin/participant-feedback", icon: FaCommentDots },
     // {
     //     label: "Team Tasks",
     //     icon: MdTaskAlt,

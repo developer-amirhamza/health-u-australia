@@ -1,4 +1,4 @@
-import NDIS from 'app/pages/NDIS'
+import NDIS from './NDISView'
 import { Metadata } from 'next'
 import React from 'react'
 
