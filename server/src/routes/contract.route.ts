@@ -4,6 +4,7 @@ import {
   getContractById,
   createContract,
   deleteContract,
+  updateContract,
   sendContractPdf,
   sendContractSignatureRequest,
   getContractByToken,
@@ -28,6 +29,7 @@ router.post('/sign', submitEmployeeSignature);
 // Managing saved contracts is an admin-panel (CRUD) concern.
 router.get('/', auth, admin, getContracts);
 router.get('/single', auth, admin, getContractById);
+router.put('/update', auth, admin, updateContract);
 router.delete('/delete', auth, admin, deleteContract);
 
 export default router;

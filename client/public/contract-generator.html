@@ -337,6 +337,7 @@ table.ed tbody tr.lvl-start td{border-top:1px solid var(--line)}
 }
 @keyframes authspin{to{transform:rotate(360deg)}}
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap">
 </head>
 <body>
 <div id="authGate" style="position:fixed;inset:0;background:#f4f5f7;z-index:9999;display:flex;align-items:center;justify-content:center">
@@ -401,11 +402,17 @@ table.ed tbody tr.lvl-start td{border-top:1px solid var(--line)}
                   <label id="sigLabelEmployee">Employee signature</label>
                   <div class="sigpad" data-role="employee" data-empty="true"><canvas></canvas><span class="sigpad-ph">Sign here</span></div>
                   <button type="button" class="lnk sigpad-clear" data-role="employee" style="margin-top:6px">Clear</button>
+                  <button type="button" class="lnk sigpad-upload" data-role="employee" style="margin-top:6px;margin-left:12px">Upload signature image</button>
+                  <button type="button" class="lnk sigpad-type" data-role="employee" style="margin-top:6px;margin-left:12px">Type signature</button>
+                  <input type="text" class="sigpad-text" data-role="employee" placeholder="Type the full name" maxlength="60" hidden style="margin-top:6px;max-width:360px">
                 </div>
                 <div class="f wide">
                   <label>Signed for Health U by</label>
                   <div class="sigpad" data-role="signatory" data-empty="true"><canvas></canvas><span class="sigpad-ph">Sign here</span></div>
                   <button type="button" class="lnk sigpad-clear" data-role="signatory" style="margin-top:6px">Clear</button>
+                  <button type="button" class="lnk sigpad-upload" data-role="signatory" style="margin-top:6px;margin-left:12px">Upload signature image</button>
+                  <button type="button" class="lnk sigpad-type" data-role="signatory" style="margin-top:6px;margin-left:12px">Type signature</button>
+                  <input type="text" class="sigpad-text" data-role="signatory" placeholder="Type the full name" maxlength="60" hidden style="margin-top:6px;max-width:360px">
                 </div>
               </div>
             </div>
@@ -551,15 +558,24 @@ const TYPES = {
   casual:     { label:"Casual",     blurb:"Hours by agreement, 25% loading", title:"Casual Employee",       status:"Casual Employee" },
   parttime:   { label:"Part-time",  blurb:"Guaranteed hours, pro-rata leave",title:"Part-Time Employee",    status:"Part-Time Employee" },
   fulltime:   { label:"Full-time",  blurb:"38 hrs/week, full leave",         title:"Full-Time Employee",    status:"Full-Time Employee" },
-  fixedterm:  { label:"Fixed-term", blurb:"Set end date, FT or PT basis",    title:"Fixed-Term Employee",   status:"Fixed-Term Employee" },
+  fixedterm:  { label:"Office Employee", blurb:"Full time or part time, salary or hourly", title:"Office Employee", status:"Office Employee" },
   contractor: { label:"Contractor", blurb:"ABN, services agreement",         title:"Independent Contractor",status:"Independent Contractor",
                 doc:"Independent Contractor Agreement", file:"Contractor agreement" }
 };
 const isEmp = t => t !== "contractor";
-// Fixed-term inherits its leave / hours behaviour from the chosen basis
+// Office Employee (internal key "fixedterm", kept so saved contracts still load) inherits
+// its leave / hours behaviour from the full time / part time basis chosen for it
 function basis(){ return state.type === "fixedterm" ? (state.data.ftBasis || "fulltime") : state.type; }
-// full-time on a fixed annual salary: the letter states the salary and package only, no Award pay point
-function isSalaried(){ return state.type !== "contractor" && basis() === "fulltime" && state.data.ftPay === "salary"; }
+function isOffice(){ return state.type === "fixedterm"; }
+// full-time on a fixed annual salary: the letter states the salary and package only, no Award pay point.
+// Office employees are always paid this way when full time.
+function isSalaried(){ return state.type !== "contractor" && basis() === "fulltime" && (isOffice() || state.data.ftPay === "salary"); }
+// part-time office employee: paid an agreed hourly rate, no Award pay point
+function isOfficePT(){ return isOffice() && basis() === "parttime"; }
+function noPayPoint(){ return isSalaried() || isOfficePT(); }
+// What the document calls the employment: an Office Employee reads as plain
+// Full-Time or Part-Time — "Office Employee" never appears in the letter
+function docType(){ return TYPES[isOffice() ? basis() : state.type]; }
 
 const DEFAULTS = {
   docRef:"HU043.01",
@@ -570,7 +586,7 @@ const DEFAULTS = {
   startDate:"", endDate:"",
   level:"1", payPoint:"1",
   superRate:"12", kmAllowance:"0.99",
-  ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award",
+  ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award", ptRate:"",
   homeVisit:"",
   hoursCasual:"Upon agreement",
   payFrequency:"Wednesday weekly",
@@ -591,7 +607,7 @@ const DEFAULTS = {
 };
 
 const state = {
-  style: { family: "calibri", size: 11 },   // matches the existing Word template
+  style: { family: "arial", size: 11 },
   type: "casual",
   data: Object.assign({}, DEFAULTS),
   logo: HU_LOGO_PNG,                        // shown in the preview and the Word file
@@ -740,7 +756,7 @@ function schema(){
   if(t === "contractor") return schemaContractor();
   const fx = t === "fixedterm", B = basis();
   const casual = t==="casual", pt = B==="parttime", ft = B==="fulltime";
-  const salaried = isSalaried();
+  const salaried = isSalaried(), officePT = isOfficePT(), noPay = salaried || officePT;
   return [
     { n:1, t:"Letter details", sub:"Reference and date", open:true, fields:[
       {k:"docRef", l:"Document reference", ph:"HU043.01", half:true},
@@ -759,24 +775,25 @@ function schema(){
     { n:3, t:"Position", sub:"Role, location and reporting", open:true, fields:[
       {k:"positionTitle", l:"Position title", ph:"e.g. Disability Support Worker", wide:true, req:true,
         hint:"Used in both the offer paragraph and the details table, so they can't drift apart"},
-      {k:"location", l:"Location on appointment", wide:true},
+      {k:"location", l:"Location on appointment", type:"choice", wide:true,
+        opts:["Multiple office location of Health U Australia", "Various locations"],
+        hint:"Pick one, or choose Other to type your own"},
       {k:"reportingTo", l:"Reporting to", type:"textarea", wide:true,
         hint:"One manager per line — name then title"},
       {k:"homeVisit", l:"Participant home visit", ph:"e.g. When required", wide:true,
         hint:"Optional — leave blank to leave it out of the letter"},
-      ...(fx ? [{k:"ftBasis", l:"Employment basis", type:"select", wide:true,
-        opts:[{v:"fulltime",t:"Full-time — 38 hours per week"},{v:"parttime",t:"Part-time — guaranteed hours"}],
-        hint:"Determines hours, leave accrual and pay display"}] : []),
+      ...(fx ? [{k:"ftBasis", l:"Full time or part time", type:"select", wide:true,
+        opts:[{v:"fulltime",t:"Full time — 38 hours per week, annual salary"},{v:"parttime",t:"Part time — agreed hours, hourly rate"}],
+        hint:"Determines hours, leave accrual and how pay appears in the letter"}] : []),
       {k:"startDate", l:"Start date", type:"date", half:true, req:true},
-      {k:"endDate", l:"End date", type:"date", half:true, req:fx,
-        hint: fx ? "The contract ends on this date without further notice"
-                 : "Leave blank for ongoing employment"}
+      ...(fx ? [] : [{k:"endDate", l:"End date", type:"date", half:true,
+        hint:"Leave blank for ongoing employment"}])
     ]},
-    { n:4, t:"Classification and pay", sub: salaried ? "Fixed annual salary" : "SCHADS Award", open:true, fields:[
-      ...(ft ? [{k:"ftPay", l:"Pay basis", type:"select", wide:true,
+    { n:4, t:"Classification and pay", sub: salaried ? "Fixed annual salary" : officePT ? "Agreed hourly rate" : "SCHADS Award", open:true, fields:[
+      ...(ft && !fx ? [{k:"ftPay", l:"Pay basis", type:"select", wide:true,
         opts:[{v:"award",t:"Award pay point"},{v:"salary",t:"Fixed annual salary \u2014 no pay point"}],
         hint:"A fixed salary leaves the classification, pay point and hourly rates out of the letter"}] : []),
-      ...(salaried ? [] : [{k:"classCode", l:"Award pay point", type:"select", wide:true, dyn:"classCode",
+      ...(noPay ? [] : [{k:"classCode", l:"Award pay point", type:"select", wide:true, dyn:"classCode",
         hint:"Exactly as listed in the Health U pay schedule \u2014 this sets every rate below"}]),
       {k:"superRate", l:"Superannuation rate", type:"number", step:"0.1", suffix:"%", half:true,
         hint:"Guarantee rate is 12% from 1 July 2025"},
@@ -785,6 +802,8 @@ function schema(){
       ...(ft ? [{k:"ftSalary", l:"Annual salary", type:"number", money:true, wide:true, req:salaried,
         hint: salaried ? "Base salary per annum. The letter adds super to show the total package"
                        : "Leave blank to use the Award annual equivalent shown below"}] : []),
+      ...(officePT ? [{k:"ptRate", l:"Hourly rate", type:"number", money:true, half:true, req:true,
+        hint:"Base rate per hour. The letter adds super to show the total"}] : []),
       ...(pt ? [
         {k:"ptHours", l:"Guaranteed hours per week", type:"number", step:"0.5", half:true, req:true},
         {k:"ptRoster", l:"Agreed roster pattern", type:"textarea", wide:true, req:true,
@@ -793,7 +812,7 @@ function schema(){
       ...(casual ? [{k:"hoursCasual", l:"Hours of work", wide:true}] : []),
       ...(casual ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
         hint:"Casual contracts only — lifts every rate: weekday, weekend, public holiday and shift. The letter shows the rates only, never the pay point"}] : []),
-      ...(salaried ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
+      ...(noPay ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
         opts:[{v:"no",t:"Leave out of the letter"},{v:"yes",t:"Show in the letter"}],
         hint:"They are always visible in the Rate table tab"}]),
       {k:"payFrequency", l:"Payment frequency", half:true},
@@ -884,14 +903,14 @@ const P = (t,o)=> Object.assign({t:t}, o||{});
 
 function buildDoc(){
   if(state.type === "contractor") return buildContractorDoc();
-  const d = state.data, T = TYPES[state.type], R = currentRates();
+  const d = state.data, T = docType(), R = currentRates();
   const fx = state.type === "fixedterm", B = basis();
   const casual = state.type==="casual", pt = B==="parttime", ft = B==="fulltime";
   const L = d.level, PP = d.payPoint, LPP = `${L}.${PP}`;
   const nm = ph(d.fullName, "Employee full name");
   const pos = ph(d.positionTitle, "Position title");
   const supPct = R ? R.superPct : parseFloat(d.superRate||12);
-  const salaried = isSalaried();
+  const salaried = isSalaried(), officePT = isOfficePT();
   const restraint = ph(d.restraintMonths, "Restraint months");
   const probM = ph(d.probationMonths, "Probation months");
   const b = [];
@@ -904,9 +923,8 @@ function buildDoc(){
   b.push({k:"p", t:"Dear " + ph(firstName(d.fullName), "First name") + ","});
   b.push({k:"subject", t:"Letter of Engagement – " + T.title});
 
-  const engagement = casual ? "casual"
-    : (fx ? `${pt?"part-time":"full-time"} employment on a fixed-term basis` : (pt ? "part-time" : "full-time"));
-  b.push({k:"p", t:`I am pleased to offer you ${engagement}${fx?"":" employment"} in the position of `
+  const engagement = casual ? "casual" : (pt ? "part-time" : "full-time");
+  b.push({k:"p", t:`I am pleased to offer you ${engagement} employment in the position of `
     + pos + ` with us at ${COMPANY.name} on the terms and conditions set out in this letter. `
     + `This offer must be read in conjunction with the National Employment Standards (the NES) and any relevant and applicable ${COMPANY.short} policies.`});
   b.push({k:"p", t:"The details of your employment are as follows:"});
@@ -918,17 +936,25 @@ function buildDoc(){
   if(String(d.homeVisit||"").trim()) rows.push(["Participant Home Visit", [P(d.homeVisit.trim())]]);
   rows.push(["Reporting to", (lines(d.reportingTo).length? lines(d.reportingTo):[ph("","Reporting manager")]).map(x=>P(x,{tight:true}))]);
 
+  const endDate = fx ? "" : d.endDate;
   const dates = d.startDate
-    ? (d.endDate ? `${shortDate(d.startDate)} to ${shortDate(d.endDate)}` : `${shortDate(d.startDate)} — ongoing`)
+    ? (endDate ? `${shortDate(d.startDate)} to ${shortDate(d.endDate)}` : `${shortDate(d.startDate)} — ongoing`)
     : ph("", "Start date");
-  rows.push([d.endDate ? "Contract start and end date" : "Commencement date", [P(dates)]]);
+  rows.push([endDate ? "Contract start and end date" : "Commencement date", [P(dates)]]);
 
   if(salaried){
     // fixed annual salary: no classification, pay point or hourly rates — just salary and package
     const sal = parseFloat(d.ftSalary);
     rows.push(["Base Salary", isNaN(sal) ? [P(ph("", "Annual salary"))] : [
       P(`Base ${money0(sal)} per annum plus ${supPct}% super`),
-      P(`Total package ${money(sal * (1 + supPct/100))} per annum`)
+      P(`Total package $${(sal * (1 + supPct/100)).toLocaleString("en-AU", {minimumFractionDigits:2, maximumFractionDigits:2})} per annum`)
+    ]]);
+  } else if(officePT){
+    // part-time office employee: agreed hourly rate, no pay point
+    const rate = parseFloat(d.ptRate);
+    rows.push(["Base Salary", isNaN(rate) ? [P(ph("", "Hourly rate"))] : [
+      P(`Base ${money(rate)} per hour plus ${supPct}% super`),
+      P(`Total ${money(rate * (1 + supPct/100))} per hour including super`)
     ]]);
   } else {
   rows.push(["Classification", [P(
@@ -1008,7 +1034,7 @@ function buildDoc(){
 
   if(!salaried) rows.push(["Roster Policy", (lines(d.rosterPolicy).length? lines(d.rosterPolicy):[ph("","Roster policy")]).map(x=>P(x,{tight:true}))]);
   rows.push(["Payment Frequency", [P(ph(d.payFrequency,"Payment frequency"))]]);
-  rows.push(["Status", [P(fx ? `${T.status} (${pt?"part-time":"full-time"} basis)` : T.status)]]);
+  rows.push(["Status", [P(T.status)]]);
   b.push({k:"table", rows:rows});
 
   b.push({k:"p", t:`All terms and conditions will be in accordance with the attached standard terms and conditions which will apply `
@@ -1022,17 +1048,6 @@ function buildDoc(){
   const C = [];
   C.push({title:"Employer", paras:[`Your contract of employment is with ${COMPANY.name} ABN ${COMPANY.abn}.`]});
 
-  if(fx) C.push({title:"Term of Employment", paras:[
-    `Your employment is for a fixed term commencing on ${ph(shortDate(d.startDate),"Start date")} and ending on `
-      + `${ph(shortDate(d.endDate),"End date")}. Your employment ends automatically on the end date without either party `
-      + `being required to give notice, and no redundancy entitlement arises from the expiry of the fixed term.`,
-    `This Agreement does not create any expectation of ongoing employment beyond the end date. If ${COMPANY.short} wishes `
-      + `to continue your employment past the end date, a new written agreement will be entered into before the end date.`,
-    `Either party may end this Agreement before the end date in accordance with the Probationary Period and Termination of `
-      + `Employment clauses below.`,
-    `You will be given a copy of the Fixed Term Contract Information Statement published by the Fair Work Ombudsman, `
-      + `in addition to the Fair Work Information Statement.`
-  ]});
 
   C.push({title:"Duties", paras:[
     `Your specific duties and responsibilities in this position are as discussed. You may however, be required to undertake other duties and responsibilities from time to time in addition to or as variations of the duties and responsibilities of the position. As a consequence, or for other reasons, your reporting responsibility and/or position title may also be altered from time to time. In this event, your remuneration and other benefits under this Agreement will not be altered without your consent, except to the extent that this Agreement permits.`,
@@ -2120,6 +2135,7 @@ function renderDOCX(blocks){
    ========================================================================== */
 const openSecs = {};
 
+const choiceCustom = {};   // choice fields switched to "Other", so a cleared box stays open
 function renderForm(){
   const secs = schema();
   const html = [];
@@ -2150,7 +2166,14 @@ function fieldHTML(f){
   const lab = `<label for="fld_${f.k}">${f.l}${f.req?' <span class="req">*</span>':""}</label>`;
   const hint = f.hint ? `<div class="hint">${f.hint}</div>` : "";
   let ctl;
-  if(f.type === "textarea"){
+  if(f.type === "choice"){
+    // preset options plus "Other", which reveals a text box for typing a value by hand
+    const custom = choiceCustom[f.k] || (v !== "" && !f.opts.includes(v));
+    ctl = `<select id="fld_${f.k}" data-choice="${f.k}">`
+      + f.opts.map(o=> `<option value="${esc(o)}"${!custom && v===o?" selected":""}>${esc(o)}</option>`).join("")
+      + `<option value="__other"${custom?" selected":""}>Other \u2014 type it in</option></select>`
+      + (custom ? `<input data-k="${f.k}" type="text" value="${esc(v)}" placeholder="Type the location" style="margin-top:6px">` : "");
+  } else if(f.type === "textarea"){
     ctl = `<textarea id="fld_${f.k}" data-k="${f.k}" placeholder="${esc(f.ph||"")}">${esc(v)}</textarea>`;
   } else if(f.type === "select"){
     let opts = f.opts;
@@ -2220,7 +2243,7 @@ function secExtra(n){
     </div>`;
   }
   if(n !== 4) return "";
-  if(isSalaried()) return "";   // fixed salary: no Award pay point, so no rate readout
+  if(noPayPoint()) return "";   // salary / agreed hourly rate: no Award pay point, so no rate readout
   if(state.type === "contractor"){
     return `<div class="note note-warn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg>
@@ -2303,6 +2326,13 @@ function wireForm(){
     openSecs[n] = sec.dataset.open !== "true";
     sec.dataset.open = openSecs[n];
   });
+  $$("[data-choice]").forEach(el=> el.addEventListener("change", ()=>{
+    const k = el.dataset.choice, other = el.value === "__other";
+    choiceCustom[k] = other;
+    state.data[k] = other ? "" : el.value;
+    renderForm(); renderPreview();
+    if(other){ const box = $(`[data-k="${k}"]`); if(box) box.focus(); }
+  }));
   $$("[data-k]").forEach(el=>{
     const ev = (el.tagName==="SELECT") ? "change" : "input";
     el.addEventListener(ev, ()=>{
@@ -2358,7 +2388,7 @@ function renderPreview(){
     el.style.fontFamily = fam;
     el.style.fontSize = fsz;
   });
-  $("#prevType").textContent = TYPES[state.type].label;
+  $("#prevType").textContent = docType().label;
   $("#prevName").textContent = state.data.fullName ? state.data.fullName : "Live preview";
   const uni = unsupportedChars();
   const ubar = $("#uniBar");
@@ -3265,7 +3295,7 @@ function fileBase(){
   const d = state.data;
   const nm = (d.fullName||"Unnamed").replace(/[\\/:*?"<>|]/g,"").trim();
   const dt = d.startDate ? d.startDate.split("-").reverse().join(".") : "";
-  const T = TYPES[state.type];
+  const T = docType();
   return T.file
     ? [d.docRef||"HU", T.file, nm, dt].filter(Boolean).join(" ")
     : [d.docRef||"HU", "Letter of engagement", T.label, nm, dt].filter(Boolean).join(" ");
@@ -3386,7 +3416,53 @@ function setupSignaturePad(role){
   };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointerleave", end);
-  sigPads[role] = { canvas, ctx, wrap };
+  sigPads[role] = { canvas, ctx, wrap, w: rect.width, h: rect.height };
+}
+// Attach a signature instead of drawing one: the image (PNG/JPG, e.g. a scan or
+// photo) is fitted onto the pad and saved as PNG, exactly like a drawn signature.
+function loadSignatureImage(role, file){
+  const p = sigPads[role];
+  if(!p || !file) return;
+  if(!/^image\//.test(file.type)){ toast("Choose an image file (PNG or JPG)", "err"); return; }
+  const reader = new FileReader();
+  reader.onload = ()=> drawSignatureImage(role, reader.result, true);
+  reader.readAsDataURL(file);
+}
+// Fits an image onto the pad. save=false just shows an already-saved signature
+// (editing a submitted contract) without re-encoding it.
+function drawSignatureImage(role, src, save){
+  const p = sigPads[role];
+  if(!p || !src) return;
+  const img = new Image();
+  img.onload = ()=>{
+    p.ctx.clearRect(0, 0, p.w, p.h);
+    const sc = Math.min(p.w / img.width, p.h / img.height, 1);
+    const w = img.width * sc, h = img.height * sc;
+    p.ctx.drawImage(img, (p.w - w) / 2, (p.h - h) / 2, w, h);
+    p.wrap.dataset.empty = "false";
+    if(save){ state.data[role+"Signature"] = p.canvas.toDataURL("image/png"); renderPreview(); }
+  };
+  img.onerror = ()=> toast("That image couldn't be read", "err");
+  img.src = src;
+}
+// Typed signature: the name drawn in a handwriting font, saved as PNG like a drawn one.
+const SIG_FONT = '"Dancing Script", "Brush Script MT", "Segoe Script", cursive';
+async function typeSignature(role, text){
+  const p = sigPads[role];
+  if(!p) return;
+  text = String(text || "").trim();
+  if(!text){ clearSignaturePad(role); return; }
+  try{ await document.fonts.load(`48px ${SIG_FONT}`, text); }catch(e){}
+  p.ctx.clearRect(0, 0, p.w, p.h);
+  let size = 48;
+  p.ctx.font = `${size}px ${SIG_FONT}`;
+  while(size > 16 && p.ctx.measureText(text).width > p.w - 24){ size -= 2; p.ctx.font = `${size}px ${SIG_FONT}`; }
+  p.ctx.fillStyle = "#171717";
+  p.ctx.textAlign = "center"; p.ctx.textBaseline = "middle";
+  p.ctx.fillText(text, p.w / 2, p.h / 2);
+  p.wrap.dataset.empty = "false";
+  state.data[role+"Signature"] = p.canvas.toDataURL("image/png");
+  renderPreview();
 }
 function clearSignaturePad(role){
   const p = sigPads[role];
@@ -3394,12 +3470,30 @@ function clearSignaturePad(role){
   p.ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
   p.wrap.dataset.empty = "true";
   state.data[role+"Signature"] = "";
+  const box = $(`.sigpad-text[data-role="${role}"]`);
+  if(box && document.activeElement !== box) box.value = "";
   renderPreview();
 }
 function initSignaturePads(){
   setupSignaturePad("employee");
   setupSignaturePad("signatory");
   $$(".sigpad-clear").forEach(b=> b.onclick = ()=> clearSignaturePad(b.dataset.role));
+  const picker = document.createElement("input");
+  picker.type = "file"; picker.accept = "image/png,image/jpeg"; picker.hidden = true;
+  document.body.appendChild(picker);
+  $$(".sigpad-type").forEach(b=> b.onclick = ()=>{
+    const box = $(`.sigpad-text[data-role="${b.dataset.role}"]`);
+    box.hidden = !box.hidden;
+    if(!box.hidden){
+      if(!box.value) box.value = b.dataset.role === "employee" ? (state.data.fullName || "") : (state.data.signatoryName || "");
+      box.focus(); typeSignature(b.dataset.role, box.value);
+    }
+  });
+  $$(".sigpad-text").forEach(box=> box.addEventListener("input", ()=> typeSignature(box.dataset.role, box.value)));
+  $$(".sigpad-upload").forEach(b=> b.onclick = ()=>{
+    picker.onchange = ()=>{ loadSignatureImage(b.dataset.role, picker.files[0]); picker.value = ""; };
+    picker.click();
+  });
 }
 // Called after a wholesale state.data reset (Clear / Load example), since
 // those don't touch the canvases themselves, only the state they read from.
@@ -3416,6 +3510,8 @@ function resetSignaturePadsVisual(){
    download it as a PDF, and email it to the employee/contractor —
    without re-running any of this tool's own award-rate/document logic. */
 const API_BASE = new URLSearchParams(location.search).get("apiBase") || "";
+// ?edit=<contract id> reopens a submitted contract; Submit then saves over it
+const EDIT_ID = new URLSearchParams(location.search).get("edit") || "";
 let submitting = false;
 async function submitContract(){
   if(submitting) return;
@@ -3428,11 +3524,12 @@ async function submitContract(){
   btn.disabled = true; btn.textContent = "Submitting…";
   try{
     const documentHtml = renderHTML(buildDoc());
-    const res = await fetch(API_BASE + "/api/contracts/create", {
-      method: "POST",
+    const res = await fetch(API_BASE + (EDIT_ID ? "/api/contracts/update" : "/api/contracts/create"), {
+      method: EDIT_ID ? "PUT" : "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
       body: JSON.stringify({
+        ...(EDIT_ID ? { id: EDIT_ID } : {}),
         contractType: state.type,
         employeeName: state.data.fullName || "",
         employeeEmail: state.data.email || "",
@@ -3444,7 +3541,7 @@ async function submitContract(){
     });
     const json = await res.json().catch(()=>null);
     if(res.ok && json && json.success){
-      toast("Submitted — opening it in the admin panel…", "ok");
+      toast(EDIT_ID ? "Changes saved — opening the admin panel…" : "Submitted — opening it in the admin panel…", "ok");
       setTimeout(()=>{ (window.top||window).location.href = "/admin/contracts"; }, 900);
     }else{
       toast((json && json.message) || "Could not submit the contract", "err");
@@ -3456,6 +3553,36 @@ async function submitContract(){
     toast("Could not reach the server", "err");
     btn.disabled = false; btn.innerHTML = prevHtml;
     submitting = false;
+  }
+}
+
+/* ---------- edit a submitted contract ---------- */
+async function loadContractForEdit(){
+  const token = localStorage.getItem("accessToken");
+  if(!token){ toast("Please sign in again", "err"); return; }
+  const btn = $("#btnSubmit");
+  btn.disabled = true;
+  try{
+    const res = await fetch(API_BASE + "/api/contracts/single?id=" + encodeURIComponent(EDIT_ID), {
+      credentials: "include", headers: { Authorization: "Bearer " + token },
+    });
+    const json = await res.json().catch(()=>null);
+    if(!res.ok || !json || !json.success){ toast((json && json.message) || "Could not load that contract", "err"); return; }
+    const c = json.data, saved = (c.data && c.data.data) || {};
+    state.type = (c.data && c.data.type) || c.contractType || state.type;
+    Object.assign(state.data, DEFAULTS, saved);
+    renderForm(); renderPreview(); resetSignaturePadsVisual();
+    ["employee","signatory"].forEach(role=> drawSignatureImage(role, state.data[role+"Signature"], false));
+    if(c.status === "SIGNED" || c.employeeSignature){
+      toast("This contract has been signed by the employee and can't be edited", "err");
+      return;   // leave Save disabled
+    }
+    btn.lastChild.textContent = " Save changes";
+    btn.disabled = false;
+    toast("Editing " + (c.employeeName || "contract") + " — click Save changes when done", "ok");
+  }catch(e){
+    console.error(e);
+    toast("Could not reach the server", "err");
   }
 }
 
@@ -3489,6 +3616,7 @@ function boot(){
   $("#btnWord").onclick = downloadWord;
   $("#btnSubmit").onclick = submitContract;
   initSignaturePads();
+  if(EDIT_ID) loadContractForEdit();
   $("#btnSample").onclick = ()=>{
     Object.assign(state.data, DEFAULTS, SAMPLE);
     state.type = "casual";

@@ -90,6 +90,41 @@ export const createContract = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Re-saves a contract edited in the generator tool. A signed contract is locked:
+// changing it would no longer match what the employee signed. While a signature
+// request is out, the link keeps working and shows the updated contract.
+export const updateContract = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id, contractType, employeeName, employeeEmail, position, startDate, data, documentHtml } = req.body;
+    if (!id) return errorHandler(res, 400, 'Contract ID is required');
+    if (!employeeName || !documentHtml) {
+      return errorHandler(res, 400, 'Employee name and the generated document are required');
+    }
+    const existing = await prisma.contract.findUnique({ where: { id: String(id) } });
+    if (!existing) return errorHandler(res, 404, 'Contract not found');
+    if (existing.status === 'SIGNED' || existing.employeeSignature) {
+      return errorHandler(res, 400, 'This contract has been signed by the employee and can no longer be edited');
+    }
+
+    const contract = await prisma.contract.update({
+      where: { id: existing.id },
+      data: {
+        contractType: contractType || '',
+        employeeName,
+        employeeEmail: employeeEmail || '',
+        position: position || '',
+        startDate: startDate || '',
+        data: data ?? {},
+        documentHtml,
+      },
+    });
+    const { signingToken, ...safeContract } = contract;
+    return errorHandler(res, 200, 'Contract updated', false, safeContract);
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
 export const deleteContract = async (req: Request, res: Response) => {
   try {
     const { id } = req.body;

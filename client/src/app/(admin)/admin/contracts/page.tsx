@@ -43,7 +43,7 @@ const TYPE_LABEL: Record<string, string> = {
     casual: 'Casual',
     parttime: 'Part-time',
     fulltime: 'Full-time',
-    fixedterm: 'Fixed-term',
+    fixedterm: 'Office Employee',
     contractor: 'Contractor',
 };
 
@@ -239,6 +239,9 @@ const AdminContractsPage = () => {
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => viewContract(c.id)} className="text-blue-600 hover:text-blue-900 text-sm">View</button>
+                                            {c.status !== 'SIGNED' && (
+                                                <Link href={`/admin/contract-generator?edit=${c.id}`} className="text-blue-600 hover:text-blue-900 text-sm">Edit</Link>
+                                            )}
                                             <button disabled={actionLoading === c.id} onClick={() => handleDelete(c.id, c.employeeName)}
                                                 className="text-red-600 hover:text-red-900 text-sm disabled:opacity-50">
                                                 {actionLoading === c.id ? '...' : 'Delete'}
@@ -287,6 +290,14 @@ const AdminContractsPage = () => {
                                     >
                                         {downloading ? 'Preparing…' : 'Download PDF'}
                                     </button>
+                                    {selected.status !== 'SIGNED' && (
+                                        <Link
+                                            href={`/admin/contract-generator?edit=${selected.id}`}
+                                            className="text-sm font-semibold px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300"
+                                        >
+                                            Edit Contract
+                                        </Link>
+                                    )}
                                     <div className="flex items-end gap-2">
                                         <div>
                                             <label className="block text-xs font-medium text-gray-500 mb-1">Send to</label>
