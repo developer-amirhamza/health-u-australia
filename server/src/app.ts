@@ -13,6 +13,7 @@ import contentRouter from "./routes/content.route.js";
 import imageRouter from "./routes/image.route.js";
 import silHouseRouter from "./routes/silHouse.route.js";
 import trainingResourceRouter from "./routes/trainingResource.route.js"
+import handbookSectionRouter from "./routes/handbookSection.route.js";
 import ndisRouter from './routes/ndis.route.js';
 import compassionRouter from './routes/compassion.route.js';
 import feedbackRouter from './routes/feedback.route.js';
@@ -46,9 +47,6 @@ app.use("/api/content", contentRouter);
 app.use("/api/image", imageRouter);
 app.use("/api/sil-houses", silHouseRouter);
 app.use("/api/training-resources", trainingResourceRouter);
-app.use('/api/pages/ndis', ndisRouter);
-app.use('/api/pages/compassion-in-action', compassionRouter);
-app.use('/api/pages/participant-feedback', feedbackRouter);
 
 
 

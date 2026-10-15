@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { SummeryApi } from 'app/common/SummeryApi';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
+import { docStyles } from 'app/common/contractDocStyles';
 
 interface ContractRow {
     id: string;
@@ -15,6 +16,7 @@ interface ContractRow {
     employeeEmail: string;
     position: string;
     startDate: string;
+    signingTokenExpiresAt?: string | null;
     createdAt: string;
     updatedAt: string;
     createdBy?: { id: string; firstName: string; lastName: string | null } | null;
@@ -22,61 +24,29 @@ interface ContractRow {
 
 interface ContractDetail extends ContractRow {
     documentHtml: string;
+    employeeSignatureName: string;
+    employeeSignedDate: string;
+    data?: { data?: { employeeSignature?: string } };
 }
+
+const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+    SUBMITTED: { label: 'Submitted', cls: 'bg-gray-50 text-gray-700 border-gray-200' },
+    AWAITING_SIGNATURE: { label: 'Awaiting Signature', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+    SIGNED: { label: 'Signed', cls: 'bg-green-50 text-green-700 border-green-200' },
+};
+const StatusBadge = ({ status }: { status: string }) => {
+    const b = STATUS_BADGE[status] ?? STATUS_BADGE.SUBMITTED;
+    return <span className={`inline-block text-xs font-semibold rounded border px-2 py-0.5 ${b.cls}`}>{b.label}</span>;
+};
 
 const TYPE_LABEL: Record<string, string> = {
     casual: 'Casual',
     parttime: 'Part-time',
     fulltime: 'Full-time',
-    fixedterm: 'Fixed-term',
+    fixedterm: 'Office Employee',
     contractor: 'Contractor',
 };
 
-// Mirrors the `.doc` typographic styles from the Contract Generator tool
-// (client/public/contract-generator.html) so the stored documentHtml — the
-// tool's own rendered output — looks right here too, scoped under
-// `.hu-contract-doc` so it can't leak into the rest of the admin panel.
-const docStyles = `
-.hu-contract-doc{--brand:#0d6b63;--brand-ink:#095049;--accent:#b4531f;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
-.hu-contract-doc .doc{font-family:Georgia,"Times New Roman",Times,serif;font-size:11pt;line-height:1.52;color:#1a1a1a}
-.hu-contract-doc .doc .lh{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;border-bottom:2px solid var(--brand);padding-bottom:12px;margin-bottom:24px}
-.hu-contract-doc .doc .lh.haslogo{border-bottom:1.5px solid #FE0000}
-.hu-contract-doc .doc .lh-l{font-family:inherit;text-align:left}
-.hu-contract-doc .doc .lh.haslogo .lh-l{text-align:right}
-.hu-contract-doc .doc .lh-l b{display:block;font-size:15pt;font-weight:640;color:var(--brand-ink);letter-spacing:-.01em}
-.hu-contract-doc .doc .lh.haslogo .lh-l b{font-size:1em;font-weight:600;color:#5b6172;letter-spacing:0}
-.hu-contract-doc .doc .lh-l span{display:block;font-size:8.5pt;color:#5b6172;margin-top:3px;letter-spacing:.02em}
-.hu-contract-doc .doc .lh img{max-height:58px;max-width:230px;object-fit:contain;flex:0 0 auto}
-.hu-contract-doc .doc p{margin:0 0 11px}
-.hu-contract-doc .doc .date{margin-bottom:16px}
-.hu-contract-doc .doc .conf{font-weight:700;letter-spacing:.04em;font-size:9.5pt;text-transform:uppercase;margin-bottom:14px;color:#444}
-.hu-contract-doc .doc .addr{margin-bottom:18px;line-height:1.4}
-.hu-contract-doc .doc .addr div{margin:0}
-.hu-contract-doc .doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px;text-decoration:underline}
-.hu-contract-doc .doc table.det{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:10pt}
-.hu-contract-doc .doc table.det th,.hu-contract-doc .doc table.det td{border:1px solid #b9bec9;padding:7px 9px;vertical-align:top;text-align:left}
-.hu-contract-doc .doc table.det th{width:31%;background:#f2f6f6;font-weight:650}
-.hu-contract-doc .doc table.det td p{margin:0 0 6px}
-.hu-contract-doc .doc table.det td p:last-child{margin:0}
-.hu-contract-doc .doc h3.tc{font-size:11.5pt;font-weight:700;text-align:center;margin:26px 0 14px;text-transform:uppercase;letter-spacing:.04em}
-.hu-contract-doc .doc ol.cl{padding-left:0;margin:0;counter-reset:cl;list-style:none}
-.hu-contract-doc .doc ol.cl>li{counter-increment:cl;margin:0 0 13px;padding-left:26px;position:relative}
-.hu-contract-doc .doc ol.cl>li::before{content:counter(cl) ".";position:absolute;left:0;top:0;font-weight:700}
-.hu-contract-doc .doc ol.cl>li>b.ct{display:block;font-weight:700;margin-bottom:4px}
-.hu-contract-doc .doc ul.sub{margin:7px 0 0;padding-left:19px}
-.hu-contract-doc .doc ul.sub li{margin-bottom:5px}
-.hu-contract-doc .doc ol.sub{margin:7px 0 0;padding-left:22px}
-.hu-contract-doc .doc ol.sub li{margin-bottom:5px}
-.hu-contract-doc .doc .sig{margin-top:26px;border-top:1px solid #c6cbd4;padding-top:16px}
-.hu-contract-doc .doc .sig h4{font-size:11pt;font-weight:700;margin-bottom:10px}
-.hu-contract-doc .doc .sigline{margin:16px 0 0;display:flex;gap:10px;align-items:flex-end}
-.hu-contract-doc .doc .sigline span{font-weight:600;min-width:96px}
-.hu-contract-doc .doc .sigline i{flex:1;border-bottom:1px solid #6b7280;height:15px;display:block}
-.hu-contract-doc .doc .sigline img.sigimg{flex:1;max-height:44px;border-bottom:1px solid #6b7280;object-fit:contain;object-position:left bottom}
-.hu-contract-doc .doc .fill{border-bottom:1px solid #6b7280;display:inline-block;min-width:190px}
-.hu-contract-doc .doc .ftr{margin-top:28px;padding-top:9px;border-top:1px solid #d7dbe2;font-family:var(--font);font-size:8pt;color:#7a8090;display:flex;justify-content:space-between}
-.hu-contract-doc .doc .ph{background:#fdf1e8;border-bottom:1px dashed var(--accent);color:var(--accent);padding:0 2px;border-radius:2px;font-style:italic}
-`;
 
 const AdminContractsPage = () => {
     const [contracts, setContracts] = useState<ContractRow[]>([]);
@@ -87,6 +57,7 @@ const AdminContractsPage = () => {
     const [detailLoading, setDetailLoading] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const [sending, setSending] = useState(false);
+    const [requestingSignature, setRequestingSignature] = useState(false);
     const [sendToEmail, setSendToEmail] = useState('');
     const docRef = useRef<HTMLDivElement>(null);
 
@@ -195,6 +166,26 @@ const AdminContractsPage = () => {
         } finally { setSending(false); }
     };
 
+    // Emails the employee a link to review the contract and sign it themselves
+    // (see /contract/sign) — the same flow as Service Agreements.
+    const handleSendSignatureRequest = async () => {
+        if (!selected) return;
+        const toEmail = sendToEmail.trim();
+        if (!toEmail) { toast.error('Enter the employee email'); return; }
+        try {
+            setRequestingSignature(true);
+            const response = await Axios({ ...SummeryApi.sendContractSignatureRequest, data: { id: selected.id, toEmail } });
+            if (response.data?.success) {
+                toast.success(response.data.message || 'Signature request sent');
+                const patch = { status: 'AWAITING_SIGNATURE', employeeEmail: toEmail };
+                setSelected(prev => prev ? { ...prev, ...patch } : prev);
+                setContracts(prev => prev.map(c => c.id === selected.id ? { ...c, ...patch } : c));
+            } else toast.error(response.data?.message || 'Could not send the signature request');
+        } catch (error) {
+            AxiosToastError(error);
+        } finally { setRequestingSignature(false); }
+    };
+
     const formatDate = (dateStr: string | null | undefined) => {
         if (!dateStr) return '—';
         try { return format(new Date(dateStr), 'dd MMM yyyy'); } catch { return dateStr; }
@@ -225,13 +216,13 @@ const AdminContractsPage = () => {
                 <div className="overflow-x-auto bg-white rounded-lg shadow">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50"><tr>
-                            {['Name', 'Type', 'Position', 'Start Date', 'Email', 'Created', 'Actions'].map(h => (
+                            {['Name', 'Type', 'Status', 'Position', 'Start Date', 'Email', 'Created', 'Actions'].map(h => (
                                 <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                             ))}
                         </tr></thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {contracts.length === 0 ? (
-                                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No contracts found.</td></tr>
+                                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">No contracts found.</td></tr>
                             ) : contracts.map(c => (
                                 <tr key={c.id} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 whitespace-nowrap">
@@ -240,6 +231,7 @@ const AdminContractsPage = () => {
                                         </button>
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{TYPE_LABEL[c.contractType] ?? c.contractType ?? '—'}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={c.status} /></td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{c.position || '—'}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{formatDate(c.startDate)}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{c.employeeEmail || '—'}</td>
@@ -247,6 +239,9 @@ const AdminContractsPage = () => {
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => viewContract(c.id)} className="text-blue-600 hover:text-blue-900 text-sm">View</button>
+                                            {c.status !== 'SIGNED' && (
+                                                <Link href={`/admin/contract-generator?edit=${c.id}`} className="text-blue-600 hover:text-blue-900 text-sm">Edit</Link>
+                                            )}
                                             <button disabled={actionLoading === c.id} onClick={() => handleDelete(c.id, c.employeeName)}
                                                 className="text-red-600 hover:text-red-900 text-sm disabled:opacity-50">
                                                 {actionLoading === c.id ? '...' : 'Delete'}
@@ -271,9 +266,17 @@ const AdminContractsPage = () => {
                                 <div className="flex items-start justify-between mb-4">
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900">{selected.employeeName || 'Unnamed'}</h2>
-                                        <span className="inline-block mt-1 text-xs font-semibold rounded border px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                                            {TYPE_LABEL[selected.contractType] ?? selected.contractType}
-                                        </span>
+                                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                                            <span className="inline-block text-xs font-semibold rounded border px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
+                                                {TYPE_LABEL[selected.contractType] ?? selected.contractType}
+                                            </span>
+                                            <StatusBadge status={selected.status} />
+                                            {selected.status === 'SIGNED' && selected.employeeSignatureName && (
+                                                <span className="text-xs text-gray-500">
+                                                    Signed by {selected.employeeSignatureName}{selected.employeeSignedDate ? ` on ${selected.employeeSignedDate}` : ''}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
                                 </div>
@@ -287,6 +290,14 @@ const AdminContractsPage = () => {
                                     >
                                         {downloading ? 'Preparing…' : 'Download PDF'}
                                     </button>
+                                    {selected.status !== 'SIGNED' && (
+                                        <Link
+                                            href={`/admin/contract-generator?edit=${selected.id}`}
+                                            className="text-sm font-semibold px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300"
+                                        >
+                                            Edit Contract
+                                        </Link>
+                                    )}
                                     <div className="flex items-end gap-2">
                                         <div>
                                             <label className="block text-xs font-medium text-gray-500 mb-1">Send to</label>
@@ -294,7 +305,7 @@ const AdminContractsPage = () => {
                                                 type="email"
                                                 value={sendToEmail}
                                                 onChange={e => setSendToEmail(e.target.value)}
-                                                placeholder="participant@email.com"
+                                                placeholder="employee@email.com"
                                                 className="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
@@ -306,6 +317,17 @@ const AdminContractsPage = () => {
                                         >
                                             {sending ? 'Sending…' : 'Send Email'}
                                         </button>
+                                        {selected.status !== 'SIGNED' && !selected.data?.data?.employeeSignature && (
+                                            <button
+                                                type="button"
+                                                disabled={requestingSignature}
+                                                onClick={handleSendSignatureRequest}
+                                                title="Email the employee a link to review and sign this contract"
+                                                className="text-white cursor-pointer text-sm font-semibold px-4 py-2 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                                            >
+                                                {requestingSignature ? 'Sending…' : selected.status === 'AWAITING_SIGNATURE' ? 'Resend Signature Request' : 'Send for Signature'}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 

@@ -58,6 +58,7 @@ model User {
   contracts               Contract[]
   contentPosts            ContentPost[]
   trainingResources       TrainingResource[]
+  handbookSections        HandbookSection[]
 }
 
 // A participant's support-coordination NDIS plan: budget, billing rates and
@@ -228,8 +229,18 @@ model Contract {
   data Json @default("{}")
 
   // The tool's own rendered contract document (renderHTML(buildDoc())),
-  // captured at submission time.
+  // captured at submission time. When the employee signs via the emailed
+  // link, their signature, name and date are written into it.
   documentHtml String @default("")
+
+  // Set when staff email the employee a link to review and sign the
+  // contract themselves (see /contract/sign). Kept (not cleared) once
+  // signed, so a re-visited link can still show "already signed".
+  employeeSignature     String    @default("")
+  employeeSignatureName String    @default("")
+  employeeSignedDate    String    @default("")
+  signingToken          String?   @unique
+  signingTokenExpiresAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -281,4 +292,28 @@ model TrainingResource {
   updatedAt DateTime @updatedAt
 
   @@index([category])
+}
+
+// One section of the public /participant-handbook page. `part` is the
+// handbook division the section sits under (e.g. "Section 1: Our
+// Organisation"); parts appear in the order of their first section.
+// `content` is lightweight Markdown (paragraphs, ### sub-headings, - and 1.
+// lists, | tables |, **bold**, [links](url)) rendered by the client.
+model HandbookSection {
+  id String @id @default(dbgenerated("gen_random_uuid()"))
+
+  part    String
+  title   String
+  content String @default("")
+
+  order       Int     @default(0)
+  isPublished Boolean @default(true)
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
 }

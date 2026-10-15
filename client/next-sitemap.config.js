@@ -5,7 +5,7 @@ const config = {
   changefreq: "daily",
   priority: 0.7,
   autoLastmod: true,
-  exclude: ["/non-ndis", "/login", "/register", "/welcome", "/service-agreement-tool"],
+  exclude: ["/non-ndis", "/login", "/register", "/welcome", "/service-agreement-tool", "/contract/sign"],
 };
 
 export default config;

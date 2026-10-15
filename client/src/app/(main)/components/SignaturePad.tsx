@@ -1,5 +1,9 @@
 "use client"
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Dancing_Script } from 'next/font/google'
+
+// Handwriting font for typed signatures
+const handwriting = Dancing_Script({ subsets: ['latin'], weight: '500' })
 
 interface SignaturePadProps {
   value?: string
@@ -12,6 +16,9 @@ const SignaturePad = ({ value, onChange, label, error }: SignaturePadProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawing = useRef(false)
   const hasDrawn = useRef(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [typing, setTyping] = useState(false)
+  const [typed, setTyped] = useState('')
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -60,12 +67,61 @@ const SignaturePad = ({ value, onChange, label, error }: SignaturePadProps) => {
     }
   }
 
+  // Attach a signature instead of drawing one: the image is fitted onto the
+  // pad and saved as PNG, the same as a drawn signature.
+  const upload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!file || !canvas || !ctx || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const img = new Image()
+      img.onload = () => {
+        const { width: w, height: h } = canvas.getBoundingClientRect()
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const sc = Math.min(w / img.width, h / img.height, 1)
+        const dw = img.width * sc, dh = img.height * sc
+        ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh)
+        hasDrawn.current = true
+        onChange(canvas.toDataURL('image/png'))
+      }
+      img.src = reader.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Typed signature: the name drawn in the handwriting font, saved as PNG like a drawn one
+  const typeSignature = async (text: string) => {
+    setTyped(text)
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+    const { width: w, height: h } = canvas.getBoundingClientRect()
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    const name = text.trim()
+    if (!name) { hasDrawn.current = false; onChange(''); return }
+    const family = handwriting.style.fontFamily
+    try { await document.fonts.load(`48px ${family}`, name) } catch { /* fall back to cursive */ }
+    let size = 48
+    ctx.font = `${size}px ${family}, cursive`
+    while (size > 16 && ctx.measureText(name).width > w - 24) { size -= 2; ctx.font = `${size}px ${family}, cursive` }
+    ctx.fillStyle = '#171717'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(name, w / 2, h / 2)
+    hasDrawn.current = true
+    onChange(canvas.toDataURL('image/png'))
+  }
+
   const clear = () => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (canvas && ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       hasDrawn.current = false
+      setTyped('')
       onChange('')
     }
   }
@@ -95,14 +151,42 @@ const SignaturePad = ({ value, onChange, label, error }: SignaturePadProps) => {
           </span>
         )}
       </div>
-      <button
-        type="button"
-        onClick={clear}
-        data-pdf-hide="true"
-        className="print:hidden self-start text-xs font-semibold text-primary hover:underline cursor-pointer"
-      >
-        Clear signature
-      </button>
+      <div data-pdf-hide="true" className="print:hidden flex gap-4">
+        <button
+          type="button"
+          onClick={clear}
+          className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+        >
+          Clear signature
+        </button>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+        >
+          Upload signature image
+        </button>
+        <button
+          type="button"
+          onClick={() => setTyping(t => !t)}
+          className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+        >
+          Type signature
+        </button>
+        <input ref={fileRef} type="file" accept="image/png,image/jpeg" hidden onChange={upload} />
+      </div>
+      {typing && (
+        <input
+          type="text"
+          value={typed}
+          onChange={e => typeSignature(e.target.value)}
+          placeholder="Type your full name"
+          maxLength={60}
+          autoFocus
+          data-pdf-hide="true"
+          className="print:hidden w-full max-w-md border border-neutral-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+        />
+      )}
     </div>
   )
 }

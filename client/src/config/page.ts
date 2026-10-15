@@ -79,7 +79,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt, MdSchool } from "react-icons/md";
+import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt, MdSchool, MdMenuBook } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -185,6 +185,11 @@ export const adminNavItems = [
         label: "Training",
         icon: MdSchool,
         path: "/admin/training",
+    },
+    {
+        label: "Participant Handbook",
+        icon: MdMenuBook,
+        path: "/admin/participant-handbook",
     }
 ]
 
@@ -215,7 +220,10 @@ export const career_jobs = [
 export const nav_items = [
     {
         label: "Home",
-        options: [{ label: "About Health U", path: "/about/" }]
+        options: [
+            { label: "About Health U", path: "/about/" },
+            { label: "Participant Handbook", path: "/participant-handbook/" },
+        ]
     },
     { label: "NDIS", path: "/ndis/" },
     {

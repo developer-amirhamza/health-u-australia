@@ -102,6 +102,9 @@ export const SummeryApi = {
     getContractById: { url: "/api/contracts/single", method: "get" },
     deleteContract: { url: "/api/contracts/delete", method: "delete" },
     sendContractPdf: { url: "/api/contracts/send-pdf", method: "post" },
+    sendContractSignatureRequest: { url: "/api/contracts/send-signature-request", method: "post" },
+    getContractByToken: { url: "/api/contracts/sign", method: "get" },
+    submitEmployeeSignature: { url: "/api/contracts/sign", method: "post" },
 
     // ── CMS Content Management (admin-managed website content; public read access) ──
     getContent: { url: "/api/content", method: "get" },
@@ -115,4 +118,11 @@ export const SummeryApi = {
     createTrainingResource: { url: "/api/training-resources/create", method: "post" },
     updateTrainingResource: { url: "/api/training-resources/update", method: "put" },
     deleteTrainingResource: { url: "/api/training-resources/delete", method: "delete" },
+
+    // ── Participant Handbook (public /participant-handbook page + its admin CRUD panel) ──
+    getPublicHandbookSections: { url: "/api/handbook-sections/public", method: "get" },
+    getHandbookSections: { url: "/api/handbook-sections", method: "get" },
+    createHandbookSection: { url: "/api/handbook-sections/create", method: "post" },
+    updateHandbookSection: { url: "/api/handbook-sections/update", method: "put" },
+    deleteHandbookSection: { url: "/api/handbook-sections/delete", method: "delete" },
 };
