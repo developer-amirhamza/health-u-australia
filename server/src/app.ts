@@ -47,6 +47,7 @@ app.use("/api/content", contentRouter);
 app.use("/api/image", imageRouter);
 app.use("/api/sil-houses", silHouseRouter);
 app.use("/api/training-resources", trainingResourceRouter);
+app.use("/api/handbook-sections", handbookSectionRouter);
 app.use('/api/pages/ndis', ndisRouter);
 app.use('/api/pages/compassion-in-action', compassionRouter);
 app.use('/api/pages/participant-feedback', feedbackRouter);
