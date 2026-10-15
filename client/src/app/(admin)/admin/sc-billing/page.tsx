@@ -104,6 +104,15 @@ interface PlanStats {
 }
 
 type StatsMap = Record<string, PlanStats>;
+
+interface DashFilter {
+  client: string; // participant name, or "all"
+  period: string; // a rangeFor() period, or "custom"
+  from: string; // "YYYY-MM-DD", custom period only
+  to: string; // "YYYY-MM-DD", custom period only
+}
+
+const NO_DASH_FILTER: DashFilter = { client: "all", period: "all", from: "", to: "" };
 type Notify = (msg: string, kind?: "success" | "error") => void;
 
 /* ---------------------------- helpers ----------------------------- */
@@ -399,6 +408,7 @@ export default function AdminScBillingPage() {
   const [entries, setEntries] = useState<ScEntryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [dashFilter, setDashFilter] = useState<DashFilter>(NO_DASH_FILTER);
 
   const { user } = useSelector((state: RootState) => state.userSlice);
   const me = (user as any)?.name || user?.email || "Admin";
@@ -585,7 +595,16 @@ export default function AdminScBillingPage() {
 
         <div className="mt-5">
           {tab === "dashboard" && (
-            <Dashboard plans={plans} stats={stats} onEdit={startEdit} onDelete={deleteEntry} onGoLog={() => setTab("log")} />
+            <Dashboard
+              plans={plans}
+              stats={stats}
+              today={today}
+              filter={dashFilter}
+              onFilterChange={setDashFilter}
+              onEdit={startEdit}
+              onDelete={deleteEntry}
+              onGoLog={() => setTab("log")}
+            />
           )}
           {tab === "log" && (
             <LogTime
@@ -623,19 +642,53 @@ export default function AdminScBillingPage() {
 /* ============================ dashboard =========================== */
 
 function Dashboard({
-  plans,
+  plans: allPlans,
   stats,
+  today,
+  filter,
+  onFilterChange,
   onEdit,
   onDelete,
   onGoLog,
 }: {
   plans: ScPlanItem[];
   stats: StatsMap;
+  today: Date;
+  filter: DashFilter;
+  onFilterChange: (f: DashFilter) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onGoLog: () => void;
 }) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
+
+  const clients = useMemo(
+    () => Array.from(new Set(allPlans.map((p) => p.participant))).sort((a, b) => a.localeCompare(b)),
+    [allPlans]
+  );
+  // A client whose plans were all removed falls back to "all".
+  const client = clients.includes(filter.client) ? filter.client : "all";
+  const dated = filter.period !== "all";
+  const [fromKey, toKeyStr] =
+    filter.period === "custom"
+      ? [filter.from || "1970-01-01", filter.to || "2999-12-31"]
+      : rangeFor(filter.period, today).map(toKey);
+  const openStart = fromKey === "1970-01-01";
+  const openEnd = toKeyStr === "2999-12-31";
+  const rangeLabel =
+    openStart && openEnd ? "in total" : openStart ? `up to ${toKeyStr}` : openEnd ? `from ${fromKey}` : `${fromKey} → ${toKeyStr}`;
+  const inRange = (e: ScEntryItem) => !dated || (e.date >= fromKey && e.date <= toKeyStr);
+  const set = (patch: Partial<DashFilter>) => onFilterChange({ ...filter, client, ...patch });
+  const filtered = client !== "all" || dated;
+
+  // Plans for the chosen client whose dates overlap the chosen period.
+  const plans = allPlans.filter(
+    (p) => (client === "all" || p.participant === client) && (!dated || (p.start <= toKeyStr && p.end >= fromKey))
+  );
+
+  const periodEntries = plans.flatMap((p) => stats[p.id].entries.filter(inRange).map((e) => ({ e, p })));
+  const periodHours = periodEntries.reduce((a, { e }) => a + e.hours, 0);
+  const periodValue = periodEntries.reduce((a, { e, p }) => a + lineValue(e, p), 0);
 
   const alerts: { rank: number; glyph: string; text: string }[] = [];
   for (const p of plans) {
@@ -676,6 +729,56 @@ function Dashboard({
 
   return (
     <div className="space-y-4">
+      {allPlans.length > 0 ? (
+        <div className={`${CARD} flex flex-wrap items-end gap-3 p-3`}>
+          <div className="min-w-40 flex-1">
+            <Field label="Client">
+              <select className={INPUT} value={client} onChange={(ev) => set({ client: ev.target.value })}>
+                <option value="all">All clients</option>
+                {clients.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <div className="min-w-40 flex-1">
+            <Field label="Period">
+              <select className={INPUT} value={filter.period} onChange={(ev) => set({ period: ev.target.value })}>
+                <option value="all">All time</option>
+                <option value="month">This month</option>
+                <option value="last">Last month</option>
+                <option value="90">Last 90 days</option>
+                <option value="custom">Custom range</option>
+              </select>
+            </Field>
+          </div>
+          {filter.period === "custom" ? (
+            <>
+              <div className="min-w-36 flex-1">
+                <Field label="From">
+                  <input type="date" className={INPUT} value={filter.from} max={filter.to || undefined} onChange={(ev) => set({ from: ev.target.value })} />
+                </Field>
+              </div>
+              <div className="min-w-36 flex-1">
+                <Field label="To">
+                  <input type="date" className={INPUT} value={filter.to} min={filter.from || undefined} onChange={(ev) => set({ to: ev.target.value })} />
+                </Field>
+              </div>
+            </>
+          ) : null}
+          {filtered ? (
+            <button
+              onClick={() => onFilterChange(NO_DASH_FILTER)}
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {alerts.length > 0 ? (
         <div className="space-y-2">
           {alerts.map((a, i) => (
@@ -698,9 +801,23 @@ function Dashboard({
           {hrs(totalHours)} of support coordination
           {attention > 0 ? ` · ${attention} plan${attention === 1 ? "" : "s"} need attention` : ""}
         </div>
+        {dated ? (
+          <div className="mt-1 text-sm tabular-nums text-slate-500">
+            {hrs(periodHours)} · {money2(periodValue)} logged {rangeLabel}
+          </div>
+        ) : null}
       </div>
 
-      {plans.length === 0 ? (
+      {allPlans.length > 0 && plans.length === 0 ? (
+        <div className={`${CARD} px-3 py-6 text-center text-sm text-slate-500`}>
+          No plans match these filters.{" "}
+          <button onClick={() => onFilterChange(NO_DASH_FILTER)} className="font-medium text-blue-700 hover:underline">
+            Clear filters
+          </button>
+        </div>
+      ) : null}
+
+      {allPlans.length === 0 ? (
         <div className={`${CARD} px-3 py-6 text-center text-sm text-slate-500`}>
           No plans yet.{" "}
           <button onClick={onGoLog} className="font-medium text-blue-700 hover:underline">
@@ -712,6 +829,7 @@ function Dashboard({
 
       {ordered.map((p) => {
         const s = stats[p.id];
+        const shown = s.entries.filter(inRange);
         const isOpen = !!open[p.id];
         return (
           <div key={p.id} className={`${CARD} p-4`}>
@@ -765,11 +883,14 @@ function Dashboard({
                 {isOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
               </button>
               <span className="text-slate-400">
-                · {s.entries.length} {s.entries.length === 1 ? "entry" : "entries"}
+                · {shown.length} {shown.length === 1 ? "entry" : "entries"}
+                {dated ? ` in period · ${hrs(shown.reduce((a, e) => a + e.hours, 0))}` : ""}
               </span>
             </div>
 
-            {isOpen ? <PlanDetail plan={p} stats={s} onEdit={onEdit} onDelete={onDelete} onGoLog={onGoLog} /> : null}
+            {isOpen ? (
+              <PlanDetail plan={p} entries={shown} dated={dated} onEdit={onEdit} onDelete={onDelete} onGoLog={onGoLog} />
+            ) : null}
           </div>
         );
       })}
@@ -783,19 +904,27 @@ function Dashboard({
 
 function PlanDetail({
   plan,
-  stats,
+  entries,
+  dated,
   onEdit,
   onDelete,
   onGoLog,
 }: {
   plan: ScPlanItem;
-  stats: PlanStats;
+  entries: ScEntryItem[];
+  dated: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onGoLog: () => void;
 }) {
-  const s = stats;
-  if (s.entries.length === 0) {
+  if (entries.length === 0) {
+    if (dated) {
+      return (
+        <div className="mt-4 rounded-md border border-dashed border-slate-300 px-3 py-4 text-sm text-slate-500">
+          No time logged against this plan in the selected period.
+        </div>
+      );
+    }
     return (
       <div className="mt-4 rounded-md border border-dashed border-slate-300 px-3 py-4 text-sm text-slate-500">
         No time logged against this plan yet.{" "}
@@ -809,7 +938,7 @@ function PlanDetail({
 
   const byCoord: Record<string, { support: number; travel: number; value: number }> = {};
   const byMonth: Record<string, { hours: number; value: number; sort: string }> = {};
-  for (const e of s.entries) {
+  for (const e of entries) {
     const c = (byCoord[e.coordinator] ||= { support: 0, travel: 0, value: 0 });
     if (e.type === "travel") c.travel += e.hours;
     else c.support += e.hours;
@@ -821,7 +950,7 @@ function PlanDetail({
     m.value += lineValue(e, plan);
   }
 
-  const sorted = s.entries.slice().sort((a, b) => (a.date === b.date ? (a.start < b.start ? 1 : -1) : a.date < b.date ? 1 : -1));
+  const sorted = entries.slice().sort((a, b) => (a.date === b.date ? (a.start < b.start ? 1 : -1) : a.date < b.date ? 1 : -1));
 
   return (
     <div className="mt-4 space-y-5">
