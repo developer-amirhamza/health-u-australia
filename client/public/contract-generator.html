@@ -573,6 +573,8 @@ function isSalaried(){ return state.type !== "contractor" && basis() === "fullti
 // part-time office employee: paid an agreed hourly rate, no Award pay point
 function isOfficePT(){ return isOffice() && basis() === "parttime"; }
 function noPayPoint(){ return isSalaried() || isOfficePT(); }
+// custom pay point: available wherever an Award pay point is
+function isCustomPay(){ return state.type !== "contractor" && !noPayPoint() && state.data.customPay === "yes"; }
 // What the document calls the employment: an Office Employee reads as plain
 // Full-Time or Part-Time — "Office Employee" never appears in the letter
 function docType(){ return TYPES[isOffice() ? basis() : state.type]; }
@@ -585,6 +587,10 @@ const DEFAULTS = {
   reportingTo:"Audrey Wong — Support Service Manager\nMozadder Jabir — Operations Manager",
   startDate:"", endDate:"",
   level:"1", payPoint:"1",
+  // custom pay point: level, pay point and every rate entered by hand instead of the schedule
+  customPay:"", cuLevel:"", cuPayPoint:"",
+  cuWeekday:"", cuSaturday:"", cuSunday:"", cuPublicHoliday:"",
+  cuAfternoon:"", cuNight:"", cuOtFirst2:"", cuOtAfter2:"",
   superRate:"12", kmAllowance:"0.99",
   ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award", ptRate:"",
   homeVisit:"",
@@ -675,7 +681,7 @@ function incTier(level, payPoint, code){
    loading applies to casual contracts only — for every other employment type
    this returns "none selected", which keeps any stale choice inert. */
 function incSel(){
-  if(state.type !== "casual") return { code:"", manual:false };
+  if(state.type !== "casual" || isCustomPay()) return { code:"", manual:false };
   const c = String(state.data.incChoice || "");
   return { code: (c && c !== "custom") ? c : "", manual: false };
 }
@@ -730,6 +736,40 @@ function rateSet(level, payPoint, type, incCode, paidWeekday){
 }
 function classLabel(level, pp){ return "Level " + level + " - pay point " + pp; }
 
+/* Custom pay point: each shift rate is typed in by hand. Only the weekday rate is
+   required — any rate left blank is worked out from it with the same multipliers
+   the schedule uses, so a partly filled table still gives a full set. */
+const CU_RATES = [
+  ["weekday","cuWeekday","Weekday"], ["saturday","cuSaturday","Saturday"],
+  ["sunday","cuSunday","Sunday"], ["publicHoliday","cuPublicHoliday","Public holiday"],
+  ["afternoon","cuAfternoon","Afternoon shift"], ["night","cuNight","Night shift"],
+  ["otFirst2","cuOtFirst2","Overtime \u2014 first 2 hrs"], ["otAfter2","cuOtAfter2","Overtime \u2014 after 2 hrs"]
+];
+function customRates(){
+  const A = state.award, d = state.data;
+  const wk = parseFloat(d.cuWeekday);
+  if(!(wk > 0)) return null;
+  const pen = (state.type === "casual") ? A.penalties.casual : A.penalties.permanent;
+  const baseHourly = wk / pen.weekday;   // ordinary rate, without any casual loading
+  const sup = 1 + (parseFloat(d.superRate||A.superRate*100)/100);
+  const weekly = r2(baseHourly * A.hoursPerWeek);
+  const out = { weekly, hourly: r2(baseHourly), tier: null, custom: true,
+                annual: r2(weekly * A.weeksPerYear), superPct: r2((sup-1)*100) };
+  CU_RATES.forEach(([k, key])=>{
+    const v = parseFloat(d[key]), manual = v > 0;
+    const base = manual ? r2(v) : r2(baseHourly * pen[k]);
+    out[k] = { base, incSuper: r2(base*sup), manual };
+  });
+  return out;
+}
+// the level and pay point the letter names: typed in for a custom pay point
+function classOf(){
+  const d = state.data;
+  return isCustomPay()
+    ? { L: ph(d.cuLevel, "Level"), PP: ph(d.cuPayPoint, "Pay point") }
+    : { L: d.level, PP: d.payPoint };
+}
+
 /* Incentive loading: staff enter the actual weekday rate paid; the loading is
    whatever sits above the Award weekday rate for this classification. */
 function incentiveInfo(){
@@ -744,11 +784,12 @@ function incentiveInfo(){
 }
 function currentRates(){
   const d = state.data;
+  if(isCustomPay()) return customRates();
   // the incentive lifts every rate in the schedule, so it feeds the rate set itself
   return rateSet(d.level, +d.payPoint, state.type, incSel().code);
 }
 // the plain Award rate for the same classification, ignoring any incentive tier
-function awardRates(){ return rateSet(state.data.level, +state.data.payPoint, state.type, ""); }
+function awardRates(){ return isCustomPay() ? customRates() : rateSet(state.data.level, +state.data.payPoint, state.type, ""); }
 
 /* ---------- field schema ---------- */
 function schema(){
@@ -794,7 +835,15 @@ function schema(){
         opts:[{v:"award",t:"Award pay point"},{v:"salary",t:"Fixed annual salary \u2014 no pay point"}],
         hint:"A fixed salary leaves the classification, pay point and hourly rates out of the letter"}] : []),
       ...(noPay ? [] : [{k:"classCode", l:"Award pay point", type:"select", wide:true, dyn:"classCode",
-        hint:"Exactly as listed in the Health U pay schedule \u2014 this sets every rate below"}]),
+        hint:"Exactly as listed in the Health U pay schedule \u2014 this sets every rate below. Choose Custom pay point to enter them by hand"}]),
+      ...(isCustomPay() ? [
+        {k:"cuLevel", l:"Level", ph:"e.g. 2", half:true, req:true},
+        {k:"cuPayPoint", l:"Pay point", ph:"e.g. 3", half:true, req:true},
+        ...CU_RATES.map(([k, key, lbl], i)=>({k:key, l:lbl + " rate", type:"number", money:true, half:true, req: i===0,
+          ph: i===0 ? "" : "Calculated",
+          hint: i===0 ? (casual ? "Casual hourly rate, including the 25% loading" : "Ordinary hourly rate")
+                      : (i===1 ? "Leave any rate blank to calculate it from the weekday rate" : "")}))
+      ] : []),
       {k:"superRate", l:"Superannuation rate", type:"number", step:"0.1", suffix:"%", half:true,
         hint:"Guarantee rate is 12% from 1 July 2025"},
       {k:"kmAllowance", l:"Vehicle allowance", type:"number", step:"0.01", money:true, half:true,
@@ -810,7 +859,7 @@ function schema(){
           ph:"e.g. Mon, Wed, Fri 9:00am – 3:00pm", hint:"Part-time employees must have an agreed pattern of hours"}
       ] : []),
       ...(casual ? [{k:"hoursCasual", l:"Hours of work", wide:true}] : []),
-      ...(casual ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
+      ...(casual && !isCustomPay() ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
         hint:"Casual contracts only — lifts every rate: weekday, weekend, public holiday and shift. The letter shows the rates only, never the pay point"}] : []),
       ...(noPay ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
         opts:[{v:"no",t:"Leave out of the letter"},{v:"yes",t:"Show in the letter"}],
@@ -906,7 +955,7 @@ function buildDoc(){
   const d = state.data, T = docType(), R = currentRates();
   const fx = state.type === "fixedterm", B = basis();
   const casual = state.type==="casual", pt = B==="parttime", ft = B==="fulltime";
-  const L = d.level, PP = d.payPoint, LPP = `${L}.${PP}`;
+  const { L, PP } = classOf(), LPP = `${L}.${PP}`;
   const nm = ph(d.fullName, "Employee full name");
   const pos = ph(d.positionTitle, "Position title");
   const supPct = R ? R.superPct : parseFloat(d.superRate||12);
@@ -2190,7 +2239,7 @@ function fieldHTML(f){
     if(f.dyn === "classCode"){
       // each employment type sees only its own rates: casual lists the loaded casual hourly
       const casual = state.type === "casual";
-      opts = [];
+      opts = [{ v:"custom", t:"Custom pay point \u2014 enter level, pay point and rates manually" }];
       Object.keys(state.award.weekly).forEach(L=>{
         state.award.weekly[L].forEach((wk,i)=>{
           const pp = i + 1, hr = r2(wk / state.award.hoursPerWeek);
@@ -2199,7 +2248,7 @@ function fieldHTML(f){
                       t:classLabel(L,pp)+"   ("+L+"."+pp+")   \u2014   "+money(shown)+" / hour"+(casual?" casual":"") });
         });
       });
-      v = state.data.level + "." + state.data.payPoint;
+      v = state.data.customPay === "yes" ? "custom" : state.data.level + "." + state.data.payPoint;
     }
     ctl = `<select id="fld_${f.k}" data-k="${f.k}">` + opts.map(o=>
       `<option value="${esc(o.v)}"${String(v)===String(o.v)?" selected":""}>${esc(o.t)}</option>`).join("") + `</select>`;
@@ -2253,6 +2302,8 @@ function secExtra(n){
     </div>`;
   }
   const R = currentRates();
+  const CU = isCustomPay();
+  if(!R && CU) return `<div class="note note-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg><div>Enter the weekday rate to build the custom rate table.</div></div>`;
   if(!R) return `<div class="note note-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg><div>No rate found for that level and pay point. Check the <b>Rate table</b> tab.</div></div>`;
   const casual = state.type === "casual";
   const rows = [["Weekday", R.weekday],["Saturday", R.saturday],["Sunday", R.sunday],
@@ -2263,22 +2314,25 @@ function secExtra(n){
   return `<div class="rates">
     <div class="rates-h">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      ${SEL.code
+      ${CU
+          ? "Custom \u2014 " + esc(classLabel(state.data.cuLevel || "?", state.data.cuPayPoint || "?"))
+          : SEL.code
           ? "Level " + state.data.level + " - pay point " + SEL.code + " (with incentive)"
           : classLabel(state.data.level, state.data.payPoint)} — ${casual?"casual":"permanent"} rates
-      <span class="eff">effective ${esc(state.award.effectiveFrom)}</span>
+      <span class="eff">${CU ? "entered manually" : "effective " + esc(state.award.effectiveFrom)}</span>
     </div>
     <table class="rt">
       <thead><tr><th>Shift</th><th>Base rate</th><th>+ super (${R.superPct}%)</th></tr></thead>
       <tbody>${rows.map(([l,v])=>
-        `<tr><td>${l}</td><td class="num">${money(v.base)}</td><td class="num tot">${money(v.incSuper)}</td></tr>`).join("")}
+        `<tr><td>${l}${CU && !v.manual ? ' <span style="color:var(--ink-3);font-size:11px;font-weight:450">(calculated)</span>' : ""}</td><td class="num">${money(v.base)}</td><td class="num tot">${money(v.incSuper)}</td></tr>`).join("")}
       </tbody>
     </table>
   </div>
   <div class="note note-info">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01" stroke-linecap="round"/></svg>
     <div>Ordinary rate <b>${money(R.hourly)}/hr</b> · ${money0(R.weekly)}/week · ${money0(R.annual)}/year (38 hrs).
-    From the ${esc(state.award.scheduleName)}.</div>
+    ${CU ? "Custom pay point \u2014 rates entered manually, not taken from the pay schedule. Check they are at or above the Award minimum."
+         : "From the " + esc(state.award.scheduleName) + "."}</div>
   </div>` + (INC ? incentiveNote(INC) : "");
 }
 
@@ -2337,6 +2391,7 @@ function wireForm(){
     const ev = (el.tagName==="SELECT") ? "change" : "input";
     el.addEventListener(ev, ()=>{
       if(el.dataset.k === "classCode"){   // one control drives level and pay point
+        state.data.customPay = el.value === "custom" ? "yes" : "";
         const m = String(el.value).match(/^(\d+)\.(\d+)$/);
         if(m){
           state.data.level = m[1];
@@ -2355,7 +2410,7 @@ function wireForm(){
         renderForm();
       } else if(el.dataset.k === "ftBasis" || el.dataset.k === "incChoice" || el.dataset.k === "ftPay"){
         renderForm();          // these change which fields are shown
-      } else if(["payPoint","superRate"].includes(el.dataset.k)){
+      } else if(["payPoint","superRate"].includes(el.dataset.k) || /^cu/.test(el.dataset.k)){
         // replace only the derived rate readout, so focus stays in the field
         const box = $(".sec[data-sec='4'] .sec-extra");
         if(box) box.innerHTML = secExtra(4);
