@@ -133,33 +133,10 @@ export const adminNavItems = [
         icon: AiFillDashboard,
     },
     {
-        label: "SIL Houses",
-        path: "/admin/sil-houses",
-        icon: HiOutlineHome,
-    },
-    { label: "NDIS Page", path: "/admin/ndis", icon: FaAccessibleIcon },
-    { label: "Compassion Page", path: "/admin/compassion-in-action", icon: FaHeart },
-    { label: "Feedback Page", path: "/admin/participant-feedback", icon: FaCommentDots },
-    // {
-    //     label: "Team Tasks",
-    //     icon: MdTaskAlt,
-    //     path: "/admin/tasks",
-    // },
-    // {
-    //     label: "Waitlist",
-    //     icon: MdOutlinePendingActions,
-    //     path: "/admin/waitlist",
-    // },
-    {
         label: "All Users",
         icon: FaUsersGear,
         path: "/admin/users"
     },
-    // {
-    //     label: "Applications",
-    //     icon: FaUsersGear,
-    //     path: "/admin/applications",
-    // },
     {
         label: "SC Billing",
         icon: MdReceiptLong,
@@ -176,12 +153,6 @@ export const adminNavItems = [
         path: "/admin/contracts",
     },
     {
-        label: "Community Participation",
-        icon: HiOutlineUserGroup,
-        path: "/admin/community-participation",
-
-    },
-    {
         label: "Training",
         icon: MdSchool,
         path: "/admin/training",
@@ -190,7 +161,39 @@ export const adminNavItems = [
         label: "Participant Handbook",
         icon: MdMenuBook,
         path: "/admin/participant-handbook",
-    }
+    },
+    {
+        label: "SIL Houses",
+        path: "/admin/sil-houses",
+        icon: HiOutlineHome,
+    },
+    { label: "NDIS Page", path: "/admin/ndis", icon: FaAccessibleIcon },
+    { label: "Compassion Page", path: "/admin/compassion-in-action", icon: FaHeart },
+    { label: "Feedback Page", path: "/admin/participant-feedback", icon: FaCommentDots },
+     {
+        label: "Community Participation",
+        icon: HiOutlineUserGroup,
+        path: "/admin/community-participation",
+    },
+    // {
+    //     label: "Team Tasks",
+    //     icon: MdTaskAlt,
+    //     path: "/admin/tasks",
+    // },
+    // {
+    //     label: "Waitlist",
+    //     icon: MdOutlinePendingActions,
+    //     path: "/admin/waitlist",
+    // },
+
+    // {
+    //     label: "Applications",
+    //     icon: FaUsersGear,
+    //     path: "/admin/applications",
+    // },
+
+
+
 ]
 
 
