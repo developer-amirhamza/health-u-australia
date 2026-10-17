@@ -79,7 +79,7 @@ import {
     cooking10,
     cooking1,
 } from "assets"
-import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt, MdSchool, MdMenuBook } from "react-icons/md";
+import { MdDiversity2, MdOutlinePendingActions, MdReceiptLong, MdTaskAlt, MdSchool, MdEvent } from "react-icons/md";
 export const gallery_images = [
     sil_house1, sil_house2, sil_house3, belmore1, belmore2, belmore3, belmore4, belmore5, belmore6, belmore7, belmore8, belmore9,
     belmore10, belmore11, belmore12, normanhurst1, normanhurst2, normanhurst10, normanhurst3, normanhurst4,
@@ -117,8 +117,7 @@ import innovation from "assets/images/infographic/innovation.png";
 import integrity from "assets/images/infographic/integrity.png";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUsersGear } from "react-icons/fa6";
-import { FaAccessibleIcon, FaHeart, FaCommentDots } from "react-icons/fa";
-import { HiOutlineUserGroup } from "react-icons/hi2";
+import { FaAccessibleIcon, FaCommentDots, FaHeart } from "react-icons/fa";
 import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineHome } from "react-icons/hi2";
 
 
@@ -128,18 +127,46 @@ import { HiOutlineDocumentText, HiOutlineDocumentDuplicate, HiOutlineHome } from
 
 export const adminNavItems = [
     {
-        label: "Dashboard",
+        label: "Home",
         path: "/admin",
         icon: AiFillDashboard,
+        children: [
+            { label: "About Health U", path: "/admin/about" },
+            { label: "Participant Handbook", path: "/admin/participant-handbook" },
+        ],
     },
+    { label: "NDIS", path: "/admin/ndis", icon: FaAccessibleIcon },
     {
-        label: "SIL Houses",
-        path: "/admin/sil-houses",
+        label: "Services",
+        path: "/admin/community-participation",
         icon: HiOutlineHome,
+        children: [
+            { label: "Community Participation", path: "/admin/community-participation" },
+            { label: "Capacity Building", path: "/admin/capacity-building" },
+            { label: "Support Coordination", path: "/admin/support-coordination" },
+            { label: "Assist In Self-care", path: "/admin/assist-in-self-care" },
+            { label: "Assist In Transport", path: "/admin/assist-in-transport" },
+            { label: "Home Modification", path: "/admin/home-modification" },
+            { label: "Non NDIS Service", path: "/admin/non-ndis-service" },
+            { label: "Gardening/House And Yard", path: "/admin/gardening-house-yard" },
+        ],
     },
-    { label: "NDIS Page", path: "/admin/ndis", icon: FaAccessibleIcon },
-    { label: "Compassion Page", path: "/admin/compassion-in-action", icon: FaHeart },
-    { label: "Feedback Page", path: "/admin/participant-feedback", icon: FaCommentDots },
+    { label: "SIL House", path: "/admin/sil-houses", icon: HiOutlineHome },
+    { label: "Compassion in Action", path: "/admin/compassion-in-action", icon: FaHeart },
+    {
+        label: "Events And News",
+        path: "/admin/current-events",
+        icon: MdEvent,
+        children: [
+            { label: "Current Events", path: "/admin/current-events" },
+            { label: "Past Events", path: "/admin/past-events" },
+        ],
+    },
+    { label: "Feedback", path: "/admin/participant-feedback", icon: FaCommentDots },
+    { label: "Career", path: "/admin/career", icon: FaUsersGear },
+    { label: "Training", path: "/admin/training", icon: MdSchool },
+    { label: "Contact Us", path: "/admin/contact-us", icon: HiOutlineDocumentText },
+    { label: "Referral", path: "/admin/referral", icon: HiOutlineDocumentText },
     // {
     //     label: "Team Tasks",
     //     icon: MdTaskAlt,
@@ -175,22 +202,6 @@ export const adminNavItems = [
         icon: HiOutlineDocumentDuplicate,
         path: "/admin/contracts",
     },
-    {
-        label: "Community Participation",
-        icon: HiOutlineUserGroup,
-        path: "/admin/community-participation",
-
-    },
-    {
-        label: "Training",
-        icon: MdSchool,
-        path: "/admin/training",
-    },
-    {
-        label: "Participant Handbook",
-        icon: MdMenuBook,
-        path: "/admin/participant-handbook",
-    }
 ]
 
 
