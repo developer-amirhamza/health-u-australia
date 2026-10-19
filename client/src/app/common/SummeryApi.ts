@@ -108,11 +108,12 @@ export const SummeryApi = {
     createContent: { url: "/api/content", method: "post" },
     updateContent: { url: "/api/content", method: "put" },
     deleteContent: { url: "/api/content", method: "delete" },
-};
-    // ── Training resources (public /training page + its admin CRUD panel) ──
+
+       // ── Training resources (public /training page + its admin CRUD panel) ──
     getPublicTrainingResources: { url: "/api/training-resources/public", method: "get" },
     getTrainingResources: { url: "/api/training-resources", method: "get" },
     createTrainingResource: { url: "/api/training-resources/create", method: "post" },
     updateTrainingResource: { url: "/api/training-resources/update", method: "put" },
     deleteTrainingResource: { url: "/api/training-resources/delete", method: "delete" },
 };
+ 
