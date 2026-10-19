@@ -171,14 +171,48 @@ export const adminNavItems = [
         icon: HiOutlineDocumentDuplicate,
         path: "/admin/contracts",
     },
-    {
-        label: "Community Participation",
-        icon: HiOutlineUserGroup,
-        path: "/admin/community-participation",
-        label: "Training",
-        icon: MdSchool,
-        path: "/admin/training",
-    },
+   
+{
+    label: "Community Participation",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/community-participation",
+},
+{
+    label: "Capacity Building",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/capacity-building",
+},
+{
+    label: "Support Coordination",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/support-coordination",
+},
+{
+    label: "Assist In Self-Care",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/assist-in-self-care",
+},
+{
+    label: "Assist In Transport",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/assist-in-transport",
+},
+{
+    label: "Home Modification",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/home-modification",
+},
+{
+    label: "Gardening / House and Yard",
+    icon: HiOutlineUserGroup,
+    path: "/admin/services/gardening-house-yard",
+},
+{
+    label: "Training",
+    icon: MdSchool,
+    path: "/admin/training",
+},
+
 ]
 
 
