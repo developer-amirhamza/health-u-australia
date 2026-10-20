@@ -155,6 +155,15 @@ h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.01em}
   border-bottom:1px solid var(--line);font-size:12px;font-weight:640;color:var(--brand-ink);
 }
 .rates-h .eff{margin-left:auto;font-weight:450;color:var(--ink-3);font-size:11px}
+/* additional hours editor */
+.xh{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.xh-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 32px;gap:6px;align-items:center}
+.xh-head{font-size:11px;font-weight:600;color:var(--ink-3)}
+.xh-del{padding:0;width:32px;justify-content:center;font-size:16px;line-height:1}
+.xh > #xhAdd{align-self:flex-start}
+.xh-sum{font-size:12.3px;color:var(--brand-ink)}
+.xh-sum:empty{display:none}
+.xh-warn{color:var(--warn)}
 table.rt{width:100%;border-collapse:collapse;font-size:12.5px}
 table.rt th,table.rt td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line-2)}
 table.rt th:first-child,table.rt td:first-child{text-align:left}
@@ -593,6 +602,7 @@ const DEFAULTS = {
   cuAfternoon:"", cuNight:"", cuOtFirst2:"", cuOtAfter2:"",
   superRate:"12", kmAllowance:"0.99",
   ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award", ptRate:"",
+  extraHours:"",
   homeVisit:"",
   hoursCasual:"Upon agreement",
   payFrequency:"Wednesday weekly",
@@ -791,6 +801,61 @@ function currentRates(){
 // the plain Award rate for the same classification, ignoring any incentive tier
 function awardRates(){ return isCustomPay() ? customRates() : rateSet(state.data.level, +state.data.payPoint, state.type, ""); }
 
+/* Additional hours: regular hours worked on top of the ordinary week (above 38 hours,
+   or on a Saturday / Sunday). Stored as a JSON string in state.data.extraHours so it
+   saves and loads like every other field. Each row is { day, hours, rate } — rate is
+   optional; left blank it comes from this employee's rate for that kind of day. */
+const XDAYS = [
+  ["monday","Monday","weekday"], ["tuesday","Tuesday","weekday"], ["wednesday","Wednesday","weekday"],
+  ["thursday","Thursday","weekday"], ["friday","Friday","weekday"],
+  ["saturday","Saturday","saturday"], ["sunday","Sunday","sunday"], ["publicHoliday","Public holiday","publicHoliday"]
+];
+function xDay(k){ return XDAYS.filter(x => x[0] === k)[0] || XDAYS[5]; }
+function extraRows(){
+  try { const a = JSON.parse(state.data.extraHours || "[]"); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function setExtraRows(a){ state.data.extraHours = a.length ? JSON.stringify(a) : ""; }
+// the hourly rate a row is paid when no custom rate is typed in
+function extraDefaultRate(kind){
+  const d = state.data, pen = state.award.penalties.permanent;
+  if(isSalaried()){
+    const sal = parseFloat(d.ftSalary);
+    return sal > 0 ? r2(sal / state.award.weeksPerYear / state.award.hoursPerWeek * pen[kind]) : null;
+  }
+  if(isOfficePT()){
+    const rate = parseFloat(d.ptRate);
+    return rate > 0 ? r2(rate * pen[kind]) : null;
+  }
+  const R = currentRates();
+  return R && R[kind] ? R[kind].base : null;
+}
+// rows with hours and a usable rate, plus weekly / annual totals
+function extraPlaceholder(dayKey){
+  const def = extraDefaultRate(xDay(dayKey)[2]);
+  return def ? def.toFixed(2) : "Rate";
+}
+function extraInfo(){
+  const rows = extraRows().map(r => {
+    const [, label, kind] = xDay(r.day);
+    const hours = parseFloat(r.hours), custom = parseFloat(r.rate);
+    const rate = custom > 0 ? r2(custom) : extraDefaultRate(kind);
+    return { label, kind, hours, rate, custom: custom > 0,
+             weekly: hours > 0 && rate ? r2(hours * rate) : 0 };
+  }).filter(r => r.hours > 0);
+  if(!rows.length) return null;
+  const hours = rows.reduce((s, r) => s + r.hours, 0);
+  const weekly = r2(rows.reduce((s, r) => s + r.weekly, 0));
+  return { rows, hours, weekly, annual: r2(weekly * state.award.weeksPerYear),
+           missingRate: rows.some(r => !r.rate) };
+}
+const fmtHrs = h => (Math.round(h * 100) / 100) + (h === 1 ? " hour" : " hours");
+// one sentence listing every additional-hours row, for the letter
+function extraSentence(X){
+  return X.rows.map(r => `${fmtHrs(r.hours)} on ${r.label === "Public holiday" ? "public holidays" : r.label}`
+    + (r.rate ? ` at ${money(r.rate)} per hour` : "")).join("; ");
+}
+
 /* ---------- field schema ---------- */
 function schema(){
   const t = state.type;
@@ -859,6 +924,9 @@ function schema(){
           ph:"e.g. Mon, Wed, Fri 9:00am – 3:00pm", hint:"Part-time employees must have an agreed pattern of hours"}
       ] : []),
       ...(casual ? [{k:"hoursCasual", l:"Hours of work", wide:true}] : []),
+      {k:"extraHours", l:"Additional hours", type:"extras", wide:true,
+        hint:"Regular hours on top of the ordinary week — above 38 hours, or Saturday / Sunday work. "
+          + "Leave the rate blank to use this employee’s rate for that day. The total is added to the salary in the letter"},
       ...(casual && !isCustomPay() ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
         hint:"Casual contracts only — lifts every rate: weekday, weekend, public holiday and shift. The letter shows the rates only, never the pay point"}] : []),
       ...(noPay ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
@@ -991,19 +1059,38 @@ function buildDoc(){
     : ph("", "Start date");
   rows.push([endDate ? "Contract start and end date" : "Commencement date", [P(dates)]]);
 
+  // additional hours on top of the ordinary week — their pay is folded into the salary below
+  const X = extraInfo();
+  const xLine = X ? `Additional hours: ${extraSentence(X)} — ${fmtHrs(X.hours)} per week in total, `
+    + `adding ${money(X.weekly)} per week (${money0(X.annual)} per annum) plus superannuation.` : "";
+  // weekly pay for a part-time employee: guaranteed hours at the ordinary rate plus additional hours
+  const ptWeekly = rate => {
+    const h = parseFloat(d.ptHours);
+    if(!X || !(h > 0) || !(rate > 0)) return null;
+    const wk = r2(h * rate + X.weekly);
+    return P(`Total weekly pay: ${money(wk)} per week (${money0(wk * AWARD.weeksPerYear)} per annum) for `
+      + `${fmtHrs(h)} ordinary plus ${fmtHrs(X.hours)} additional, plus superannuation.`, {b:true});
+  };
+  const pkg = n => "$" + n.toLocaleString("en-AU", {minimumFractionDigits:2, maximumFractionDigits:2});
   if(salaried){
     // fixed annual salary: no classification, pay point or hourly rates — just salary and package
     const sal = parseFloat(d.ftSalary);
+    const tot = isNaN(sal) ? NaN : r2(sal + (X ? X.annual : 0));
     rows.push(["Base Salary", isNaN(sal) ? [P(ph("", "Annual salary"))] : [
-      P(`Base ${money0(sal)} per annum plus ${supPct}% super`),
-      P(`Total package $${(sal * (1 + supPct/100)).toLocaleString("en-AU", {minimumFractionDigits:2, maximumFractionDigits:2})} per annum`)
+      P(`Base ${money0(tot)} per annum plus ${supPct}% super`),
+      ...(X ? [P(`This is ${money0(sal)} for ${AWARD.hoursPerWeek} ordinary hours per week plus ${money0(X.annual)} for additional hours: `
+        + `${extraSentence(X)} (${fmtHrs(X.hours)} per week in total).`)] : []),
+      P(`Total package ${pkg(tot * (1 + supPct/100))} per annum`)
     ]]);
   } else if(officePT){
     // part-time office employee: agreed hourly rate, no pay point
     const rate = parseFloat(d.ptRate);
+    const wk = ptWeekly(rate);
     rows.push(["Base Salary", isNaN(rate) ? [P(ph("", "Hourly rate"))] : [
       P(`Base ${money(rate)} per hour plus ${supPct}% super`),
-      P(`Total ${money(rate * (1 + supPct/100))} per hour including super`)
+      P(`Total ${money(rate * (1 + supPct/100))} per hour including super`),
+      ...(X ? [P(xLine)] : []),
+      ...(wk ? [wk] : [])
     ]]);
   } else {
   rows.push(["Classification", [P(
@@ -1022,12 +1109,25 @@ function buildDoc(){
   const payCell = [], rateLines = [];
   const INC = incentiveInfo();
   if(ft){
-    const annual = d.ftSalary ? money0(parseFloat(d.ftSalary)) : (R? money0(R.annual) : ph("","Annual salary"));
+    const baseAnnual = d.ftSalary ? parseFloat(d.ftSalary) : (R ? R.annual : NaN);
+    // whole dollars added, so the total matches the two figures the letter shows
+    const annual = isNaN(baseAnnual) ? ph("","Annual salary") : money0(Math.round(baseAnnual) + (X ? Math.round(X.annual) : 0));
     payCell.push(P(`Annual salary: ${annual} per annum, plus superannuation. Paid ${ph(d.payFrequency,"Payment frequency")}.`, {b:true}));
-    payCell.push(P(`This is based on ${AWARD.hoursPerWeek} ordinary hours per week at ${R?money(R.hourly):"—"} per hour.`));
+    payCell.push(P(`This is based on ${AWARD.hoursPerWeek} ordinary hours per week at ${R?money(R.hourly):"—"} per hour`
+      + (X && !isNaN(baseAnnual)
+          ? ` (${money0(baseAnnual)} per annum), plus ${(Math.round(X.hours * 100) / 100)} additional ${X.hours === 1 ? "hour" : "hours"} per week: ${extraSentence(X)} `
+            + `(${money(X.weekly)} per week, ${money0(X.annual)} per annum).`
+          : `.`)));
   } else if(pt){
     payCell.push(P(`Ordinary hourly rate: ${R?money(R.weekday.base):"—"} per hour, plus superannuation.`, {b:true}));
     payCell.push(P(`Guaranteed minimum hours: ${ph(d.ptHours,"Hours per week")} hours per week.`));
+    if(X){
+      payCell.push(P(xLine));
+      const wk = ptWeekly(R ? R.weekday.base : NaN); if(wk) payCell.push(wk);
+    }
+  } else if(X){
+    payCell.push(P(`Agreed regular hours: ${extraSentence(X)} — ${fmtHrs(X.hours)} per week, `
+      + `${money(X.weekly)} per week (${money0(X.annual)} per annum) plus superannuation.`, {b:true}));
   }
   payCell.push(P(`Weekend, Public Holiday and Overtime Rates: Saturday, Sunday, public holiday penalties and overtime `
     + `will be paid strictly in accordance with the SCHADS Award and calculated based on the applicable Award rate for Level ${LPP}.`));
@@ -1079,6 +1179,12 @@ function buildDoc(){
     rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week`)]]);
   } else {
     rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week, plus reasonable additional hours as required.`)]]);
+  }
+  if(X){
+    // list the agreed additional days under Hours of work as well
+    const hw = rows[rows.length - 1][1];
+    hw.push(P(`Additional hours: ${X.rows.map(r => `${r.label} — ${fmtHrs(r.hours)}`).join(", ")} `
+      + `(${fmtHrs(X.hours)} per week in total).`));
   }
 
   if(!salaried) rows.push(["Roster Policy", (lines(d.rosterPolicy).length? lines(d.rosterPolicy):[ph("","Roster policy")]).map(x=>P(x,{tight:true}))]);
@@ -2252,12 +2358,47 @@ function fieldHTML(f){
     }
     ctl = `<select id="fld_${f.k}" data-k="${f.k}">` + opts.map(o=>
       `<option value="${esc(o.v)}"${String(v)===String(o.v)?" selected":""}>${esc(o.t)}</option>`).join("") + `</select>`;
+  } else if(f.type === "extras"){
+    ctl = extrasHTML();
   } else if(f.money){
     ctl = `<div class="pfx"><span>$</span><input id="fld_${f.k}" data-k="${f.k}" type="number" step="${f.step||"0.01"}" value="${esc(v)}" placeholder="${esc(f.ph||"")}"></div>`;
   } else {
     ctl = `<input id="fld_${f.k}" data-k="${f.k}" type="${f.type||"text"}"${f.step?` step="${f.step}"`:""} value="${esc(v)}" placeholder="${esc(f.ph||"")}">`;
   }
   return `<div class="${cls}">${lab}${ctl}${hint}</div>`;
+}
+
+/* Additional hours editor: one row per day, with hours per week and an optional rate */
+function extrasHTML(){
+  const rows = extraRows();
+  return `<div class="xh" id="fld_extraHours">`
+    + (rows.length ? `<div class="xh-row xh-head"><span>Day</span><span>Hours / week</span><span>Rate / hour</span><span></span></div>` : "")
+    + rows.map((r, i) => {
+        return `<div class="xh-row" data-xi="${i}">`
+          + `<select data-x="day">` + XDAYS.map(([v, t]) =>
+              `<option value="${v}"${xDay(r.day)[0] === v ? " selected" : ""}>${t}</option>`).join("") + `</select>`
+          + `<input data-x="hours" type="number" step="0.5" min="0" value="${esc(r.hours || "")}" placeholder="e.g. 8">`
+          + `<div class="pfx"><span>$</span><input data-x="rate" type="number" step="0.01" min="0" value="${esc(r.rate || "")}" placeholder="${esc(extraPlaceholder(r.day))}"></div>`
+          + `<button class="btn btn-sm xh-del" type="button" data-xdel="${i}" title="Remove" aria-label="Remove row">×</button>`
+          + `</div>`;
+      }).join("")
+    + `<button class="btn btn-sm" type="button" id="xhAdd">+ Add hours</button>`
+    + `<div class="xh-sum" id="xhSum">${extrasSummary()}</div></div>`;
+}
+// a pay field changed: update default-rate placeholders and the total without re-rendering
+function refreshExtras(){
+  $$(".xh-row[data-xi]").forEach(row=>{
+    const day = row.querySelector("[data-x='day']"), rate = row.querySelector("[data-x='rate']");
+    if(!day || !rate) return;
+    rate.placeholder = extraPlaceholder(day.value);
+  });
+  const s = $("#xhSum"); if(s) s.innerHTML = extrasSummary();
+}
+function extrasSummary(){
+  const X = extraInfo();
+  if(!X) return "";
+  if(X.missingRate) return `<span class="xh-warn">Enter a rate for every row — no base rate to calculate it from yet.</span>`;
+  return `<b>${fmtHrs(X.hours)}</b> extra per week · <b>${money(X.weekly)}</b>/week · <b>${money0(X.annual)}</b>/year — added to the salary`;
 }
 
 function secExtra(n){
@@ -2387,6 +2528,31 @@ function wireForm(){
     renderForm(); renderPreview();
     if(other){ const box = $(`[data-k="${k}"]`); if(box) box.focus(); }
   }));
+  const xa = $("#xhAdd"); if(xa) xa.onclick = ()=>{
+    const a = extraRows(); a.push({ day: a.length ? "sunday" : "saturday", hours:"", rate:"" });
+    setExtraRows(a); renderForm(); renderPreview();
+    const ins = $$(".xh-row[data-xi] [data-x='hours']"); if(ins.length) ins[ins.length-1].focus();
+  };
+  $$("[data-xdel]").forEach(b=> b.onclick = ()=>{
+    const a = extraRows(); a.splice(+b.dataset.xdel, 1);
+    setExtraRows(a); renderForm(); renderPreview();
+  });
+  $$(".xh-row[data-xi] [data-x]").forEach(el=>{
+    const ev = (el.tagName==="SELECT") ? "change" : "input";
+    el.addEventListener(ev, ()=>{
+      const a = extraRows(), i = +el.closest(".xh-row").dataset.xi;
+      if(!a[i]) return;
+      a[i][el.dataset.x] = el.value;
+      setExtraRows(a);
+      if(el.dataset.x === "day"){
+        // the default rate depends on the day, so refresh the placeholder
+        const rate = el.closest(".xh-row").querySelector("[data-x='rate']");
+        if(rate) rate.placeholder = extraPlaceholder(el.value);
+      }
+      const s = $("#xhSum"); if(s) s.innerHTML = extrasSummary();
+      renderPreview();
+    });
+  });
   $$("[data-k]").forEach(el=>{
     const ev = (el.tagName==="SELECT") ? "change" : "input";
     el.addEventListener(ev, ()=>{
@@ -2415,6 +2581,7 @@ function wireForm(){
         const box = $(".sec[data-sec='4'] .sec-extra");
         if(box) box.innerHTML = secExtra(4);
       }
+      refreshExtras();
       renderPreview();
     });
   });
