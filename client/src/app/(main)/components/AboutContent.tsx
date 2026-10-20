@@ -23,11 +23,11 @@ const AboutContent = () => {
     <div className="flex flex-col justify-center items-center w-full h-full ">
       <PageBanner title='About Health U Australia' path='/about' />
 
-      <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full h-full ">
-        <div className="grid gap-10 ">
+      <div className="container px-5 flex flex-col items-center mx-auto justify-center w-full ">
+        <div className="grid w-full gap-12 py-10 md:gap-16">
           {sections.map((item, index) => (
-            <div key={index} className={`flex flex-col gap-x-8 ${[0, 2, 4].includes(index) ? 'md:flex-row-reverse' : 'md:flex-row'} justify-between items-start w-full`}>
-              <motion.div className="w-full h-full flex"
+            <div key={index} className={`flex w-full flex-col items-center gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
+              <motion.div className="w-full min-w-0 shrink-0 md:w-[calc(50%-1rem)]"
                 initial={{
                   opacity: 0,
                   x: [0, 2, 4].includes(index) ? 80 : -80,
@@ -44,9 +44,9 @@ const AboutContent = () => {
                 }}
               >
                 <Image src={item.image && !item.image.startsWith("/images/about/") ? item.image : about[index % 2].image} alt='about heath u australia'
-                  className='hover:scale-102 ease-in-out transition-all duration-500 rounded-md w-full h-full object-center inset-0 items-start justify-start p-0 m-0 ' />
+                  className='hover:scale-102 ease-in-out transition-all duration-500 rounded-md w-full h-auto object-cover' />
               </motion.div>
-              <motion.div className="flex flex-col w-full justify-center gap-2    "
+              <motion.div className="flex min-w-0 w-full flex-col justify-center gap-2 md:w-[calc(50%-1rem)]"
                 initial={{
                   opacity: 0,
                   x: [0, 2, 4].includes(index) ? -80 : 80,
@@ -63,7 +63,7 @@ const AboutContent = () => {
                   }
                 }}>
                 <Title title1={item.title1} title2={item.title2} />
-                <p className=" flex w-full text-lg text-secondary-text font-medium  ">{item.paragraph1}</p>
+                <p className="w-full text-lg text-secondary-text font-medium whitespace-pre-line break-words">{item.paragraph1}</p>
               </motion.div>
             </div>
           ))}
@@ -72,7 +72,7 @@ const AboutContent = () => {
 
 
 
-        <motion.div className="flex w-full items-start justify-center flex-col md:flex-row gap-10 h-full  my-20 "
+        <motion.div className="flex w-full items-stretch justify-center flex-col md:flex-row gap-10 my-16 "
           initial={{
             opacity: 0,
             y: -80,
@@ -88,7 +88,7 @@ const AboutContent = () => {
             }
           }}
         >
-          <div className=" border border-secondary-text/40 hover:scale-102 ease-in-out transition-all duration-500 flex-1 flex flex-col items-start p-8 w-full h-full rounded-md shadow-2xl gap-10 ">
+          <div className=" border border-secondary-text/40 hover:scale-102 ease-in-out transition-all duration-500 flex-1 min-w-0 flex flex-col items-stretch p-8 w-full rounded-md shadow-2xl gap-10 ">
             <Image src={about_icon} alt='about health u australia' />
             <div className="flex flex-col w-full justify-center gap-4    ">
               <Title title1={mission.title1} title2={mission.title2} />
@@ -113,13 +113,13 @@ const AboutContent = () => {
               }
             }}>
             <Image src={about_icon1} alt='about health u australia' />
-            <div className="flex flex-col w-full justify-center gap-2    ">
+            <div className="flex min-w-0 w-full flex-col justify-center gap-2">
               <Title title1={values.title1} title2={values.title2} />
               <ul className=" flex flex-col w-full text-lg text-secondary-text font-medium gap-3 ">
                 {values.bullets?.map((item, index) => (
                   <li key={index} className=" flex items-start w-full gap-2 ">
-                    <TiTick className='bg-secondary rounded-full text-4xl  h-full w-full max-h-6 max-w-6 mt-0.5 text-white ' />
-                    <p className=" text-xl text-secondary-text font-bold  ">{item.keyword}
+                    <TiTick className='bg-secondary rounded-full text-2xl h-6 w-6 shrink-0 mt-0.5 text-white' />
+                    <p className="min-w-0 flex-1 text-xl text-secondary-text font-bold break-words">{item.keyword}
                       <span className="text-lg font-medium ">{item.text} </span>
                     </p>
                   </li>
@@ -129,7 +129,7 @@ const AboutContent = () => {
           </motion.div>
         </motion.div>
 
-        <motion.div className="flex flex-col w-full justify-center gap-4 h-full items-center bg-gray-100 p-10    "
+        <motion.div className="flex flex-col w-full justify-center gap-4 items-center bg-gray-100 p-10    "
           initial={{
             opacity: 0,
             y: -80,
