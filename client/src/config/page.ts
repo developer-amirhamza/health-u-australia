@@ -182,11 +182,6 @@ export const adminNavItems = [
         icon: FaUsersGear,
         path: "/admin/users"
     },
-    // {
-    //     label: "Applications",
-    //     icon: FaUsersGear,
-    //     path: "/admin/applications",
-    // },
     {
         label: "SC Billing",
         icon: MdReceiptLong,
