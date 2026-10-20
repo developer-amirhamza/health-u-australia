@@ -14,6 +14,9 @@ import ConfirmDeleteModal, { type DeleteRequest } from './ConfirmDeleteModal'
 import AboutContent from 'app/(main)/components/AboutContent'
 import Career from 'app/pages/Career'
 import Contact from 'app/pages/Contact'
+import AdminContentCard from './AdminContentCard'
+import { about } from 'config/page'
+import careerImage from 'assets/images/career.png'
 
 type Json = string | Json[] | { [key: string]: Json }
 const inputClass = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-2'
@@ -44,6 +47,49 @@ function blankFrom(template: Json): Json {
   if (typeof template === 'string') return ''
   if (Array.isArray(template)) return []
   return Object.fromEntries(Object.entries(template).map(([key, value]) => [key, blankFrom(value)]))
+}
+
+function cardDescription(value: Json): string {
+  if (typeof value === 'string') return value
+  if (Array.isArray(value)) return value.map(cardDescription).filter(Boolean).join(' · ')
+  const preferred = ['paragraph1', 'paragraph2', 'paragraph3', 'paragraphs', 'desc', 'description', 'text', 'detail', 'address', 'phone', 'email', 'subtitle', 'time', 'date', 'publish_date', 'bullets', 'requirements']
+  const parts = preferred.map(key => value[key]).filter((part): part is Json => part !== undefined).map(cardDescription).filter(Boolean)
+  if (parts.length) return parts.join(' · ')
+  return Object.entries(value).filter(([key]) => !['image', 'src', 'icon', 'href', 'id'].includes(key)).map(([, part]) => cardDescription(part)).filter(Boolean).slice(0, 2).join(' · ')
+}
+
+function cardTitle(heading: string, value: Json): string {
+  if (typeof value === 'string' || Array.isArray(value)) return heading
+  const named = [value.title1, value.title2].filter(part => typeof part === 'string' && part.trim()).join(' ')
+    || [value.first, value.second].filter(part => typeof part === 'string' && part.trim()).join(' ')
+    || [value.title, value.name].find(part => typeof part === 'string' && part.trim())
+  return typeof named === 'string' && named ? named : heading
+}
+
+function uniqueJobId(jobs: Json[], original = 'new-job'): string {
+  const ids = new Set(jobs.map(job => typeof job === 'object' && !Array.isArray(job) ? job.id : undefined))
+  const base = original || 'new-job'
+  let id = base
+  let suffix = 2
+  while (ids.has(id)) id = `${base}-${suffix++}`
+  return id
+}
+
+function cardImage(value: Json, slug: string, key: string, index: number): string | undefined {
+  if (slug === 'about') {
+    if (key === 'sections' && index < 2) {
+      const candidate = typeof value === 'object' && !Array.isArray(value) ? value.image : undefined
+      if (typeof candidate === 'string' && candidate && !candidate.startsWith('/images/about/')) return candidate
+      return about[index].image.src
+    }
+    if (key === 'mission' || key === 'values') return about[key === 'mission' ? 2 : 3].image.src
+  }
+  if (slug === 'career') return careerImage.src
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const candidate = value.image ?? value.src
+    if (typeof candidate === 'string' && candidate) return candidate
+  }
+  return undefined
 }
 
 function AddressField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
@@ -139,6 +185,7 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
   const [previewOpen, setPreviewOpen] = useState(false)
   const [error, setError] = useState(false)
   const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null)
+  const [editing, setEditing] = useState<{ key: string; index: number | null } | null>(null)
   useEffect(() => {
     Promise.all([Axios.get(`/api/pages/${slug}`), Axios.get(`/api/pages/${slug}/template`)])
       .then(([page, original]) => { setContent(page.data.data); setTemplate(original.data.data) })
@@ -157,6 +204,38 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
     catch { toast.error('Unable to save page') }
     finally { setSaving(false) }
   }
+  const changeBlock = (key: string, index: number | null, next: Json) => setContent(current => {
+    const page = current as Record<string, Json>
+    if (index === null) return { ...page, [key]: next }
+    const items = page[key] as Json[]
+    return { ...page, [key]: items.map((item, position) => position === index ? next : item) }
+  })
+  const addBlock = (key: string, sample: Json) => {
+    const index = ((content as Record<string, Json>)[key] as Json[]).length
+    setContent(current => { const page = current as Record<string, Json>; const items = page[key] as Json[]; const next = blankFrom(sample); if (slug === 'career' && key === 'jobs' && typeof next === 'object' && !Array.isArray(next)) next.id = uniqueJobId(items); return { ...page, [key]: [...items, next] } })
+    setEditing({ key, index })
+  }
+  const duplicateBlock = (key: string, index: number) => {
+    setContent(current => {
+      const page = current as Record<string, Json>
+      const items = page[key] as Json[]
+      const copy = structuredClone(items[index])
+      if (slug === 'career' && key === 'jobs' && typeof copy === 'object' && !Array.isArray(copy)) copy.id = uniqueJobId(items, typeof copy.id === 'string' ? copy.id : 'new-job')
+      return { ...page, [key]: [...items.slice(0, index + 1), copy, ...items.slice(index + 1)] }
+    })
+    setEditing({ key, index: index + 1 })
+  }
+  const moveBlock = (key: string, index: number, direction: number) => {
+    const target = index + direction
+    setContent(current => { const page = current as Record<string, Json>; const items = [...page[key] as Json[]]; if (target < 0 || target >= items.length) return current; [items[index], items[target]] = [items[target], items[index]]; return { ...page, [key]: items } })
+    setEditing(null)
+  }
+  const removeBlock = (key: string, index: number, name: string) => setDeleteRequest({ name, onConfirm: () => {
+    setContent(current => { const page = current as Record<string, Json>; return { ...page, [key]: (page[key] as Json[]).filter((_, position) => position !== index) } })
+    setEditing(current => current?.key === key ? null : current)
+  } })
+  const editFields = (key: string, index: number | null, value: Json, shape: Json) => editing?.key === key && editing.index === index &&
+    <div className="rounded-xl border border-primary/30 bg-white p-5 shadow-sm"><div className="mb-4 flex items-center justify-between gap-4"><h3 className="text-lg font-semibold">Edit {sectionNames[key] ?? key}</h3><button type="button" className="rounded-lg border px-3 py-1.5" onClick={() => setEditing(null)}>Close</button></div><Field label="Content" value={value} template={shape} slug={slug} onChange={next => changeBlock(key, index, next)} onUploadChange={delta => setUploadCount(count => Math.max(0, count + delta))} onRequestDelete={setDeleteRequest} /></div>
   const Preview = slug === 'ndis' ? NDISView : slug === 'compassion-in-action' ? CompassionView : slug === 'participant-feedback' ? FeedbackView : slug === 'about' ? AboutContent : slug === 'career' ? Career : Contact
   const PageIcon = slug === 'ndis' ? FaAccessibleIcon : slug === 'compassion-in-action' ? FaHeart : FaCommentDots
   return <main className="mx-auto max-w-5xl space-y-6 p-6">
@@ -164,7 +243,20 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
       <button type="button" disabled={!content || uploadCount > 0} onClick={() => setPreviewOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:opacity-50" aria-label={`Preview ${title}`}><FiEye aria-hidden="true" /> Preview</button>
     </div>
     {loading && <PageLoader label={`Loading ${title} content`} compact />}{error && <p role="alert">Unable to load page content.</p>}
-    {content && template && <><Field label="Page content" value={content} template={template} slug={slug} onChange={setContent} onUploadChange={delta => setUploadCount(count => Math.max(0, count + delta))} onRequestDelete={setDeleteRequest} /><button disabled={saving || uploadCount > 0} onClick={save} className="rounded-lg bg-[#1a1a18] px-5 py-3 text-white disabled:opacity-50">{saving ? 'Saving...' : uploadCount > 0 ? 'Uploading photo...' : 'Save page'}</button></>}
+    {content && template && <>
+      <div className="space-y-8">{Object.entries(content as Record<string, Json>).map(([key, value]) => {
+        const shape = (template as Record<string, Json>)[key] ?? value
+        const heading = sectionNames[key] ?? key.replace(/([A-Z])/g, ' $1')
+        if (Array.isArray(value)) {
+          const sample = Array.isArray(shape) && shape.length ? shape[0] : undefined
+          return <section key={key} className="space-y-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-semibold capitalize">{heading}</h2><p className="text-sm text-gray-500">{value.length} item{value.length === 1 ? '' : 's'}</p></div>{sample && <button type="button" className="rounded-lg bg-[#1a1a18] px-4 py-2 text-white" onClick={() => addBlock(key, sample)}>Add item</button>}</div>
+            {value.length === 0 && <p className="rounded-lg border bg-white p-5 text-gray-500">No items yet.</p>}
+            {value.map((item, index) => <div key={`${key}-${index}`} className="space-y-3"><AdminContentCard title={itemName(key, item, index)} description={cardDescription(item)} image={cardImage(item, slug, key, index)} badge={`${heading} ${index + 1}`} selected={editing?.key === key && editing.index === index} actions={<><button type="button" className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50" onClick={() => setEditing({ key, index })}>Edit</button><button type="button" className="rounded-md border px-3 py-1 text-sm disabled:opacity-40" disabled={index === 0} onClick={() => moveBlock(key, index, -1)}>Up</button><button type="button" className="rounded-md border px-3 py-1 text-sm disabled:opacity-40" disabled={index === value.length - 1} onClick={() => moveBlock(key, index, 1)}>Down</button><button type="button" className="rounded-md border px-3 py-1 text-sm" onClick={() => duplicateBlock(key, index)}>Duplicate</button><button type="button" className="rounded-md border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50" onClick={() => removeBlock(key, index, itemName(key, item, index))}>Delete</button></>} />{editFields(key, index, item, sample ?? item)}</div>)}</section>
+        }
+        return <section key={key} className="space-y-3"><AdminContentCard title={cardTitle(heading, value)} description={cardDescription(value)} image={cardImage(value, slug, key, 0)} badge={heading} selected={editing?.key === key && editing.index === null} actions={<button type="button" className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50" onClick={() => setEditing({ key, index: null })}>Edit</button>} />{editFields(key, null, value, shape)}</section>
+      })}</div>
+      <button disabled={saving || uploadCount > 0} onClick={save} className="rounded-lg bg-[#1a1a18] px-5 py-3 text-white disabled:opacity-50">{saving ? 'Saving...' : uploadCount > 0 ? 'Uploading photo...' : 'Save page'}</button>
+    </>}
     <ConfirmDeleteModal request={deleteRequest && { ...deleteRequest, onConfirm: () => { deleteRequest.onConfirm(); setDeleteRequest(null) } }} onClose={() => setDeleteRequest(null)} />
     {previewOpen && content && createPortal(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm md:p-6" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPreviewOpen(false) }}>
       <div className="flex h-[min(84vh,900px)] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-label={`${title} preview`}>
