@@ -1,6 +1,2 @@
-import UpcomingPage from '../components/UpcomingPage'
-
-export default function Page() {
-    return <UpcomingPage title="Past Events" />
-}
-
+import EventsEditor from '../components/EventsEditor'
+export default function Page() { return <EventsEditor status='past' /> }

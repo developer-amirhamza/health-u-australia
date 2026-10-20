@@ -8,10 +8,15 @@ import ndis_logo from "assets/ndis-logo-img.png"
 import logo from "assets/footer-logo-img.png";
 import { career_infographic, career_jobs } from 'config/page'
 import { SiTicktick } from 'react-icons/si'
-import { useRouter } from 'next/navigation'
+import { useManagedPage } from 'app/(main)/(pages)/_managed/useManagedPage'
+import { useEffect, useState } from 'react'
 
 const Career = () => {
-  const router = useRouter();
+  const { data } = useManagedPage<{ jobs: (typeof career_jobs[number] & { pay: string; description: string; requirements: string[]; responsibilities: string[]; benefits: string[]; job_type: string; location: string })[] }>('career');
+  const jobs = data?.jobs ?? career_jobs;
+  const [slide, setSlide] = useState(0);
+  useEffect(() => { if (jobs.length < 3) return; const timer = window.setInterval(() => setSlide(value => (value + 1) % jobs.length), 5000); return () => window.clearInterval(timer); }, [jobs.length]);
+  useEffect(() => { if (slide >= jobs.length) setSlide(0); }, [jobs.length, slide]);
   return (
     <main className="bg-white text-gray-800">
                         {/* hero image */}
@@ -37,24 +42,20 @@ const Career = () => {
                                 difference in people's lives.
                             </p>
                             {/* current jobs */}
-                            <div  className="flex flex-col md:flex-row items-start justify-center gap-10  ">
-                                {career_jobs.map((item:any,index:any)=>(
-                                <Link href={`/career/${item?.id}`} key={index} className=" shadow-2xl py-10 rounded-md max-w-sm items-center min-h-107 scale-100 hover:scale-105
-                                justify-between bg-red-50 p-2 gap-3 flex flex-col cursor-pointer duration-300 transition-transform text-neutral-800 ">
-                                    <h3 className="text-xl font-bold text-secondary-text  ">{item.title}</h3>
-                                    <span className="text-secondary-text   font-medium ">{item.publish_date} </span>
-                                    <ul className="flex flex-col gap-2 mb-2 items-start justify-center px-4 text-secondary-text  ">
-                                        {item.keywords.map((itm:any,idx:number)=>(
-                                            <div key={idx} className="flex gap-3 items-center font-semibold justify-start text-start">
-                                                <SiTicktick size={15} />
-                                                <li key={idx} className=" w-full  ">{itm}</li>
-                                            </div>
-                                        ))}
+                            <div className="w-full max-w-5xl mx-auto">
+                              <div className="flex flex-col md:flex-row items-stretch justify-center gap-10">
+                                {(jobs.length > 2 ? [jobs[slide], jobs[(slide + 1) % jobs.length]] : jobs).map((item, index) => (
+                                  <Link href={`/career/${item.id}`} key={`${item.id}-${index}`} className="shadow-2xl py-10 rounded-md w-full max-w-sm min-h-107 hover:scale-105 bg-red-50 p-4 gap-3 flex flex-col cursor-pointer duration-300 transition-transform text-neutral-800 text-left">
+                                    <h3 className="text-xl font-bold text-secondary-text h-28 overflow-y-auto break-words">{item.title}</h3>
+                                    <span className="text-secondary-text font-medium block h-8">{item.publish_date}</span>
+                                    <ul className="flex-1 flex flex-col gap-2 mb-2 items-start px-4 text-secondary-text">
+                                      {item.keywords.map((keyword, idx) => <li key={idx} className="flex gap-3 items-start font-semibold"><SiTicktick size={15} className="shrink-0 mt-1" /><span>{keyword}</span></li>)}
                                     </ul>
-                                    <button onClick={()=> router.push(`/career/${item?.id}`)}
-                                    className='cursor-pointer transition-all duration-300 hover:bg-primary px-5 py-2.5 hover:text-white text-primary font-semibold rounded-full border  border-primary' >Job Details</button>
-                                </Link>
-                            ))}
+                                    <span className="self-center px-5 py-2.5 text-primary font-semibold rounded-full border border-primary">Job Details</span>
+                                  </Link>
+                                ))}
+                              </div>
+                              {jobs.length > 2 && <div className="flex justify-center gap-3 mt-6" aria-label="Job slides">{jobs.map((job, index) => <button key={job.id} type="button" onClick={() => setSlide(index)} aria-label={`Show job ${index + 1}`} aria-current={slide === index ? 'true' : undefined} className={`h-3 w-3 rounded-full ${slide === index ? 'bg-primary' : 'bg-gray-400'}`} />)}</div>}
                             </div>
 
                             <Link href={"https://healthuaustralia.snapforms.com.au/form/career-request-to-health-u-australia"} className="bg-white text-primary font-semibold px-6 py-3 border-2 border-white hover:border-primary max-w-max mx-auto mt-6 items-center text-2xl flex gap-5 rounded-full shadow hover:bg-gray-100 transition">

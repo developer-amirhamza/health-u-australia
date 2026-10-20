@@ -1,6 +1,5 @@
-import UpcomingPage from '../components/UpcomingPage'
+import ManagedPageEditor from '../components/ManagedPageEditor'
 
 export default function Page() {
-    return <UpcomingPage title="Contact Us" />
+  return <ManagedPageEditor title='Contact Us' slug='contact-us' />
 }
-

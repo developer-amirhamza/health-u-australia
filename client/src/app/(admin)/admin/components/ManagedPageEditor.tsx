@@ -10,6 +10,10 @@ import { ManagedPagePreviewContext, setManagedPageCache } from 'app/(main)/(page
 import NDISView from 'app/(main)/(pages)/ndis/NDISView'
 import CompassionView from 'app/(main)/(pages)/compassion-in-action/CompassionView'
 import FeedbackView from 'app/(main)/(pages)/participant-feedback/FeedbackView'
+import ConfirmDeleteModal, { type DeleteRequest } from './ConfirmDeleteModal'
+import AboutContent from 'app/(main)/components/AboutContent'
+import Career from 'app/pages/Career'
+import Contact from 'app/pages/Contact'
 
 type Json = string | Json[] | { [key: string]: Json }
 const inputClass = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-2'
@@ -42,9 +46,32 @@ function blankFrom(template: Json): Json {
   return Object.fromEntries(Object.entries(template).map(([key, value]) => [key, blankFrom(value)]))
 }
 
-function Field({ label, value, template, slug, onChange, onUploadChange }: { label: string; value: Json; template: Json; slug: string; onChange: (value: Json) => void; onUploadChange: (delta: number) => void }) {
+function AddressField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open || value.trim().length < 2) return
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({ q: value, countrycode: 'AU', lat: '-33.815', lon: '151.1', limit: '6' })
+        const response = await fetch(`https://photon.komoot.io/api?${params}`, { signal: controller.signal })
+        const data: { features: { properties: { housenumber?: string; street?: string; name?: string; city?: string; state?: string; postcode?: string; country?: string } }[] } = await response.json()
+        setSuggestions([...new Set(data.features.map(({ properties: p }) => [[p.housenumber, p.street || p.name].filter(Boolean).join(' '), p.city, p.state, p.postcode, p.country].filter(Boolean).join(', ')).filter(Boolean))])
+      } catch { if (!controller.signal.aborted) setSuggestions([]) }
+    }, 600)
+    return () => { window.clearTimeout(timer); controller.abort() }
+  }, [value, open])
+  return <div className="relative"><label className="block font-medium">Address<input className={inputClass} value={value} autoComplete="off" onChange={event => { onChange(event.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onBlur={() => window.setTimeout(() => setOpen(false), 150)} /></label>
+    {open && suggestions.length > 0 && <ul className="absolute z-20 w-full max-h-60 overflow-y-auto rounded border bg-white shadow">{suggestions.map(address => <li key={address}><button type="button" className="w-full p-2 text-left hover:bg-gray-100" onMouseDown={event => event.preventDefault()} onClick={() => { onChange(address); setOpen(false) }}>{address}</button></li>)}</ul>}
+    <p className="text-xs text-gray-500">Suggestions from Photon and OpenStreetMap. You can also type an address manually.</p>
+  </div>
+}
+
+function Field({ label, value, template, slug, onChange, onUploadChange, onRequestDelete }: { label: string; value: Json; template: Json; slug: string; onChange: (value: Json) => void; onUploadChange: (delta: number) => void; onRequestDelete: (request: DeleteRequest) => void }) {
   const [uploading, setUploading] = useState(false)
   const heading = sectionNames[label] ?? label.replace(/([A-Z])/g, ' $1')
+  if (typeof value === 'string' && label === 'address' && slug === 'contact-us') return <AddressField value={value} onChange={onChange} />
   if (typeof value === 'string' && (label === 'image' || label === 'src')) {
     const upload = async (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
@@ -90,15 +117,15 @@ function Field({ label, value, template, slug, onChange, onUploadChange }: { lab
           <button type="button" className="underline disabled:opacity-40" disabled={index === 0} onClick={() => move(index, index - 1)}>Move up</button>
           <button type="button" className="underline disabled:opacity-40" disabled={index === value.length - 1} onClick={() => move(index, index + 1)}>Move down</button>
           <button type="button" className="underline" onClick={() => onChange([...value.slice(0, index + 1), structuredClone(item), ...value.slice(index + 1)])}>Duplicate</button>
-          <button type="button" className="text-red-700 underline" onClick={() => onChange(value.filter((_, i) => i !== index))}>Delete</button>
+          <button type="button" className="text-red-700 underline" onClick={() => onRequestDelete({ name: itemName(label, item, index), onConfirm: () => onChange(value.filter((_, i) => i !== index)) })}>Delete</button>
         </div></div>
-        <Field label="Content" value={item} template={sample ?? item} slug={slug} onChange={next => onChange(value.map((old, i) => i === index ? next : old))} onUploadChange={onUploadChange} />
+        <Field label="Content" value={item} template={sample ?? item} slug={slug} onChange={next => onChange(value.map((old, i) => i === index ? next : old))} onUploadChange={onUploadChange} onRequestDelete={onRequestDelete} />
       </div>)}
       {sample && <button type="button" className="rounded-lg bg-[#1a1a18] px-4 py-2 text-white" onClick={() => onChange([...value, blankFrom(sample)])}>Add item</button>}
     </fieldset>
   }
   const shape = typeof template === 'object' && !Array.isArray(template) ? template : value
-  const fields = <div className="space-y-4">{Object.entries(value).map(([key, child]) => <Field key={key} label={key} value={child} template={shape[key] ?? child} slug={slug} onChange={next => onChange({ ...value, [key]: next })} onUploadChange={onUploadChange} />)}</div>
+  const fields = <div className="space-y-4">{Object.entries(value).map(([key, child]) => <Field key={key} label={key} value={child} template={shape[key] ?? child} slug={slug} onChange={next => onChange({ ...value, [key]: next })} onUploadChange={onUploadChange} onRequestDelete={onRequestDelete} />)}</div>
   if (label === 'Page content' || label === 'Content') return fields
   return <fieldset className="rounded-xl border p-4"><legend className="px-2 font-semibold">{heading}</legend>{fields}</fieldset>
 }
@@ -111,6 +138,7 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
   const [uploadCount, setUploadCount] = useState(0)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [error, setError] = useState(false)
+  const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null)
   useEffect(() => {
     Promise.all([Axios.get(`/api/pages/${slug}`), Axios.get(`/api/pages/${slug}/template`)])
       .then(([page, original]) => { setContent(page.data.data); setTemplate(original.data.data) })
@@ -129,14 +157,15 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
     catch { toast.error('Unable to save page') }
     finally { setSaving(false) }
   }
-  const Preview = slug === 'ndis' ? NDISView : slug === 'compassion-in-action' ? CompassionView : FeedbackView
+  const Preview = slug === 'ndis' ? NDISView : slug === 'compassion-in-action' ? CompassionView : slug === 'participant-feedback' ? FeedbackView : slug === 'about' ? AboutContent : slug === 'career' ? Career : Contact
   const PageIcon = slug === 'ndis' ? FaAccessibleIcon : slug === 'compassion-in-action' ? FaHeart : FaCommentDots
   return <main className="mx-auto max-w-5xl space-y-6 p-6">
     <div className="flex flex-wrap items-center justify-between gap-4"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a1a18] text-[#c9b89a]"><PageIcon size={23} aria-hidden="true" /></div><div><h1 className="text-2xl font-bold">{title}</h1><p className="text-gray-600">Add, edit, reorder and delete the content shown on this page.</p></div></div>
       <button type="button" disabled={!content || uploadCount > 0} onClick={() => setPreviewOpen(true)} className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:opacity-50" aria-label={`Preview ${title}`}><FiEye aria-hidden="true" /> Preview</button>
     </div>
     {loading && <PageLoader label={`Loading ${title} content`} compact />}{error && <p role="alert">Unable to load page content.</p>}
-    {content && template && <><Field label="Page content" value={content} template={template} slug={slug} onChange={setContent} onUploadChange={delta => setUploadCount(count => Math.max(0, count + delta))} /><button disabled={saving || uploadCount > 0} onClick={save} className="rounded-lg bg-[#1a1a18] px-5 py-3 text-white disabled:opacity-50">{saving ? 'Saving...' : uploadCount > 0 ? 'Uploading photo...' : 'Save page'}</button></>}
+    {content && template && <><Field label="Page content" value={content} template={template} slug={slug} onChange={setContent} onUploadChange={delta => setUploadCount(count => Math.max(0, count + delta))} onRequestDelete={setDeleteRequest} /><button disabled={saving || uploadCount > 0} onClick={save} className="rounded-lg bg-[#1a1a18] px-5 py-3 text-white disabled:opacity-50">{saving ? 'Saving...' : uploadCount > 0 ? 'Uploading photo...' : 'Save page'}</button></>}
+    <ConfirmDeleteModal request={deleteRequest && { ...deleteRequest, onConfirm: () => { deleteRequest.onConfirm(); setDeleteRequest(null) } }} onClose={() => setDeleteRequest(null)} />
     {previewOpen && content && createPortal(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm md:p-6" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPreviewOpen(false) }}>
       <div className="flex h-[min(84vh,900px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-label={`${title} preview`}>
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b bg-white px-5 py-4"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1a1a18] text-[#c9b89a]"><PageIcon aria-hidden="true" /></div><div><strong>{title} preview</strong><p className="text-xs text-gray-600">Your current edits. Save to publish.</p></div></div><button type="button" onClick={() => setPreviewOpen(false)} aria-label="Close preview" className="rounded-full p-2 hover:bg-gray-100"><FiX size={22} /></button></div>
