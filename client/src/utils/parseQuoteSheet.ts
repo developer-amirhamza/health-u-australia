@@ -143,3 +143,51 @@ export const parseQuoteFile = async (
   }
   return null
 }
+
+export type ImportedCatalogItem = { itemCode: string; itemName: string; unitPrice: number }
+
+// Reads an NDIS Support Catalogue (Support Item Number / Support Item Name /
+// National price columns), or any sheet with Item Code / Item Name / Unit Price,
+// into catalog items. Quotable items without a price come in at 0.
+export const parseCatalogueRows = (rows: Cell[][]): ImportedCatalogItem[] => {
+  const h = rows.findIndex((r) => {
+    const n = r.map((c) => norm(text(c)))
+    return (n.includes('supportitemnumber') && n.includes('supportitemname'))
+      || (n.includes('itemcode') && n.includes('itemname'))
+  })
+  if (h < 0) return []
+  const head = rows[h].map((c) => norm(text(c)))
+  const col = (...names: string[]) => head.findIndex((x) => names.includes(x))
+  const code = col('supportitemnumber', 'itemcode')
+  const name = col('supportitemname', 'itemname')
+  const price = col('national', 'unitprice', 'price')
+
+  const byCode = new Map<string, ImportedCatalogItem>()
+  for (const r of rows.slice(h + 1)) {
+    const itemCode = text(r[code])
+    const itemName = text(r[name])
+    if (!itemCode || !itemName || itemCode.startsWith('#')) continue
+    byCode.set(itemCode, { itemCode, itemName, unitPrice: price >= 0 ? toNumber(r[price]) : 0 })
+  }
+  return [...byCode.values()]
+}
+
+// Reads the file and returns the items of its newest catalogue sheet. A workbook
+// can hold one tab per price year ("2025-26 v1.0", "2026-2027 v1.0", ...): the tab
+// with the latest year in its name wins, then the one with the most items.
+export const parseCatalogueFile = async (file: File): Promise<ImportedCatalogItem[]> => {
+  const XLSX = await import('xlsx')
+  const isCsv = /\.csv$/i.test(file.name) || file.type === 'text/csv'
+  const wb = isCsv
+    ? XLSX.read(await file.text(), { type: 'string', raw: true })
+    : XLSX.read(await file.arrayBuffer(), { type: 'array' })
+  let best: { year: number; items: ImportedCatalogItem[] } | null = null
+  for (const name of wb.SheetNames) {
+    const rows = XLSX.utils.sheet_to_json<Cell[]>(wb.Sheets[name], { header: 1, raw: true, defval: '' })
+    const items = parseCatalogueRows(rows)
+    if (!items.length) continue
+    const year = +(name.match(/20\d\d/)?.[0] ?? 0)
+    if (!best || year > best.year || (year === best.year && items.length > best.items.length)) best = { year, items }
+  }
+  return best?.items ?? []
+}

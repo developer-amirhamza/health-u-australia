@@ -8,7 +8,7 @@ import SignaturePad from './SignaturePad'
 import { SummeryApi } from 'app/common/SummeryApi'
 import Axios from 'utils/Axios'
 import AxiosToastError from 'utils/AxiosToastError'
-import { parseQuoteFile } from 'utils/parseQuoteSheet'
+import { parseCatalogueFile, parseQuoteFile } from 'utils/parseQuoteSheet'
 import { SUPPORT_ITEM_CATALOG, loadCatalog, rememberCatalogItems, type CatalogItem } from 'app/data/supportItemCatalog'
 
 const SCHEDULE_OPTIONS = [
@@ -249,6 +249,8 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
   const printRef = useRef<HTMLDivElement>(null)
   const importRef = useRef<HTMLInputElement>(null)
   const [importing, setImporting] = useState(false)
+  const catalogImportRef = useRef<HTMLInputElement>(null)
+  const [importingCatalog, setImportingCatalog] = useState(false)
   // built-in items until mounted, then with the ones saved by earlier imports
   const [catalog, setCatalog] = useState<CatalogItem[]>(SUPPORT_ITEM_CATALOG)
   useEffect(() => setCatalog(loadCatalog()), [])
@@ -261,6 +263,28 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
     setValue(`items.${index}.itemCode`, hit.itemCode)
     setValue(`items.${index}.itemName`, hit.itemName)
     setValue(`items.${index}.unitPrice`, hit.unitPrice)
+  }
+
+  // "Import item codes": adds the items of an NDIS Support Catalogue to the item list
+  const onImportCatalogue = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImportingCatalog(true)
+    try {
+      const items = await parseCatalogueFile(file)
+      if (!items.length) {
+        toast.error('No item codes found — expected a "Support Item Number" or "Item Code" column')
+        return
+      }
+      setCatalog(rememberCatalogItems(items))
+      toast.success(`Imported ${items.length} item code${items.length === 1 ? '' : 's'}`)
+    } catch (err) {
+      console.error(err)
+      toast.error('Could not read that file')
+    } finally {
+      setImportingCatalog(false)
+    }
   }
 
   // "Import quote": fills the Schedule of Supports from a quote calculator export
@@ -1009,6 +1033,18 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
               Its items are added to the item list, so pick them by code or name next time.
             </p>
             <input ref={importRef} type="file" accept=".csv,.xlsx,.xls,text/csv" className="hidden" onChange={onImportQuote} />
+            <button
+              type="button"
+              onClick={() => catalogImportRef.current?.click()}
+              disabled={importingCatalog}
+              className="text-sm font-semibold text-secondary border border-secondary hover:bg-secondary hover:text-white transition-colors duration-300 rounded-full px-5 py-2 disabled:opacity-60 cursor-pointer"
+            >
+              {importingCatalog ? 'Importing…' : 'Import item codes'}
+            </button>
+            <p className="text-xs text-neutral-600">
+              Upload an NDIS Support Catalogue (.csv or .xlsx) to update the item codes, names and national prices offered below.
+            </p>
+            <input ref={catalogImportRef} type="file" accept=".csv,.xlsx,.xls,text/csv" className="hidden" onChange={onImportCatalogue} />
           </div>
         )}
         <datalist id="support-item-codes">

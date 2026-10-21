@@ -1,8 +1,11 @@
 // NDIS support items offered in the Service Agreement's Schedule of Supports.
 // Typing or picking an item code or name in the form fills in the rest of the
-// item from this list. Items brought in with "Import quote" are added on top of
-// it in the browser (see loadCatalog / rememberCatalogItems), so a newly quoted
-// item is offered next time without editing this file.
+// item from this list. Items brought in with "Import quote" or "Import item codes"
+// are added on top of it in the browser (see loadCatalog / rememberCatalogItems),
+// so a newly quoted item or a newer catalogue is offered next time without
+// editing this file.
+
+import { NDIS_CATALOGUE_2026_27 } from './ndisCatalogue2026-27'
 
 export type CatalogItem = {
   itemCode: string
@@ -10,19 +13,8 @@ export type CatalogItem = {
   unitPrice: number
 }
 
-// From quote Q-2026-1016-1 (NDIS Support Quote Calculator, NDIS Price Guide 2025-26, NSW rates)
-export const SUPPORT_ITEM_CATALOG: CatalogItem[] = [
-  {
-    itemCode: '04_104_0125_6_1',
-    itemName: 'Access Community Social and Rec Activ - Standard - Weekday Daytime',
-    unitPrice: 73.58,
-  },
-  {
-    itemCode: '04_106_0125_6_1',
-    itemName: 'Access Community Social and Rec Activ - Standard - Sunday',
-    unitPrice: 133.5,
-  },
-]
+// NDIS Support Catalogue 2026-27 v1.0, national prices
+export const SUPPORT_ITEM_CATALOG: CatalogItem[] = NDIS_CATALOGUE_2026_27
 
 const STORAGE_KEY = 'hu.supportItemCatalog'
 
