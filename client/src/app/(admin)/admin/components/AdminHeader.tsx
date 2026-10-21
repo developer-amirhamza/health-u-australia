@@ -124,7 +124,7 @@ const AdminHeader: React.FC<Props> = ({ sidebar }) => {
                     >
                         Settings
                     </li>
-                    <AdminPermission >
+                    <AdminPermission section="users">
                         <li
                             onClick={() => {
                                 router.push(`/all-users`), setIsActive(false);

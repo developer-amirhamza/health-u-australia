@@ -14,14 +14,19 @@ import { errorHandler } from "../utils/errorHandler.js";
 import generateRefreshToken from "../utils/refreshToken.js";
 import generateAccessToken from "../utils/accessToken.js";
 import { uploadImageCloudinary } from "../config/cloudinary.js";
+import { isFullAdmin, PANEL_ROLES, cleanPermissions, DEFAULT_MODERATOR_SECTIONS } from "../utils/permissions.js";
 
 
 dotenv.config()
 interface AuthRequest extends Request {
     userId?: string;
 }
+// set by the admin middleware: who is making an admin-panel request
+interface AdminRequest extends AuthRequest {
+    userRole?: string;
+}
 
-// Roles the public signup form may assign to itself. ADMIN and OWNER are
+// Roles the public signup form may assign to itself. ADMIN, MODERATOR and OWNER are
 // deliberately absent — those are granted only via updateUserByAdmin (which
 // requires an existing admin) or set directly in the database, never
 // through this unauthenticated endpoint.
@@ -461,6 +466,7 @@ const GetUserDetails = async (req: AuthRequest, res: Response) => {
                 mobile:true,
                 avatar:true,
                 role:true,
+                permissions:true,
                 refresh_token:true,
                 verify_email:true,
             }
@@ -487,7 +493,7 @@ const getAllUsers = async (req: Request, res: Response) => {
         const users = await prisma.user.findMany({
            select:{
     id:true, firstName:true, lastName:true, email:true, mobile:true, avatar:true,
-    role:true, status:true, verify_email:true, last_login_date:true, createdAt:true,
+    role:true, permissions:true, status:true, verify_email:true, last_login_date:true, createdAt:true,
 },
 orderBy: { createdAt: 'desc' }
         });
@@ -505,11 +511,11 @@ orderBy: { createdAt: 'desc' }
     }
 };
 
-const ASSIGNABLE_ROLES = ["CONSUMER", "USER", "TRADE", "RETAILER", "DISTRIBUTOR", "NDIS_COORDINATOR", "ADMIN"];
+const ASSIGNABLE_ROLES = ["CONSUMER", "USER", "TRADE", "RETAILER", "DISTRIBUTOR", "NDIS_COORDINATOR", "MODERATOR", "ADMIN"];
 
-export const updateUserByAdmin = async (req: Request, res: Response) => {
+export const updateUserByAdmin = async (req: AdminRequest, res: Response) => {
     try {
-        const { id, status, role } = req.body;
+        const { id, status, role, permissions } = req.body;
         if (!id) return errorHandler(res, 400, "User ID is required", true);
 
         const target = await prisma.user.findUnique({ where: { id }, select: { role: true } });
@@ -519,6 +525,17 @@ export const updateUserByAdmin = async (req: Request, res: Response) => {
         if (target.role === "OWNER") {
             return errorHandler(res, 403, "The owner account cannot be modified", true);
         }
+        // A moderator granted the Users section can manage ordinary accounts only:
+        // roles and section access stay with admins, and admin / moderator
+        // accounts are out of reach (so no one can raise their own access).
+        if (!isFullAdmin(req.userRole)) {
+            if (role !== undefined || permissions !== undefined) {
+                return errorHandler(res, 403, "Only an admin can change roles or section access", true);
+            }
+            if (target.role && PANEL_ROLES.includes(target.role)) {
+                return errorHandler(res, 403, "Only an admin can modify admin or moderator accounts", true);
+            }
+        }
         // OWNER can never be granted through the API (DB-only, set once).
         if (role && !ASSIGNABLE_ROLES.includes(role)) {
             return errorHandler(res, 400, "Invalid role", true);
@@ -527,9 +544,16 @@ export const updateUserByAdmin = async (req: Request, res: Response) => {
         const updatedData: any = {};
         if (status) updatedData.status = status;
         if (role) updatedData.role = role;
+        if (permissions !== undefined) updatedData.permissions = cleanPermissions(permissions);
+        // section access only means something for a moderator: a new moderator
+        // starts with the website sections, and leaving the role clears it
+        if (role === "MODERATOR" && target.role !== "MODERATOR" && permissions === undefined) {
+            updatedData.permissions = DEFAULT_MODERATOR_SECTIONS;
+        }
+        if (role && role !== "MODERATOR") updatedData.permissions = [];
         const updatedUser = await prisma.user.update({
             where: { id }, data: updatedData,
-            select: { id: true, firstName:true, lastName:true, email: true, role: true, status: true }
+            select: { id: true, firstName:true, lastName:true, email: true, role: true, permissions: true, status: true }
         });
         res.status(200).json({ success: true, error: false, message: "User updated successfully", data: updatedUser });
     } catch (error: any) {
@@ -606,7 +630,7 @@ const updateUserDetails = async (req: AuthRequest, res: Response) => {
     }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: AdminRequest, res: Response) => {
     try {
         const {id} = req.body;
         if (!id) {
@@ -617,6 +641,9 @@ const deleteUser = async (req: Request, res: Response) => {
         if (!target) return errorHandler(res, 404, "User not found", true);
         if (target.role === "OWNER") {
             return errorHandler(res, 403, "The owner account cannot be deleted", true);
+        }
+        if (!isFullAdmin(req.userRole) && target.role && PANEL_ROLES.includes(target.role)) {
+            return errorHandler(res, 403, "Only an admin can delete admin or moderator accounts", true);
         }
         await prisma.user.delete({ where: { id: id } });
         res.status(200).json({

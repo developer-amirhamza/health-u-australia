@@ -7,7 +7,7 @@ import {
   deleteHandbookSection,
 } from '../controllers/handbookSection.controllers.js';
 import { auth } from '../middlewares/auth.js';
-import { admin } from '../middlewares/admin.js';
+import { admin, section } from '../middlewares/admin.js';
 
 const router = Router();
 
@@ -15,9 +15,9 @@ const router = Router();
 router.get('/public', getPublicHandbookSections);
 
 // Managing handbook sections is an admin-panel (CRUD) concern.
-router.get('/', auth, admin, getHandbookSections);
-router.post('/create', auth, admin, createHandbookSection);
-router.put('/update', auth, admin, updateHandbookSection);
-router.delete('/delete', auth, admin, deleteHandbookSection);
+router.get('/', auth, admin, section('handbook'), getHandbookSections);
+router.post('/create', auth, admin, section('handbook'), createHandbookSection);
+router.put('/update', auth, admin, section('handbook'), updateHandbookSection);
+router.delete('/delete', auth, admin, section('handbook'), deleteHandbookSection);
 
 export default router;

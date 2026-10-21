@@ -52,6 +52,9 @@ model User {
   createdAt               DateTime?          @default(now()) @db.Timestamp(6)
   updatedAt               DateTime?          @default(now()) @db.Timestamp(6)
   role                    String?            @default("USER")
+  // MODERATOR only: the restricted admin-panel sections an admin has opened to
+  // this account (see src/utils/permissions.ts). Ignored for every other role.
+  permissions             String[]           @default([])
   firstName               String?
   lastName                String?
   serviceAgreements       ServiceAgreement[]

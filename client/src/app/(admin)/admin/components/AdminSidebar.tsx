@@ -7,6 +7,7 @@ import Link from "next/link";
 import { RootState } from "app/redux/store";
 import { adminNavItems } from "config/page";
 import { HiChevronDown } from "react-icons/hi2";
+import { canAccessPath } from "utils/adminAccess";
 
 interface Props {
     activeSidebar: boolean;
@@ -18,6 +19,10 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
     const { user } = useSelector((state: RootState ) => state.userSlice);
     const pathname = usePathname();
     const [openGroups, setOpenGroups] = useState<string[]>([]);
+    // moderators don't see the official-data sections an admin hasn't granted them
+    const navItems = adminNavItems
+        .filter((item) => canAccessPath(user, item.path))
+        .map((item) => item.children ? { ...item, children: item.children.filter((c) => canAccessPath(user, c.path)) } : item);
 
     useEffect(() => {
         const currentGroup = adminNavItems.find((item) =>
@@ -60,7 +65,7 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
 
             {/* Nav */}
             <nav className="flex-1 overflow-y-auto no-scrollbar p-3 flex flex-col gap-1">
-                {adminNavItems.map((item, index) => {
+                {navItems.map((item, index) => {
                     const Icon = item?.icon;
                     const active = pathname === item?.path;
                     const hasChildren = Boolean(item.children?.length);

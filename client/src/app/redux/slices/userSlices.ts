@@ -13,6 +13,8 @@ interface User {
     lastName?: string,
     mobile: string,
     role:string,
+    // MODERATOR only: restricted admin sections granted by an admin
+    permissions?: string[],
     avatar:any,
     verify_email?: boolean,
 }

@@ -11,6 +11,9 @@ export const ROLES = {
   NDIS_COORDINATOR: "NDIS_COORDINATOR",
   USER:"USER",
   ADMIN: "ADMIN",
+  // Developers: the admin panel without the official-data sections (contracts,
+  // service agreements, SC billing, users) unless an admin grants them.
+  MODERATOR: "MODERATOR",
   // Site owner: full admin access; the account itself can't be modified,
   // demoted or deleted by anyone (enforced server-side).
   OWNER: "OWNER",
@@ -30,6 +33,7 @@ export const portalPath = (role?: string | null): string => {
   switch (normaliseRole(role)) {
     case ROLES.OWNER:
     case ROLES.ADMIN:
+    case ROLES.MODERATOR:
       return "/admin";
     case ROLES.USER:
     case ROLES.CONSUMER:
