@@ -2,11 +2,17 @@ import { prisma } from '../src/lib/prisma.js';
 import { ndisContent } from '../src/pages/ndis/content.js';
 import { compassionContent } from '../src/pages/compassion/content.js';
 import { feedbackContent } from '../src/pages/feedback/content.js';
+import { aboutContent, careerContent, contactContent } from '../src/pages/siteContent.js';
+import { eventsContent } from '../src/pages/eventsContent.js';
 
 const pages = [
   ['ndis', ndisContent],
   ['compassion-in-action', compassionContent],
   ['participant-feedback', feedbackContent],
+  ['about', aboutContent],
+  ['career', careerContent],
+  ['contact-us', contactContent],
+  ['events', eventsContent],
 ] as const;
 
 try {

@@ -5,11 +5,14 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { FaCalendarAlt, FaClock, FaUsers } from 'react-icons/fa'
 import { FaMapLocationDot } from 'react-icons/fa6'
-import { upcoming_events } from 'config/page'
+import { defaultEvents, eventImage, type SiteEvent } from 'app/data/events'
+import { useManagedPage } from 'app/(main)/(pages)/_managed/useManagedPage'
 import Title from 'utils/Title'
 import { fadeIn } from 'app/variants'
 
 const UpcomingEvents = () => {
+  const { data } = useManagedPage<{ events: SiteEvent[] }>('events')
+  const upcoming_events = (data?.events ?? defaultEvents).filter(event => event.status === 'current')
   if (!upcoming_events.length) return null
 
   return (
@@ -34,7 +37,7 @@ const UpcomingEvents = () => {
               className="flex flex-col w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white"
             >
               <div className="relative w-full h-56">
-                <Image src={event.image} alt={event.title} className="object-cover w-full h-full" />
+                <Image src={eventImage(event.image)} alt={event.title} className="object-cover w-full h-full" />
               </div>
               <div className="flex flex-col gap-3 p-5 grow">
                 {event.audience?.length ? (
@@ -52,8 +55,8 @@ const UpcomingEvents = () => {
                   <div className="flex items-center gap-2"><FaClock className="text-primary shrink-0" /> {event.time}</div>
                   <div className="flex items-center gap-2"><FaMapLocationDot className="text-primary shrink-0" /> {event.location}</div>
                 </div>
-                <p className="text-secondary-text text-sm">{event.description}</p>
-                <Link href={event.path} className="mt-auto self-start py-2.5 px-6 hover:bg-secondary transition-colors duration-300 rounded-full font-bold text-sm uppercase bg-primary text-white">
+                <p className="text-secondary-text text-sm">{event.intro.join(" ")}</p>
+                <Link href={`/current-events/#${event.id}`} className="mt-auto self-start py-2.5 px-6 hover:bg-secondary transition-colors duration-300 rounded-full font-bold text-sm uppercase bg-primary text-white">
                   View Details
                 </Link>
               </div>

@@ -6,6 +6,7 @@ import PageBanner from 'utils/PageBanner'
 import { errorAlert, successAlert } from 'utils/alart'
 import Title from 'utils/Title'
 import { contact_details } from 'config/page';
+import { useManagedPage } from 'app/(main)/(pages)/_managed/useManagedPage';
 import { LuPhoneCall } from 'react-icons/lu'
 import { MdOutlineMail } from 'react-icons/md'
 import { PiMapPinAreaBold } from 'react-icons/pi'
@@ -17,6 +18,8 @@ import Link from 'next/link'
 import { FaArrowRightLong } from 'react-icons/fa6'
 
 const Contact = () => {
+    const { data } = useManagedPage<{ offices: typeof contact_details }>('contact-us');
+    const offices = data?.offices ?? contact_details;
     const [state, handleSubmit] = useForm("xnjbvngz");
     const contactFormRef = useRef<HTMLFormElement>(null);
     // const jobFormRef = useRef<HTMLFormElement>(null);
@@ -58,7 +61,7 @@ const Contact = () => {
             <PageBanner title='Contact Us' path='/contact-us' />
             <div className="flex flex-col  w-full h-full  my-12 ">
                 <div className="flex px-10  flex-wrap  justify-center w-full gap-5 my-12    ">
-                    {contact_details.map((item, index) => (
+                    {offices.map((item, index) => (
                         <div key={index} className="flex w-full max-w-100 border-[0.5px] border-neutral-300 rounded-md  items-start  shadow-2xl">
                             <ul>
                                 <Title title1={item.title1} title2={item.title2} className={`p-5`} />

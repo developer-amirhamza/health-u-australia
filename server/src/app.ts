@@ -17,6 +17,8 @@ import handbookSectionRouter from "./routes/handbookSection.route.js";
 import ndisRouter from './routes/ndis.route.js';
 import compassionRouter from './routes/compassion.route.js';
 import feedbackRouter from './routes/feedback.route.js';
+import sitePagesRouter from './routes/sitePages.route.js';
+import eventsRouter from './routes/events.route.js';
 
 
 const app = express();
@@ -51,6 +53,8 @@ app.use("/api/handbook-sections", handbookSectionRouter);
 app.use('/api/pages/ndis', ndisRouter);
 app.use('/api/pages/compassion-in-action', compassionRouter);
 app.use('/api/pages/participant-feedback', feedbackRouter);
+app.use('/api/pages/events', eventsRouter);
+app.use('/api/pages', sitePagesRouter);
 
 
 

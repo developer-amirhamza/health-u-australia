@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ConfirmDeleteModal, { type DeleteRequest } from '../components/ConfirmDeleteModal';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
 import { SummeryApi } from 'app/common/SummeryApi';
@@ -55,6 +56,7 @@ function AddressSuggestions({ value, onChange }: { value: string; onChange: (add
 export default function AdminSilHouses() {
   const [houses, setHouses] = useState<SilHouse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [form, setForm] = useState<HouseForm | null>(null);
   const [editing, setEditing] = useState<SilHouse | null>(null);
@@ -107,12 +109,12 @@ export default function AdminSilHouses() {
   }
 
   async function remove(house: SilHouse) {
-    if (!window.confirm(`Delete "${house.address}" from SIL House Properties? This cannot be undone.`)) return;
     setBusy(true);
     try {
       await Axios.delete(`/api/sil-houses/${house.id}`);
       setHouses(current => current.filter(item => item.id !== house.id));
       toast.success('SIL house deleted');
+      setDeleteRequest(null);
     } catch (error) { AxiosToastError(error); }
     finally { setBusy(false); }
   }
@@ -142,6 +144,7 @@ export default function AdminSilHouses() {
         {!form && <button className={buttonClass} disabled={loading || loadError || busy} onClick={() => { setEditing(null); setForm({ ...emptyForm, sortOrder: houses.length ? Math.min(10000, Math.max(...houses.map(house => house.sortOrder)) + 1) : 0 }); }}>Add SIL House</button>}
       </div>
 
+      <ConfirmDeleteModal request={deleteRequest} onClose={() => setDeleteRequest(null)} busy={busy} />
       {form ? (
         <form onSubmit={save} className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 space-y-5">
           <h2 className="text-xl font-semibold">{editing ? 'Edit SIL House' : 'Add SIL House'}</h2>
@@ -158,7 +161,7 @@ export default function AdminSilHouses() {
               <label className="block">Description<textarea rows={6} maxLength={20000} className={inputClass} value={form.description} onChange={event => change('description', event.target.value)} /></label>
               <div className="space-y-3">
                 <p>Gallery images ({form.gallery.length}/30)</p>
-                {form.gallery.map((url, index) => <div key={index} className="flex gap-2 items-center"><input aria-label={`Gallery image ${index + 1} URL`} required type="text" maxLength={2048} className={inputClass} value={url} onChange={event => change('gallery', form.gallery.map((item, i) => i === index ? event.target.value : item))} /><button type="button" className="text-red-700 underline" onClick={() => change('gallery', form.gallery.filter((_, i) => i !== index))}>Remove</button></div>)}
+                {form.gallery.map((url, index) => <div key={index} className="flex gap-2 items-center"><input aria-label={`Gallery image ${index + 1} URL`} required type="text" maxLength={2048} className={inputClass} value={url} onChange={event => change('gallery', form.gallery.map((item, i) => i === index ? event.target.value : item))} /><button type="button" className="text-red-700 underline" onClick={() => setDeleteRequest({ name: `gallery image ${index + 1}`, onConfirm: () => { change('gallery', form.gallery.filter((_, i) => i !== index)); setDeleteRequest(null); } })}>Remove</button></div>)}
                 <button type="button" className="underline" disabled={form.gallery.length >= 30} onClick={() => change('gallery', [...form.gallery, ''])}>Add image URL</button>
                 <label className="block text-sm">Or upload a gallery image<input type="file" accept="image/jpeg,image/png,image/webp" disabled={form.gallery.length >= 30} className="block mt-2" onChange={event => { void upload(event.target.files?.[0], 'gallery'); event.target.value = ''; }} /></label>
               </div>
@@ -178,7 +181,7 @@ export default function AdminSilHouses() {
         </div>
         <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
           <table className="w-full text-left"><thead className="bg-gray-50"><tr><th className="p-4">Property</th><th className="p-4">Features</th><th className="p-4">Order</th><th className="p-4">Actions</th></tr></thead><tbody>
-            {visibleHouses.map(house => <tr key={house.id} className="border-t border-gray-200"><td className="p-4"><div className="flex gap-3 items-center"><img src={house.image} alt="" className="w-20 h-16 object-cover rounded" /><span>{house.address}</span></div></td><td className="p-4 text-sm">{house.bedrooms} bedrooms · {house.bathrooms} bathrooms · {house.parking} parking{house.accessible && <span className="block">Fully Accessible</span>}</td><td className="p-4">{house.sortOrder}</td><td className="p-4"><div className="flex gap-4"><Link className="underline" href={silHousePath(house)} target="_blank" rel="noreferrer">View</Link><button className="underline" disabled={busy} onClick={() => { setEditing(house); setForm({ address: house.address, image: house.image, bedrooms: house.bedrooms, bathrooms: house.bathrooms, parking: house.parking, accessible: house.accessible, description: house.description, gallery: [...house.gallery], sortOrder: house.sortOrder }); }}>Edit</button><button className="text-red-700 underline" disabled={busy} onClick={() => remove(house)}>Delete</button></div></td></tr>)}
+            {visibleHouses.map(house => <tr key={house.id} className="border-t border-gray-200"><td className="p-4"><div className="flex gap-3 items-center"><img src={house.image} alt="" className="w-20 h-16 object-cover rounded" /><span>{house.address}</span></div></td><td className="p-4 text-sm">{house.bedrooms} bedrooms · {house.bathrooms} bathrooms · {house.parking} parking{house.accessible && <span className="block">Fully Accessible</span>}</td><td className="p-4">{house.sortOrder}</td><td className="p-4"><div className="flex gap-4"><Link className="underline" href={silHousePath(house)} target="_blank" rel="noreferrer">View</Link><button className="underline" disabled={busy} onClick={() => { setEditing(house); setForm({ address: house.address, image: house.image, bedrooms: house.bedrooms, bathrooms: house.bathrooms, parking: house.parking, accessible: house.accessible, description: house.description, gallery: [...house.gallery], sortOrder: house.sortOrder }); }}>Edit</button><button className="text-red-700 underline" disabled={busy} onClick={() => setDeleteRequest({ name: house.address, onConfirm: () => remove(house) })}>Delete</button></div></td></tr>)}
           </tbody></table>
         </div>
         {filteredHouses.length === 0 && <p>No properties match your search.</p>}

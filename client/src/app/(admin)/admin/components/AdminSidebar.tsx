@@ -1,11 +1,12 @@
 "use client"
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
 
 import Link from "next/link";
 import { RootState } from "app/redux/store";
 import { adminNavItems } from "config/page";
+import { HiChevronDown } from "react-icons/hi2";
 
 interface Props {
     activeSidebar: boolean;
@@ -16,6 +17,20 @@ interface Props {
 const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
     const { user } = useSelector((state: RootState ) => state.userSlice);
     const pathname = usePathname();
+    const [openGroups, setOpenGroups] = useState<string[]>([]);
+
+    useEffect(() => {
+        const currentGroup = adminNavItems.find((item) =>
+            item.children?.some((child) => child.path === pathname)
+        );
+        if (currentGroup) {
+            setOpenGroups((groups) => groups.includes(currentGroup.label) ? groups : [...groups, currentGroup.label]);
+        }
+    }, [pathname]);
+
+    const toggleGroup = (label: string) => {
+        setOpenGroups((groups) => groups.includes(label) ? groups.filter((group) => group !== label) : [...groups, label]);
+    };
 
     return (
         <div className={`flex flex-col w-full h-full bg-[#1a1a18] ${!activeSidebar ? "flex" : "max-sm:hidden"}`}>
@@ -48,21 +63,53 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
                 {adminNavItems.map((item, index) => {
                     const Icon = item?.icon;
                     const active = pathname === item?.path;
+                    const hasChildren = Boolean(item.children?.length);
+                    const groupActive = item.children?.some((child) => child.path === pathname) ?? false;
+                    const expanded = openGroups.includes(item.label);
                     return (
-                        <Link
-                            key={index}
-                            href={`${item?.path}`}
-                            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                activeSidebar ? "flex-row" : "flex-col text-center gap-1"
-                            } ${
-                                active
-                                    ? "bg-[#c9b89a] text-[#1a1a18] font-semibold"
-                                    : "text-gray-300 hover:bg-white/10"
-                            }`}
-                        >
-                            <Icon className={`text-lg shrink-0 ${active ? "text-[#1a1a18]" : "text-[#c9b89a]"}`} />
-                            <span className={`${activeSidebar ? "inline" : "text-[10px]"}`}>{item?.label}</span>
-                        </Link>
+                        <div key={item.label}>
+                            <div className={`flex items-center rounded-lg ${groupActive && hasChildren ? "bg-white/10" : ""}`}>
+                                <Link
+                                    href={item.path}
+                                    className={`flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                                        activeSidebar ? "flex-row" : "flex-col text-center gap-1"
+                                    } ${
+                                        active && !hasChildren
+                                            ? "bg-[#c9b89a] text-[#1a1a18] font-semibold"
+                                            : "text-gray-300 hover:bg-white/10"
+                                    }`}
+                                >
+                                    <Icon className={`text-lg shrink-0 ${active && !hasChildren ? "text-[#1a1a18]" : "text-[#c9b89a]"}`} />
+                                    <span className={`${activeSidebar ? "inline" : "text-[10px]"}`}>{item.label}</span>
+                                </Link>
+                                {hasChildren && (
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleGroup(item.label)}
+                                        aria-label={`${expanded ? "Collapse" : "Expand"} ${item.label} submenu`}
+                                        aria-expanded={expanded}
+                                        aria-controls={`admin-submenu-${index}`}
+                                        className="shrink-0 rounded-lg p-2 text-[#c9b89a] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-[#c9b89a]"
+                                    >
+                                        <HiChevronDown className={`text-base transition-transform ${expanded ? "rotate-180" : ""}`} />
+                                    </button>
+                                )}
+                            </div>
+                            {hasChildren && expanded && (
+                                <div id={`admin-submenu-${index}`} className="ml-5 mt-1 flex flex-col gap-1 border-l border-white/20 pl-3">
+                                    {item.children?.map((child) => (
+                                        <Link
+                                            key={child.path}
+                                            href={child.path}
+                                            aria-current={pathname === child.path ? "page" : undefined}
+                                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${pathname === child.path ? "bg-[#c9b89a] text-[#1a1a18] font-semibold" : "text-gray-300 hover:bg-white/10"}`}
+                                        >
+                                            {child.label}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     );
                 })}
             </nav>
