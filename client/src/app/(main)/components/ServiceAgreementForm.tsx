@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFieldArray, useWatch, Controller, type SubmitHandler } from 'react-hook-form'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
@@ -8,6 +8,8 @@ import SignaturePad from './SignaturePad'
 import { SummeryApi } from 'app/common/SummeryApi'
 import Axios from 'utils/Axios'
 import AxiosToastError from 'utils/AxiosToastError'
+import { parseQuoteFile } from 'utils/parseQuoteSheet'
+import { SUPPORT_ITEM_CATALOG, loadCatalog, rememberCatalogItems, type CatalogItem } from 'app/data/supportItemCatalog'
 
 const SCHEDULE_OPTIONS = [
   'Assistance in Daily Living',
@@ -235,7 +237,7 @@ const YesNo = ({
 )
 
 const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: ServiceAgreementFormProps) => {
-  const { register, control, handleSubmit, watch, reset, getValues } = useForm<FormValues>({
+  const { register, control, handleSubmit, watch, reset, getValues, setValue } = useForm<FormValues>({
     defaultValues: initialData ? { ...defaultValues, ...initialData } : defaultValues,
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
@@ -245,6 +247,57 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
   const [sendingSignatureRequest, setSendingSignatureRequest] = useState(false)
   const [submittingSignature, setSubmittingSignature] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
+  const importRef = useRef<HTMLInputElement>(null)
+  const [importing, setImporting] = useState(false)
+  // built-in items until mounted, then with the ones saved by earlier imports
+  const [catalog, setCatalog] = useState<CatalogItem[]>(SUPPORT_ITEM_CATALOG)
+  useEffect(() => setCatalog(loadCatalog()), [])
+
+  // Picking an item code or name from the catalog fills in the other and the unit price
+  const fillFromCatalog = (index: number, by: 'itemCode' | 'itemName', value: string) => {
+    const v = value.trim().toLowerCase()
+    const hit = catalog.find((c) => c[by].toLowerCase() === v)
+    if (!hit) return
+    setValue(`items.${index}.itemCode`, hit.itemCode)
+    setValue(`items.${index}.itemName`, hit.itemName)
+    setValue(`items.${index}.unitPrice`, hit.unitPrice)
+  }
+
+  // "Import quote": fills the Schedule of Supports from a quote calculator export
+  // and keeps its items in the catalog for next time
+  const onImportQuote = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImporting(true)
+    try {
+      const q = await parseQuoteFile(file, { frequencies: FREQUENCY_OPTIONS, days: DAY_OPTIONS })
+      if (!q) {
+        toast.error('No support items found — expected a quote with an "Item Code" column')
+        return
+      }
+      type TextField = 'quoteNumber' | 'quoteDate' | 'planStartDate' | 'planEndDate' | 'preparedBy'
+        | 'contactPerson' | 'participantName' | 'participantNdisNumber'
+      const keep = (k: TextField, v: string) => { if (v) setValue(k, v) }
+      keep('quoteNumber', q.quoteNumber)
+      keep('quoteDate', q.quoteDate)
+      keep('planStartDate', q.planStartDate)
+      keep('planEndDate', q.planEndDate)
+      keep('preparedBy', q.preparedBy)
+      keep('contactPerson', q.contactPerson)
+      // the participant is entered in section 1; only fill it when still blank
+      if (!getValues('participantName')) keep('participantName', q.participantName)
+      if (!getValues('participantNdisNumber')) keep('participantNdisNumber', q.participantNdisNumber)
+      setValue('items', q.items)
+      setCatalog(rememberCatalogItems(q.items.map(({ itemCode, itemName, unitPrice }) => ({ itemCode, itemName, unitPrice }))))
+      toast.success(`Imported ${q.items.length} support item${q.items.length === 1 ? '' : 's'}${q.quoteNumber ? ` from ${q.quoteNumber}` : ''}`)
+    } catch (err) {
+      console.error(err)
+      toast.error('Could not read that file')
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const watchedItems = useWatch({ control, name: 'items' })
   const applyGst = useWatch({ control, name: 'applyGst' })
@@ -941,6 +994,30 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
           </div>
         </div>
 
+        {mode !== 'sign' && (
+          <div data-pdf-hide="true" className="print:hidden flex flex-wrap items-center gap-3 rounded border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3">
+            <button
+              type="button"
+              onClick={() => importRef.current?.click()}
+              disabled={importing}
+              className="text-sm font-semibold text-white bg-secondary hover:bg-primary transition-colors duration-300 rounded-full px-5 py-2 disabled:opacity-60 cursor-pointer"
+            >
+              {importing ? 'Importing…' : 'Import quote'}
+            </button>
+            <p className="text-xs text-neutral-600">
+              Upload a quote from the NDIS Support Quote Calculator (.csv or .xlsx) to fill the quote details and support items below.
+              Its items are added to the item list, so pick them by code or name next time.
+            </p>
+            <input ref={importRef} type="file" accept=".csv,.xlsx,.xls,text/csv" className="hidden" onChange={onImportQuote} />
+          </div>
+        )}
+        <datalist id="support-item-codes">
+          {catalog.map((c) => <option key={c.itemCode} value={c.itemCode}>{c.itemName}</option>)}
+        </datalist>
+        <datalist id="support-item-names">
+          {catalog.map((c) => <option key={c.itemCode} value={c.itemName}>{c.itemCode}</option>)}
+        </datalist>
+
         <div className="overflow-x-scroll -mx-5 sm:-mx-8 mt-2">
           <table className="min-w-[1100px] w-full my-5 border-collapse text-sm">
             <thead>
@@ -963,8 +1040,14 @@ const ServiceAgreementForm = ({ mode = 'edit', initialData, token, onSigned }: S
             <tbody>
               {fields.map((field, index) => (
                 <tr key={field.id} className="odd:bg-blue-50/40 border-b border-neutral-200">
-                  <td className="p-1.5"><input className={smallInputCls} {...register(`items.${index}.itemCode` as const)} /></td>
-                  <td className="p-1.5"><input className={smallInputCls} {...register(`items.${index}.itemName` as const)} /></td>
+                  <td className="p-1.5">
+                    <input className={smallInputCls} list="support-item-codes" placeholder="Code"
+                      {...register(`items.${index}.itemCode` as const, { onChange: (e) => fillFromCatalog(index, 'itemCode', e.target.value) })} />
+                  </td>
+                  <td className="p-1.5">
+                    <input className={smallInputCls} list="support-item-names" placeholder="Search by name"
+                      {...register(`items.${index}.itemName` as const, { onChange: (e) => fillFromCatalog(index, 'itemName', e.target.value) })} />
+                  </td>
                   <td className="p-1.5"><input type="number" step="0.01" min="0" className={smallInputCls} {...register(`items.${index}.unitPrice` as const)} /></td>
                   <td className="p-1.5">
                     <select className={smallInputCls} {...register(`items.${index}.frequency` as const)}>
