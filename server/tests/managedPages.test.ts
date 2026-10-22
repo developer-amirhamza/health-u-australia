@@ -5,6 +5,16 @@ import { ndisContent } from '../src/pages/ndis/content.js';
 import { compassionContent } from '../src/pages/compassion/content.js';
 import { feedbackContent } from '../src/pages/feedback/content.js';
 import { aboutContent, careerContent, contactContent } from '../src/pages/siteContent.js';
+import { homeContent } from '../src/pages/homeContent.js';
+
+test('home content supports editable cards and optional uploaded images', () => {
+  const changed = structuredClone(homeContent);
+  changed.services.push({ title: 'New service', image: '', path: '/new-service/' });
+  changed.services[0].image = 'https://example.com/service.jpg';
+  assert.equal(matchesShape(changed, homeContent), true);
+  changed.services[0].path = 'javascript:alert(1)';
+  assert.equal(matchesShape(changed, homeContent), false);
+});
 
 for (const [slug, original] of [
   ['ndis', ndisContent],

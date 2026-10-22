@@ -12,8 +12,10 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import {motion} from "framer-motion";
 import service_bg from "assets/images/services-pattan-img01.png"
 import Link from 'next/link';
+import { useHomeContent } from './HomeContentContext';
 
 const Service = () => {
+  const content = useHomeContent();
 
   const prevRef = useRef<any>(null);
   const nextRef = useRef<any>(null);
@@ -24,7 +26,7 @@ const Service = () => {
   }, []);
 
   return (
-    <section className='w-full h-full relative' style={{ backgroundImage: `url(${service_bg.src})`, backgroundSize: 'cover', backgroundPosition: 'center',  }}>
+    <section className='w-full relative' style={{ backgroundImage: `url(${service_bg.src})`, backgroundSize: 'cover', backgroundPosition: 'center',  }}>
       <div className="absolute inset-0 bg-yellow-500/30"></div>
       <div className="container mx-auto w-full h-full items-center justify-center py-12 flex flex-col relative z-10">
         <motion.div className="grid gap-8 py-7"
@@ -98,11 +100,11 @@ const Service = () => {
               spaceBetween: 30,
             },
           }}>
-          {service_items.map((item, index) => (
-            <SwiperSlide>
-              <div key={index} className="flex flex-col  min-h-98 w-full max-w-70  items-center justify-self-center  rounded-2xl relative
+          {(content?.services ?? service_items).map((item, index) => (
+            <SwiperSlide key={`${item.title}-${index}`}>
+              <div className="flex flex-col  min-h-98 w-full max-w-70  items-center justify-self-center  rounded-2xl relative
              bg-white ">
-                <Image src={item.image} alt={item.title}
+                <Image src={item.image || service_items[index % service_items.length].image} alt={item.title}
                   className=' flex w-full h-full max-h-64 object-scale-cover absolute top-0 rounded-t-3xl rounded-b-full ' />
                 <h3 className="absolute top-70 p-3 w-full flex text-center justify-center text-xl font-bold items-center">{item.title}</h3>
                 <Link href={item.path} className=" py-3 px-5 hover:bg-secondary z-50 cursor-pointer transition-colors duration-300 rounded-full

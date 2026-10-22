@@ -6,11 +6,12 @@ import NewsLetter from "app/(main)/components/NewsLetter"
 import Service from "app/(main)/components/Service"
 import Testimonials from "app/(main)/components/Testimonials"
 import UpcomingEvents from "app/(main)/components/UpcomingEvents"
+import { HomeContentProvider } from "app/(main)/components/HomeContentContext"
 
 
 const Home = () => {
   return (
-    <main className=" w-full  h-full ">
+    <HomeContentProvider><main className="w-full">
     {/* banner  */}
       <Hero/>
       <About/>
@@ -20,7 +21,7 @@ const Home = () => {
       <Testimonials/>
       <NewsLetter/>
 
-  </main>
+  </main></HomeContentProvider>
   )
 }
 

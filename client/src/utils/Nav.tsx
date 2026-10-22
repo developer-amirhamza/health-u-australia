@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 interface Props {
   path: string | undefined,
   label: string | undefined,
@@ -12,7 +12,6 @@ const Nav: React.FC<Props> = ({ path, label }) => {
     initial: {},
     hover: {},
   };
-  const router = useRouter()
 
   const childVariant = {
     initial: { width: 0 },
@@ -20,10 +19,10 @@ const Nav: React.FC<Props> = ({ path, label }) => {
   }
   return (
     <>
-      {path ? <motion.div onClick={() => router.push(path)} variants={parentVariant} initial="initial" whileHover="hover" style={{ cursor: "pointer" }} className="grid gap-0.5">
+      {path ? <Link href={path}><motion.div variants={parentVariant} initial="initial" whileHover="hover" className="grid gap-0.5">
         <span  className='font-medium' >{label} </span>
         <motion.div variants={childVariant} style={{ width: 0 }} className='bg-primary h-0.5 ' />
-      </motion.div> : <motion.div variants={parentVariant} initial="initial" whileHover="hover" style={{ cursor: "pointer" }} className="grid gap-0.5">
+      </motion.div></Link> : <motion.div variants={parentVariant} initial="initial" whileHover="hover" className="grid gap-0.5">
         <span className='font-medium' >{label} </span>
         <motion.div variants={childVariant} style={{ width: 0 }} className='bg-primary h-0.5 ' />
       </motion.div>}

@@ -15,7 +15,9 @@ import google_map from "assets/images/staticmap.png"
 import { MdArrowBackIosNew, MdArrowForwardIos } from 'react-icons/md';
 import { motion } from 'framer-motion';
 import { fadeIn } from 'app/variants';
+import { useHomeContent } from './HomeContentContext';
 const Testimonials = () => {
+    const review = useHomeContent()?.review
 
     const prevRef = useRef<any>(null);
     const nextRef = useRef<any>(null);
@@ -33,7 +35,7 @@ const Testimonials = () => {
     }
 
     return (
-        <section className='w-full h-full     flex  '>
+        <section className='w-full flex'>
             <div className="container mx-auto w-full h-full sm-max:px-5  items-center justify-center py-12 flex flex-col  ">
                 <motion.p className=" text-3xl w-full text-center p-5 text-primary font-bold "
                 variants={fadeIn("left",0.5)}
@@ -52,8 +54,8 @@ const Testimonials = () => {
                                 <StarRating rating={rating}handleRatingChange={handleRatingChange} />
                                 <p className="text-secondary-text font-medium">{google_reviews.length} Google reviews</p>
                             </div>
-                            <Link href={"/"} className='border py-2 rounded-sm px-4 hover:bg-secondary-text transition-colors duration-300 font-bold hover:text-white'
-                            >Write Review</Link>
+                            <Link href={review?.url || 'https://www.google.com/maps/search/?api=1&query=Health+U+Australia+Ryde'} target="_blank" rel="noopener noreferrer" className='border py-2 rounded-sm px-4 hover:bg-secondary-text transition-colors duration-300 font-bold hover:text-white'
+                            >{review?.label || 'Write Review'}</Link>
                         </div>
                     </div>
 

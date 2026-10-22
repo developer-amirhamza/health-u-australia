@@ -7,8 +7,9 @@ import { prisma } from '../lib/prisma.js';
 import { errorHandler } from '../utils/errorHandler.js';
 import { matchesShape } from '../utils/pageContentValidation.js';
 import { aboutContent, careerContent, contactContent } from '../pages/siteContent.js';
+import { homeContent } from '../pages/homeContent.js';
 
-const templates = { about: aboutContent, career: careerContent, 'contact-us': contactContent } as const;
+const templates = { home: homeContent, about: aboutContent, career: careerContent, 'contact-us': contactContent } as const;
 const router = Router();
 router.param('slug', (req, res, next, slug) => { if (!(slug in templates)) return errorHandler(res, 404, 'Page not found'); next(); });
 router.get('/:slug/template', auth, admin, (req, res) => errorHandler(res, 200, 'Page template retrieved', false, templates[req.params.slug as keyof typeof templates]));

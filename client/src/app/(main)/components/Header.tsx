@@ -25,7 +25,7 @@ import SiteSearchForm from './SiteSearchForm';
 const Header = () => {
   const [isActive, setIsActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [showTopBar, setShoTopBar] = useState(true);
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>();
@@ -47,8 +47,12 @@ const Header = () => {
   }
 
   const handleToggle = (index: number) => {
+    if (activeIndex === index) {
+      setIsOpen(!isOpen);
+      return;
+    }
     setActiveIndex(index);
-    setIsOpen(!isOpen);
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -78,8 +82,8 @@ const Header = () => {
               </a>
               <div className="flex items-center gap-1.5">
                 <FaPhoneAlt size={13} />
-                <a href="tel:+0481 707 758">0481 707 758</a> /
-                <a href="tel:+0481 707 758">0431 377 132</a>
+                <a href="tel:0481707758">0481 707 758</a> /
+                <a href="tel:0431377132">0431 377 132</a>
               </div>
             </div>
           </div>
@@ -214,7 +218,7 @@ const Header = () => {
         <ul className=" w-full items-start justify-end border-t-3  text-white flex flex-col   ">
           {nav_items.map((item, index) => (
             <li key={index} className=' flex flex-col w-full  cursor-pointer last:hidden relative   text-white text-base   '>
-              {item?.path ? <Link onClick={() => setIsActive(!isActive)} className='py-3 px-10   hover:bg-secondary transition-all duration-500 hover:text-white  ' href={item?.path}>{item.label}</Link> :
+              {item?.path ? <div className="flex items-center justify-between hover:bg-secondary transition-all duration-500"><Link onClick={() => setIsActive(false)} className='py-3 pl-10 pr-4 flex-1' href={item.path}>{item.label}</Link>{item.options && <button type="button" aria-label={`Show ${item.label} options`} aria-expanded={activeIndex === index && !isOpen} onClick={() => handleToggle(index)} className="px-6 py-3">{activeIndex === index && !isOpen ? <IoCaretUpSharp /> : <IoCaretDownSharp />}</button>}</div> :
                 <div onClick={() => handleToggle(index)} className='flex min-w-full hover:bg-secondary transition-all duration-500 hover:text-white py-3 px-10 items-center justify-between'>
                   <h2 className="flex">{item.label}</h2>
                   {activeIndex === index && !isOpen ? <IoCaretUpSharp /> : <IoCaretDownSharp />}

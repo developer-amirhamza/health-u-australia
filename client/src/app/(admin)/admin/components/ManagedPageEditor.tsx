@@ -17,15 +17,18 @@ import Contact from 'app/pages/Contact'
 import AdminContentCard from './AdminContentCard'
 import { about } from 'config/page'
 import careerImage from 'assets/images/career.png'
+import Home from 'app/pages/Home'
 
 type Json = string | Json[] | { [key: string]: Json }
 const inputClass = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-2'
 const sectionNames: Record<string, string> = {
+  hero: 'Landing banner', about: 'Home About section', services: 'Service cards',
+  choose: 'Why choose us cards', review: 'Google review button',
   banner: 'Page header banner', sections: 'Main content sections', images: 'Main page photos',
   intro: 'Header introduction', contact: 'Quick contact card', typesTitle: 'Feedback cards heading',
   types: 'Feedback cards', rightsTitle: 'Participant rights heading', rightsIntro: 'Participant rights introduction',
   rights: 'Participant rights points', processTitle: 'Complaints process heading', steps: 'Complaints process steps',
-  paragraphs: 'Main text paragraphs', servicesTitle: 'Service boxes heading', services: 'Service boxes',
+  paragraphs: 'Main text paragraphs', servicesTitle: 'Service boxes heading',
   cta: 'Footer call to action', links: 'Footer buttons',
 }
 
@@ -236,7 +239,7 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
   } })
   const editFields = (key: string, index: number | null, value: Json, shape: Json) => editing?.key === key && editing.index === index &&
     <div className="rounded-xl border border-primary/30 bg-white p-5 shadow-sm"><div className="mb-4 flex items-center justify-between gap-4"><h3 className="text-lg font-semibold">Edit {sectionNames[key] ?? key}</h3><button type="button" className="rounded-lg border px-3 py-1.5" onClick={() => setEditing(null)}>Close</button></div><Field label="Content" value={value} template={shape} slug={slug} onChange={next => changeBlock(key, index, next)} onUploadChange={delta => setUploadCount(count => Math.max(0, count + delta))} onRequestDelete={setDeleteRequest} /></div>
-  const Preview = slug === 'ndis' ? NDISView : slug === 'compassion-in-action' ? CompassionView : slug === 'participant-feedback' ? FeedbackView : slug === 'about' ? AboutContent : slug === 'career' ? Career : Contact
+  const Preview = slug === 'home' ? Home : slug === 'ndis' ? NDISView : slug === 'compassion-in-action' ? CompassionView : slug === 'participant-feedback' ? FeedbackView : slug === 'about' ? AboutContent : slug === 'career' ? Career : Contact
   const PageIcon = slug === 'ndis' ? FaAccessibleIcon : slug === 'compassion-in-action' ? FaHeart : FaCommentDots
   return <main className="mx-auto max-w-5xl space-y-6 p-6">
     <div className="flex flex-wrap items-center justify-between gap-4"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a1a18] text-[#c9b89a]"><PageIcon size={23} aria-hidden="true" /></div><div><h1 className="text-2xl font-bold">{title}</h1><p className="text-gray-600">Add, edit, reorder and delete the content shown on this page.</p></div></div>
@@ -261,7 +264,7 @@ export default function ManagedPageEditor({ title, slug }: { title: string; slug
     {previewOpen && content && createPortal(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm md:p-6" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPreviewOpen(false) }}>
       <div className="flex h-[min(84vh,900px)] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl" role="dialog" aria-modal="true" aria-label={`${title} preview`}>
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b bg-white px-5 py-4"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1a1a18] text-[#c9b89a]"><PageIcon aria-hidden="true" /></div><div><strong>{title} preview</strong><p className="text-xs text-gray-600">Your current edits. Save to publish.</p></div></div><button type="button" onClick={() => setPreviewOpen(false)} aria-label="Close preview" className="rounded-full p-2 hover:bg-gray-100"><FiX size={22} /></button></div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain" onClickCapture={event => { if ((event.target as HTMLElement).closest('a')) event.preventDefault() }}><ManagedPagePreviewContext.Provider value={{ slug, data: content }}><Preview /></ManagedPagePreviewContext.Provider></div>
+        <div className={`min-h-0 flex-1 overflow-y-auto overscroll-contain ${slug === 'home' ? 'home-preview' : ''}`} onClickCapture={event => { if ((event.target as HTMLElement).closest('a')) event.preventDefault() }}><ManagedPagePreviewContext.Provider value={{ slug, data: content }}><Preview /></ManagedPagePreviewContext.Provider></div>
       </div>
     </div>, document.body)}
   </main>

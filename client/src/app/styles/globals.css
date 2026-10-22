@@ -142,3 +142,11 @@ html[data-accessibility-text-size="3"] {
   word-spacing: 0.3em;
   line-height: 1.6;
 }
+
+/* The admin preview scrolls inside a dialog, so in-view animations can leave
+   sections temporarily invisible while an editor inspects them. */
+.home-preview [style*="opacity"] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}

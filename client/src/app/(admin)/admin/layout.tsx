@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useParams, useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import AdminSidebar from './components/AdminSidebar'
 import AdminHeader from './components/AdminHeader'
 import IsAdmin from 'utils/IsAdmin'
@@ -13,37 +13,39 @@ import { fetchUser } from 'app/redux/slices/userSlices'
 const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
     const [showSidebar, setShowSidebar] = useState(true);
+    const [verified, setVerified] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { pathname } = useParams();
+    const pathname = usePathname();
     const { user, status } = useSelector((state: RootState) => state.userSlice);
 
     useEffect(() => {
         const accessToken = localStorage.getItem("accessToken");
-        if (accessToken && status == "idle") {
-            dispatch(fetchUser())
-        }
-    }, [pathname]);
-
-    // Guard: redirect non-admins away from the admin area.
-    useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken");
-        // No token at all -> send to sign in.
         if (!accessToken) {
+            setVerified(false);
             router.replace("/signin");
             return;
         }
-        // User has been loaded and is not an admin -> kick out.
-        if (status === "succeeded" && !IsAdmin(user?.role)) {
-            router.replace("/");
+        if (status === "idle") {
+            dispatch(fetchUser());
+            return;
         }
         if (status === "failed") {
+            setVerified(false);
             router.replace("/signin");
+            return;
         }
-    }, [status, user, router]);
+        if (status === "succeeded") {
+            if (IsAdmin(user?.role)) setVerified(true);
+            else {
+                setVerified(false);
+                router.replace("/signin");
+            }
+        }
+    }, [pathname, status, user, router, dispatch]);
 
     // While we don't yet know who the user is, don't flash the admin UI.
-    if (status === "idle" || status === "loading") {
+    if (!verified || status === "idle" || status === "loading") {
         return (
             <div className="flex w-full h-screen items-center justify-center bg-[#f5f0eb]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a1a18]"></div>

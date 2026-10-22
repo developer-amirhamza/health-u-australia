@@ -4,9 +4,11 @@ import bg_pattern from "assets/images/choose-pattan-img.png"
 import { motion } from 'framer-motion'
 import { choose_items } from 'config/page'
 import { fadeIn } from 'app/variants'
+import { useHomeContent } from './HomeContentContext'
 const Choose = () => {
+  const content = useHomeContent()
   return (
-    <section className='w-full h-full bg-white  flex justify-center items-center '
+    <section className='w-full bg-white flex justify-center items-center'
     style={{ backgroundImage:`url(${bg_pattern.src})`, backgroundSize:"95%", backgroundRepeat:"no-repeat" , backgroundPosition:"center" }}
     >
       <div className="container mx-auto w-full h-full  items-center justify-center py-12 flex flex-col  ">
@@ -34,7 +36,7 @@ const Choose = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
-          {choose_items.map((item,index)=>(
+          {(content?.choose ?? choose_items).map((item,index)=>(
             <motion.div key={index} custom={index}
             variants={fadeIn("down",0.2 * index)}
             initial={{
@@ -56,8 +58,8 @@ const Choose = () => {
             viewport={{once:false, amount:1}}
             className="w-full h-full min-h-80 relative flex">
             <div className={`bg-secondary absolute min-h-80 w-full p-3 py-10 h-full ${[0,2,4].includes(index) ? "rounded-tr-[4rem]" : "rounded-tl-[4rem]" }  grid gap-5`} >
-              <Image src={item.logo} alt='' aria-hidden="true" className={`absolute top-0 ${[0,2,4].includes(index) ? "left-0" : "right-0" }`} />
-              <Image src={item.icon} alt={`${item.title} icon`} className={`absolute top-3 object-scale-down ${[0,2,4].includes(index) ? "right-3" : "left-3" }`} />
+              <Image src={choose_items[index % choose_items.length].logo} alt='' aria-hidden="true" className={`absolute top-0 ${[0,2,4].includes(index) ? "left-0" : "right-0" }`} />
+              <Image src={choose_items[index % choose_items.length].icon} alt={`${item.title} icon`} className={`absolute top-3 object-scale-down ${[0,2,4].includes(index) ? "right-3" : "left-3" }`} />
               <div className="absolute lg:top-1/2 md:top-1/3 top-1/2  md:py-5 lg:py-0 px-5   mb-10 grid gap-3">
                 <h3 className="lg:text-[1.3rem] md:text-[1.3rem] sm:text-2xl font-bold  text-3xl ">{item.title} </h3>
                 <p className="text-lg font-medium lg:text-base  ">{item.paragraph} </p>

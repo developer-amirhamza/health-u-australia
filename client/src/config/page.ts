@@ -131,6 +131,7 @@ export const adminNavItems = [
         path: "/admin",
         icon: AiFillDashboard,
         children: [
+            { label: "Landing page", path: "/admin/home" },
             { label: "About Health U", path: "/admin/about" },
             { label: "Participant Handbook", path: "/admin/participant-handbook" },
         ],
@@ -226,6 +227,7 @@ export const career_jobs = [
 export const nav_items = [
     {
         label: "Home",
+        path: "/",
         options: [
             { label: "About Health U", path: "/about/" },
             { label: "Participant Handbook", path: "/participant-handbook/" },
@@ -626,7 +628,7 @@ export const service_items = [
     {
         title: "Gardening / House And Yard Maintenance",
         image: service5,
-        path: "/gardening-yard-maintenance/"
+        path: "/gardening-house-yard/"
     },
     {
         title: "Capacity Building",
@@ -646,7 +648,7 @@ export const service_items = [
     {
         title: "NDIS Support Independent Living",
         image: service10,
-        path: "/support-independent-living/"
+        path: "/sil-house/"
     },
 
 ]

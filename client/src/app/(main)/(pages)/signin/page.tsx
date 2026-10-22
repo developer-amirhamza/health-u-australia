@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
 import Image from 'next/image';
-import { portalPath } from 'utils/roles';
+import { normaliseRole, portalPath, ROLES } from 'utils/roles';
 
 
 
@@ -51,13 +51,17 @@ const SignIn = () => {
                 localStorage.setItem("accessToken", response?.data?.data?.accessToken);
                 localStorage.setItem("refreshToken", response?.data?.data?.refreshToken);
 
-                dispatch(fetchUser())
+                const signedInUser = await dispatch(fetchUser()).unwrap().catch(() => null)
                 setFormData(initialFormData);
-                // Use the role from this response, not Redux — dispatching
-                // fetchUser() above doesn't update the store until its request
-                // resolves, so reading `user` from useSelector here would still
-                // be last render's (signed-out) value and crash on `.role`.
-                router.push(portalPath(response?.data?.data?.user?.role));
+                const role = signedInUser?.role || response?.data?.data?.user?.role;
+                if (!role || !Object.values(ROLES).includes(normaliseRole(role) as typeof ROLES[keyof typeof ROLES])) {
+                    toast.error('Your account role could not be verified. Please contact the site administrator.');
+                    return;
+                }
+                if (normaliseRole(role) === ROLES.MODERATOR) {
+                    toast('This account has the Moderator role. Admin access requires an Admin or Owner role.');
+                }
+                router.push(portalPath(role));
             }
         } catch (error: any) {
             if (error?.response?.data?.data?.code === "EMAIL_NOT_VERIFIED") {

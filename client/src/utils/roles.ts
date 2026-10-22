@@ -10,6 +10,7 @@ export const ROLES = {
   DISTRIBUTOR: "DISTRIBUTOR",
   NDIS_COORDINATOR: "NDIS_COORDINATOR",
   USER:"USER",
+  MODERATOR: "MODERATOR",
   ADMIN: "ADMIN",
   // Site owner: full admin access; the account itself can't be modified,
   // demoted or deleted by anyone (enforced server-side).
@@ -22,8 +23,10 @@ export const ROLES = {
 export const TRADE_FAMILY: string[] = [ROLES.TRADE, ROLES.RETAILER, ROLES.DISTRIBUTOR];
 
 // Legacy "USER" is treated as CONSUMER.
-export const normaliseRole = (role?: string | null): string =>
-  role === "USER" || !role ? ROLES.CONSUMER : role;
+export const normaliseRole = (role?: string | null): string => {
+  const value = role?.trim().toUpperCase();
+  return value === ROLES.USER || !value ? ROLES.CONSUMER : value;
+};
 
 // Which landing route a logged-in user should be sent to.
 export const portalPath = (role?: string | null): string => {
@@ -33,6 +36,7 @@ export const portalPath = (role?: string | null): string => {
       return "/admin";
     case ROLES.USER:
     case ROLES.CONSUMER:
+    case ROLES.MODERATOR:
         return "/welcome";
     case ROLES.TRADE:
       return "/portal/trade";
@@ -43,6 +47,6 @@ export const portalPath = (role?: string | null): string => {
     case ROLES.NDIS_COORDINATOR:
       return "/portal/ndis";
     default:
-      return "/portal/consumer";
+      return "/welcome";
   }
 };
