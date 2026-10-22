@@ -16,8 +16,8 @@ const UpcomingEvents = () => {
   if (!upcoming_events.length) return null
 
   return (
-    <section className='w-full h-full bg-white'>
-      <div className="container mx-auto w-full h-full items-center justify-center py-12 flex flex-col">
+    <section className='w-full bg-white'>
+      <div className="container mx-auto flex w-full flex-col items-center justify-center py-12">
         <motion.div initial="hidden" whileInView="show" variants={fadeIn('up', 0.2)} viewport={{ once: false, amount: 0.3 }}>
           <Title title1="Upcoming" title2="Events" className="place-content-center place-items-center text-center" />
         </motion.div>
