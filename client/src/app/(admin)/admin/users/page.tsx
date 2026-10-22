@@ -6,11 +6,15 @@ import { format } from 'date-fns';
 import { SummeryApi } from 'app/common/SummeryApi';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/redux/store';
+import { ADMIN_SECTIONS, isFullAdmin, type AdminSection } from 'utils/adminAccess';
 
 interface User {
     id: string;  firstName: string; lastName?: string | null;
     email: string; mobile: string | null;
     avatar: string | null; role: string; status: string;
+    permissions?: string[];
     verify_email: boolean; last_login_date: string | null; createdAt: string;
 }
 
@@ -22,6 +26,7 @@ const normalise = (role: string) => (role === 'USER' || !role ? 'CONSUMER' : rol
 const ASSIGNABLE_ROLES = [
     // { value: 'CONSUMER', label: 'Consumer' },
     { value: 'USER', label: 'User' },
+    { value: 'MODERATOR', label: 'Moderator' },
     { value: 'ADMIN', label: 'Admin' },
     // { value: 'TRADE', label: 'Trade Partners' },
     // { value: 'RETAILER', label: 'Retailer' },
@@ -32,6 +37,7 @@ const ASSIGNABLE_ROLES = [
 const ROLE_BADGE: Record<string, string> = {
     OWNER: 'bg-amber-100 text-amber-800 border-amber-300',
     ADMIN: 'bg-purple-100 text-purple-800 border-purple-300',
+    MODERATOR: 'bg-indigo-100 text-indigo-800 border-indigo-300',
     TRADE: 'bg-blue-100 text-blue-800 border-blue-300',
     NDIS_COORDINATOR: 'bg-teal-100 text-teal-800 border-teal-300',
     CONSUMER: 'bg-gray-100 text-gray-700 border-gray-300',
@@ -47,6 +53,13 @@ const AdminUsersPage = () => {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [exporting, setExporting] = useState(false);
+    // the moderator whose section access is being edited
+    const [accessUser, setAccessUser] = useState<User | null>(null);
+    const me = useSelector((state: RootState) => state.userSlice.user);
+    // roles and section access are an admin's to give; a moderator granted this
+    // page manages ordinary accounts only (the server enforces the same)
+    const canManageRoles = isFullAdmin(me?.role);
+    const isPanelRole = (role: string) => ['ADMIN', 'OWNER', 'MODERATOR'].includes(normalise(role));
 
     const fetchUsers = async () => {
         try {
@@ -70,13 +83,16 @@ const AdminUsersPage = () => {
         setFiltered(result);
     }, [users, search, roleFilter, statusFilter]);
 
-    const handleUpdateUser = async (id: string, data: { status?: string; role?: string }) => {
+    const handleUpdateUser = async (id: string, data: { status?: string; role?: string; permissions?: string[] }) => {
         try {
             setActionLoading(id);
             const response = await Axios({ ...SummeryApi.updateUserByAdmin, data: { id, ...data } });
             if (response.data?.success) {
                 toast.success('User updated successfully');
-                setUsers(prev => prev.map(u => (u.id === id ? { ...u, ...data } : u)));
+                const saved = response.data.data || {};
+                const patch = { ...data, ...(saved.permissions ? { permissions: saved.permissions } : {}) };
+                setUsers(prev => prev.map(u => (u.id === id ? { ...u, ...patch } : u)));
+                setAccessUser(prev => (prev && prev.id === id ? { ...prev, ...patch } : prev));
             } else toast.error(response.data?.message || 'Update failed');
         } catch (error) { AxiosToastError(error); } finally { setActionLoading(null); }
     };
@@ -153,6 +169,7 @@ const AdminUsersPage = () => {
                     <option value="CONSUMER">Consumer</option>
                     <option value="TRADE">Trade</option>
                     <option value="NDIS_COORDINATOR">NDIS Coordinator</option>
+                    <option value="MODERATOR">Moderator</option>
                     <option value="ADMIN">Admin</option>
                     <option value="OWNER">Owner</option>
                 </select>
@@ -192,18 +209,29 @@ const AdminUsersPage = () => {
                                                 👑 Owner
                                             </span>
                                         ) : (
-                                            <select value={normalise(user.role)} disabled={actionLoading === user.id}
-                                                onChange={e => handleUpdateUser(user.id, { role: e.target.value })}
-                                                className={`text-xs rounded border px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${ROLE_BADGE[normalise(user.role)] ?? ROLE_BADGE.CONSUMER}`}>
-                                                {ASSIGNABLE_ROLES.map(r => (
-                                                    <option key={r.value} value={r.value}>{r.label}</option>
-                                                ))}
-                                            </select>
+                                            <div className="flex items-center gap-2">
+                                                <select value={normalise(user.role)} disabled={actionLoading === user.id || !canManageRoles}
+                                                    title={canManageRoles ? undefined : 'Only an admin can change roles'}
+                                                    onChange={e => handleUpdateUser(user.id, { role: e.target.value })}
+                                                    className={`text-xs rounded border px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-70 ${ROLE_BADGE[normalise(user.role)] ?? ROLE_BADGE.CONSUMER}`}>
+                                                    {ASSIGNABLE_ROLES.map(r => (
+                                                        <option key={r.value} value={r.value}>{r.label}</option>
+                                                    ))}
+                                                </select>
+                                                {normalise(user.role) === 'MODERATOR' && canManageRoles && (
+                                                    <button onClick={() => setAccessUser(user)}
+                                                        className="text-xs text-indigo-700 hover:text-indigo-900 underline whitespace-nowrap">
+                                                        Access ({(user.permissions || []).length}/{ADMIN_SECTIONS.length})
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
-                                        {normalise(user.role) === 'OWNER' ? (
-                                            <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                        {normalise(user.role) === 'OWNER' || (!canManageRoles && isPanelRole(user.role)) ? (
+                                            <span className={`px-2 py-1 rounded text-xs font-medium ${user.status === 'INACTIVE' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                                {user.status === 'INACTIVE' ? 'Inactive' : 'Active'}
+                                            </span>
                                         ) : (
                                             <button disabled={actionLoading === user.id}
                                                 onClick={() => handleUpdateUser(user.id, { status: user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' })}
@@ -222,7 +250,7 @@ const AdminUsersPage = () => {
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => setSelectedUser(user)} className="text-blue-600 hover:text-blue-900 text-sm">View</button>
-                                            {normalise(user.role) === 'OWNER' ? (
+                                            {normalise(user.role) === 'OWNER' || (!canManageRoles && isPanelRole(user.role)) ? (
                                                 <span className="text-xs text-gray-400">Protected</span>
                                             ) : (
                                                 <button disabled={actionLoading === user.id} onClick={() => handleDelete(user.id, user.firstName)}
@@ -236,6 +264,57 @@ const AdminUsersPage = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {/* Moderator section access */}
+            {accessUser && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setAccessUser(null)}>
+                    <div className="bg-white rounded-lg max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-start justify-between mb-2">
+                            <h2 className="text-lg font-bold text-gray-900">
+                                Section access — {`${accessUser.firstName || ''} ${accessUser.lastName ?? ''}`.trim() || accessUser.email}
+                            </h2>
+                            <button onClick={() => setAccessUser(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-4">
+                            Tick the admin sections this moderator can open; unticked sections are hidden from them.
+                            Changes save straight away.
+                        </p>
+                        <div className="flex gap-2 mb-3">
+                            <button disabled={actionLoading === accessUser.id}
+                                onClick={() => handleUpdateUser(accessUser.id, { permissions: ADMIN_SECTIONS.filter(x => x.group === 'Website').map(x => x.key) })}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-50 disabled:opacity-50">Website only</button>
+                            <button disabled={actionLoading === accessUser.id}
+                                onClick={() => handleUpdateUser(accessUser.id, { permissions: ADMIN_SECTIONS.map(x => x.key) })}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-50 disabled:opacity-50">All sections</button>
+                            <button disabled={actionLoading === accessUser.id}
+                                onClick={() => handleUpdateUser(accessUser.id, { permissions: [] })}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-50 disabled:opacity-50">None</button>
+                        </div>
+                        <div className="flex flex-col divide-y divide-gray-100 border border-gray-200 rounded max-h-[60vh] overflow-y-auto">
+                            {ADMIN_SECTIONS.map((sec, i) => {
+                                const granted = (accessUser.permissions || []).includes(sec.key);
+                                const toggle = () => {
+                                    const current = accessUser.permissions || [];
+                                    const next = granted ? current.filter(k => k !== sec.key) : [...current, sec.key as AdminSection];
+                                    handleUpdateUser(accessUser.id, { permissions: next });
+                                };
+                                return (
+                                    <React.Fragment key={sec.key}>
+                                    {(i === 0 || ADMIN_SECTIONS[i - 1].group !== sec.group) && (
+                                        <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">{sec.group}</p>
+                                    )}
+                                    <label className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm cursor-pointer hover:bg-gray-50">
+                                        <span className="font-medium text-gray-800">{sec.label}</span>
+                                        <input type="checkbox" checked={granted} disabled={actionLoading === accessUser.id} onChange={toggle}
+                                            className="h-4 w-4 accent-indigo-600" />
+                                    </label>
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             )}
 

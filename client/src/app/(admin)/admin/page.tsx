@@ -10,6 +10,7 @@ import { HiOutlineDocumentText, HiOutlineDocumentDuplicate } from 'react-icons/h
 import { RootState } from 'app/redux/store'
 import { useRouter } from 'next/navigation'
 import IsAdmin from 'utils/IsAdmin'
+import { canAccessSection, type AdminSection } from 'utils/adminAccess'
 import Axios from 'utils/Axios'
 import { SummeryApi } from 'app/common/SummeryApi'
 import AxiosToastError from 'utils/AxiosToastError'
@@ -83,11 +84,14 @@ const AdminDashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 setLoading(true)
+                // only ask for the sections this account may see (moderators may lack some)
+                const load = (key: AdminSection, api: any) =>
+                    canAccessSection(user, key) ? Axios({ ...api }) : Promise.reject(new Error('no access'))
                 const [usersRes, agreementsRes, contractsRes, scPlansRes] = await Promise.allSettled([
-                    Axios({ ...SummeryApi.getAllUser }),
-                    Axios({ ...SummeryApi.getServiceAgreements }),
-                    Axios({ ...SummeryApi.getContracts }),
-                    Axios({ ...SummeryApi.getScPlans }),
+                    load('users', SummeryApi.getAllUser),
+                    load('serviceAgreements', SummeryApi.getServiceAgreements),
+                    load('contracts', SummeryApi.getContracts),
+                    load('scBilling', SummeryApi.getScPlans),
                 ])
 
                 const users = usersRes.status === "fulfilled" && usersRes.value.data?.success ? (usersRes.value.data.data || []) : []
@@ -158,10 +162,10 @@ const AdminDashboard = () => {
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <StatCard label="Total Users" value={stats?.totalUsers ?? 0} icon={FaUsers} color="bg-purple-500" href="/admin/users" />
-                    <StatCard label="Service Agreements" value={stats?.totalServiceAgreements ?? 0} icon={HiOutlineDocumentText} color="bg-blue-500" href="/admin/service-agreements" />
-                    <StatCard label="Contracts" value={stats?.totalContracts ?? 0} icon={HiOutlineDocumentDuplicate} color="bg-teal-500" href="/admin/contracts" />
-                    <StatCard label="SC Billing Plans" value={stats?.totalScPlans ?? 0} icon={MdReceiptLong} color="bg-amber-500" href="/admin/sc-billing" />
+                    {canAccessSection(user, 'users') && <StatCard label="Total Users" value={stats?.totalUsers ?? 0} icon={FaUsers} color="bg-purple-500" href="/admin/users" />}
+                    {canAccessSection(user, 'serviceAgreements') && <StatCard label="Service Agreements" value={stats?.totalServiceAgreements ?? 0} icon={HiOutlineDocumentText} color="bg-blue-500" href="/admin/service-agreements" />}
+                    {canAccessSection(user, 'contracts') && <StatCard label="Contracts" value={stats?.totalContracts ?? 0} icon={HiOutlineDocumentDuplicate} color="bg-teal-500" href="/admin/contracts" />}
+                    {canAccessSection(user, 'scBilling') && <StatCard label="SC Billing Plans" value={stats?.totalScPlans ?? 0} icon={MdReceiptLong} color="bg-amber-500" href="/admin/sc-billing" />}
                 </div>
 
                 {/* Recent Activity */}

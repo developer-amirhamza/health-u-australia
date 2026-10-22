@@ -2,7 +2,7 @@ import express from "express";
 import { changePassword, deleteUser, forgotPassword, getAllUsers, GetUserDetails, refreshToken, resendVerificationEmail, resetPassword, SignIn, SignOut, SignUp, updateUserByAdmin, updateUserDetails, uploadAvatar, verifyEmail } from "../controllers/user.controllers.js";
 import { uploadAvatarImage } from "../middlewares/upload.js";
 import { auth } from "../middlewares/auth.js";
-import { admin } from "../middlewares/admin.js";
+import { admin, section } from "../middlewares/admin.js";
 
 
 
@@ -25,9 +25,9 @@ router.put("/change-password", auth, changePassword);
 router.post("/upload-avatar", auth, uploadAvatarImage, uploadAvatar);
 
 // Admin only
-router.get("/all-users", auth, admin, getAllUsers);
-router.put("/update-user-by-admin", auth, admin, updateUserByAdmin);
-router.delete("/delete-user", auth, admin, deleteUser);
+router.get("/all-users", auth, admin, section('users'), getAllUsers);
+router.put("/update-user-by-admin", auth, admin, section('users'), updateUserByAdmin);
+router.delete("/delete-user", auth, admin, section('users'), deleteUser);
 
 
 

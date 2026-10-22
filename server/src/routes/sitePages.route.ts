@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import { auth } from '../middlewares/auth.js';
-import { admin } from '../middlewares/admin.js';
+import { admin, section } from '../middlewares/admin.js';
 import { uploadSilImage } from '../middlewares/upload.js';
 import { uploadImage } from '../controllers/uploadImage.controllers.js';
 import { prisma } from '../lib/prisma.js';
@@ -11,15 +11,18 @@ import { homeContent } from '../pages/homeContent.js';
 
 const templates = { home: homeContent, about: aboutContent, career: careerContent, 'contact-us': contactContent } as const;
 const router = Router();
+// each managed page is its own admin-panel section
+const pageSection = (req: Request) =>
+  ({ home: 'home', about: 'about', career: 'career', 'contact-us': 'contactUs' } as const)[String(req.params.slug) as keyof typeof templates];
 router.param('slug', (req, res, next, slug) => { if (!(slug in templates)) return errorHandler(res, 404, 'Page not found'); next(); });
-router.get('/:slug/template', auth, admin, (req, res) => errorHandler(res, 200, 'Page template retrieved', false, templates[req.params.slug as keyof typeof templates]));
+router.get('/:slug/template', auth, admin, section(pageSection), (req, res) => errorHandler(res, 200, 'Page template retrieved', false, templates[req.params.slug as keyof typeof templates]));
 router.get('/:slug', async (req, res) => {
   const slug = req.params.slug as keyof typeof templates;
   try { const page = await prisma.managedPage.findUnique({ where: { slug } }); return errorHandler(res, 200, 'Page retrieved', false, page?.content ?? templates[slug]); }
   catch { return errorHandler(res, 200, 'Default page retrieved', false, templates[slug]); }
 });
-router.post('/:slug/images', auth, admin, uploadSilImage, uploadImage);
-router.put('/:slug', auth, admin, async (req, res) => {
+router.post('/:slug/images', auth, admin, section(pageSection), uploadSilImage, uploadImage);
+router.put('/:slug', auth, admin, section(pageSection), async (req, res) => {
   const slug = req.params.slug as keyof typeof templates;
   if (!matchesShape(req.body, templates[slug])) return errorHandler(res, 400, 'Invalid page content');
   if (slug === 'career') {

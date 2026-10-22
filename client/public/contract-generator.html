@@ -160,7 +160,12 @@ h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.01em}
 .xh-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 32px;gap:6px;align-items:center}
 .xh-head{font-size:11px;font-weight:600;color:var(--ink-3)}
 .xh-del{padding:0;width:32px;justify-content:center;font-size:16px;line-height:1}
-.xh > #xhAdd{align-self:flex-start}
+.xh > .xh-add{align-self:flex-start}
+.ts{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.ts-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1.6fr);gap:8px}
+.ts-row span:not(:first-child){text-align:right}
+.ts-tot{border-top:1px solid var(--line);padding-top:5px;margin-top:2px;font-weight:650;color:var(--brand-ink)}
+.ts-empty{color:var(--ink-3)}
 .xh-sum{font-size:12.3px;color:var(--brand-ink)}
 .xh-sum:empty{display:none}
 .xh-warn{color:var(--warn)}
@@ -205,7 +210,7 @@ table.rt td.tot{color:var(--brand-ink)}
 .doc .conf{font-weight:700;letter-spacing:.04em;font-size:9.5pt;text-transform:uppercase;margin-bottom:14px;color:#444}
 .doc .addr{margin-bottom:18px;line-height:1.4}
 .doc .addr div{margin:0}
-.doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px;text-decoration:underline}
+.doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px}
 .doc table.det{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:10pt}
 .doc table.det th,.doc table.det td{border:1px solid #b9bec9;padding:7px 9px;vertical-align:top;text-align:left}
 .doc table.det th{width:31%;background:#f2f6f6;font-weight:650}
@@ -496,7 +501,7 @@ table.ed tbody tr.lvl-start td{border-top:1px solid var(--line)}
 const AWARD = {
   awardName: "Social, Community, Home Care and Disability Services Industry Award 2010",
   awardCode: "MA000100",
-  effectiveFrom: "1 July 2026",
+  effectiveFrom: "1 December 2026",
   scheduleName: "Health U pay schedule \u2014 Paypoint with ABC (2026-27)",
   source: "Weekly rates are taken directly from the Health U pay schedule (Paypoint with ABC, "
         + "Social and community services employee). Every other figure is calculated from them, "
@@ -504,7 +509,7 @@ const AWARD = {
   hoursPerWeek: 38,
   weeksPerYear: 52,
   superRate: 0.12,
-  kmAllowance: 0.99,
+  kmAllowance: 1.05,
   casualLoading: 0.25,
   // Multipliers applied to the rounded ordinary hourly rate, matching the pay schedule.
   // Casual figures are the permanent penalty plus the 25% casual loading.
@@ -600,9 +605,10 @@ const DEFAULTS = {
   customPay:"", cuLevel:"", cuPayPoint:"",
   cuWeekday:"", cuSaturday:"", cuSunday:"", cuPublicHoliday:"",
   cuAfternoon:"", cuNight:"", cuOtFirst2:"", cuOtAfter2:"",
-  superRate:"12", kmAllowance:"0.99",
+  superRate:"12", kmAllowance:"1.05",
   ptHours:"", ptRoster:"", ftSalary:"", ftPay:"award", ptRate:"",
-  extraHours:"",
+  extraHours:"", extraOt:"", showExtraDays:"yes", ordHours:"",
+  hoursWork:"", hoursWorkAuto:"", salaryNote:"", salaryNoteAuto:"",
   homeVisit:"",
   hoursCasual:"Upon agreement",
   payFrequency:"Wednesday weekly",
@@ -746,18 +752,24 @@ function rateSet(level, payPoint, type, incCode, paidWeekday){
 }
 function classLabel(level, pp){ return "Level " + level + " - pay point " + pp; }
 
-/* Custom pay point: each shift rate is typed in by hand. Only the weekday rate is
-   required — any rate left blank is worked out from it with the same multipliers
-   the schedule uses, so a partly filled table still gives a full set. */
+/* Custom pay point: rates come from the Ordinary hours rows. The weekday rate (from a
+   weekday or range row) is required; a Saturday or Sunday row's rate sets that rate, and
+   everything else is worked out from the weekday rate with the schedule's multipliers.
+   The cu* fields are only read for contracts saved before the rows existed. */
 const CU_RATES = [
   ["weekday","cuWeekday","Weekday"], ["saturday","cuSaturday","Saturday"],
   ["sunday","cuSunday","Sunday"], ["publicHoliday","cuPublicHoliday","Public holiday"],
   ["afternoon","cuAfternoon","Afternoon shift"], ["night","cuNight","Night shift"],
   ["otFirst2","cuOtFirst2","Overtime \u2014 first 2 hrs"], ["otAfter2","cuOtAfter2","Overtime \u2014 after 2 hrs"]
 ];
+// the rate typed on the first ordinary-hours row of this kind, else the old cu* field
+function cuRate(k, key){
+  const row = ordRows().filter(r => oDay(r.day)[2] === k && parseFloat(r.rate) > 0)[0];
+  return row ? parseFloat(row.rate) : parseFloat(state.data[key]);
+}
 function customRates(){
   const A = state.award, d = state.data;
-  const wk = parseFloat(d.cuWeekday);
+  const wk = cuRate("weekday", "cuWeekday");
   if(!(wk > 0)) return null;
   const pen = (state.type === "casual") ? A.penalties.casual : A.penalties.permanent;
   const baseHourly = wk / pen.weekday;   // ordinary rate, without any casual loading
@@ -766,7 +778,7 @@ function customRates(){
   const out = { weekly, hourly: r2(baseHourly), tier: null, custom: true,
                 annual: r2(weekly * A.weeksPerYear), superPct: r2((sup-1)*100) };
   CU_RATES.forEach(([k, key])=>{
-    const v = parseFloat(d[key]), manual = v > 0;
+    const v = ["weekday","saturday","sunday"].includes(k) ? cuRate(k, key) : parseFloat(d[key]), manual = v > 0;
     const base = manual ? r2(v) : r2(baseHourly * pen[k]);
     out[k] = { base, incSuper: r2(base*sup), manual };
   });
@@ -831,29 +843,215 @@ function extraDefaultRate(kind){
   return R && R[kind] ? R[kind].base : null;
 }
 // rows with hours and a usable rate, plus weekly / annual totals
+// weekday rows are paid as overtime (first 3 hours each day full time, first 2 part time / casual,
+// then the higher rate) when chosen
+const otHrs = () => state.type !== "casual" && basis() === "fulltime" ? 3 : 2;
+// both overtime labels carry the threshold: "first 3 hrs" / "after 3 hrs" full time, 2 otherwise
+const otLbl = lbl => lbl.replace("2 hrs", otHrs() + " hrs");
+const extraIsOt = kind => kind === "weekday" && state.data.extraOt === "yes";
+/* Full time: the week's first 38 hours are ordinary time and every hour past 38 is overtime,
+   counted across the week — ordinary rows that run past 38, then the additional rows, in
+   order. The first 3 overtime hours are paid at the Saturday rate (overtime first rate), every
+   one after at the Sunday rate (overtime after rate). A row whose own rate is higher, such as
+   a public holiday, keeps its own rate. Part time and casual keep the per-day choice above. */
+const weeklyOt = () => state.type !== "casual" && state.type !== "contractor" && basis() === "fulltime";
+// split `hours` that start at hour `pos` of the week into paid parts: { h, rate, ot }
+function weekParts(hours, pos, rate){
+  const A = state.award, ord = Math.min(hours, Math.max(A.hoursPerWeek - pos, 0)), ot = hours - ord;
+  const h1 = Math.min(ot, Math.max(otHrs() - Math.max(pos - A.hoursPerWeek, 0), 0)), h2 = ot - h1;
+  const up = r => r ? Math.max(r, rate || 0) : null;
+  return [{ h: ord, rate }, { h: h1, rate: up(extraDefaultRate("otFirst2")), ot: true },
+          { h: h2, rate: up(extraDefaultRate("otAfter2")), ot: true }].filter(p => p.h > 0);
+}
+const partsPay = parts => parts.every(p => p.rate) ? r2(parts.reduce((s, p) => s + p.h * p.rate, 0)) : 0;
+// "38 × $37.00 = $1,406.00 · 3 × $55.50 = $166.50", hours grouped by the rate they are paid
+function partsBreakdown(rows){
+  const g = [];
+  rows.forEach(r => r.parts.forEach(p => {
+    if(!p.rate) return;
+    const e = g.filter(x => x.rate === p.rate)[0];
+    e ? e.h += p.h : g.push({ h: p.h, rate: p.rate });
+  }));
+  return g.map(x => `${fmtN(x.h)} × ${money(x.rate)} = ${money(r2(x.h * x.rate))}`).join(" · ");
+}
+// placeholder for a row's rate box: the rate it will be paid if left blank
 function extraPlaceholder(dayKey){
-  const def = extraDefaultRate(xDay(dayKey)[2]);
+  const kind = xDay(dayKey)[2];
+  if(weeklyOt() || extraIsOt(kind)){
+    const a = extraDefaultRate("otFirst2"), b = extraDefaultRate("otAfter2");
+    return a && b ? `OT ${a.toFixed(2)} / ${b.toFixed(2)}` : "Rate";
+  }
+  const def = extraDefaultRate(kind);
   return def ? def.toFixed(2) : "Rate";
 }
 function extraInfo(){
+  const wk = weeklyOt();
+  let pos = wk ? (ordBase() || { hours: 0 }).hours : 0;   // hours already worked this week
   const rows = extraRows().map(r => {
     const [, label, kind] = xDay(r.day);
     const hours = parseFloat(r.hours), custom = parseFloat(r.rate);
-    const rate = custom > 0 ? r2(custom) : extraDefaultRate(kind);
-    return { label, kind, hours, rate, custom: custom > 0,
-             weekly: hours > 0 && rate ? r2(hours * rate) : 0 };
+    const own = custom > 0 ? r2(custom) : extraDefaultRate(kind);
+    let parts;
+    if(wk){
+      parts = hours > 0 ? weekParts(hours, pos, own) : [];
+      pos += hours > 0 ? hours : 0;
+    } else if(!(custom > 0) && extraIsOt(kind)){
+      // part time / casual overtime: the first 2 hours each day, then the higher rate
+      const n = otHrs(), h1 = Math.min(hours, n), h2 = Math.max(hours - n, 0);
+      parts = [{ h: h1, rate: extraDefaultRate("otFirst2"), ot: true },
+               { h: h2, rate: extraDefaultRate("otAfter2"), ot: true }].filter(p => p.h > 0);
+    } else parts = [{ h: hours, rate: own }];
+    return { label, kind, hours, parts, rate: parts.length ? parts[0].rate : own, custom: custom > 0,
+             weekly: hours > 0 ? partsPay(parts) : 0 };
   }).filter(r => r.hours > 0);
   if(!rows.length) return null;
   const hours = rows.reduce((s, r) => s + r.hours, 0);
   const weekly = r2(rows.reduce((s, r) => s + r.weekly, 0));
   return { rows, hours, weekly, annual: r2(weekly * state.award.weeksPerYear),
-           missingRate: rows.some(r => !r.rate) };
+           missingRate: rows.some(r => r.parts.some(p => !p.rate)) };
 }
 const fmtHrs = h => (Math.round(h * 100) / 100) + (h === 1 ? " hour" : " hours");
 // one sentence listing every additional-hours row, for the letter
 function extraSentence(X){
-  return X.rows.map(r => `${fmtHrs(r.hours)} on ${r.label === "Public holiday" ? "public holidays" : r.label}`
-    + (r.rate ? ` at ${money(r.rate)} per hour` : "")).join("; ");
+  return X.rows.map(r => {
+    const day = `${fmtHrs(r.hours)} on ${r.label === "Public holiday" ? "public holidays" : r.label}`, P = r.parts;
+    if(!P.length || P.some(p => !p.rate)) return day;
+    if(P.length === 1) return day + (P[0].ot ? ` at the overtime rate of ${money(P[0].rate)} per hour` : ` at ${money(P[0].rate)} per hour`);
+    return day + (P.every(p => p.ot) ? " at overtime rates (" : " (")
+      + P.map(p => `${fmtHrs(p.h)} at ${money(p.rate)} per hour${p.ot && !P.every(q => q.ot) ? " overtime" : ""}`).join(", then ") + ")";
+  }).join("; ");
+}
+// whether the letter lists each additional day, or only the total hours
+const showXDays = () => state.data.showExtraDays !== "no";
+/* Ordinary hours (custom pay point only): the ordinary week entered row by row instead of
+   the standard 38 hours. Same shape as additional hours: { day, hours, rate } — day may be
+   a range such as Monday – Saturday; a blank rate uses the custom rate for that day. */
+const DSHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const ODAYS = [
+  ["monFri","Monday – Friday","weekday",[0,1,2,3,4]], ["monSat","Monday – Saturday","weekday",[0,1,2,3,4,5]],
+  ["monSun","Monday – Sunday","weekday",[0,1,2,3,4,5,6]],
+  ...XDAYS.slice(0, 7).map((x, i) => [x[0], x[1], x[2], [i]])
+];
+function oDay(k){ return ODAYS.filter(x => x[0] === k)[0] || ODAYS[0]; }
+// day indices (0 = Monday) an additional-hours row covers; public holidays cover none
+const xDayIdx = k => { const i = XDAYS.findIndex(x => x[0] === k); return i >= 0 && i < 7 ? [i] : []; };
+function ordRows(){
+  try { const a = JSON.parse(state.data.ordHours || "[]"); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function setOrdRows(a){ state.data.ordHours = a.length ? JSON.stringify(a) : ""; }
+function ordPlaceholder(dayKey){ const def = extraDefaultRate(oDay(dayKey)[2]); return def ? def.toFixed(2) : "Rate *"; }
+// ordinary hours entered by row: only with a custom pay point
+function ordInfo(){
+  if(!isCustomPay()) return null;
+  const wk = weeklyOt();
+  let pos = 0;   // full time: ordinary rows that run past 38 hours are paid as overtime
+  const rows = ordRows().map(r => {
+    const [, label, kind, idx] = oDay(r.day);
+    const hours = parseFloat(r.hours), custom = parseFloat(r.rate);
+    const rate = custom > 0 ? r2(custom) : extraDefaultRate(kind);
+    const parts = !(hours > 0) ? [] : wk ? weekParts(hours, pos, rate) : [{ h: hours, rate }];
+    pos += hours > 0 ? hours : 0;
+    return { label, kind, idx, hours, rate, parts, weekly: hours > 0 ? partsPay(parts) : 0 };
+  }).filter(r => r.hours > 0);
+  if(!rows.length) return null;
+  const hours = rows.reduce((s, r) => s + r.hours, 0);
+  const weekly = r2(rows.reduce((s, r) => s + r.weekly, 0));
+  return { rows, hours, weekly, annual: r2(weekly * state.award.weeksPerYear),
+           idx: [...new Set(rows.flatMap(r => r.idx))], missingRate: rows.some(r => r.parts.some(p => !p.rate)) };
+}
+// "Mon–Sat", "Sunday", or "Mon, Wed, Fri"
+function spanLabel(idx){
+  const a = [...new Set(idx)].sort((x, y) => x - y);
+  if(!a.length) return "";
+  if(a.length === 1) return XDAYS[a[0]][1];
+  const run = a.every((v, i) => !i || v === a[i - 1] + 1);
+  return run ? DSHORT[a[0]] + "–" + DSHORT[a[a.length - 1]] : a.map(i => DSHORT[i]).join(", ");
+}
+const fmtN = h => String(Math.round(h * 100) / 100);
+// the ordinary week: hours and weekly pay, from the rows or the standard figures
+function ordBase(){
+  const d = state.data, O = ordInfo(), A = state.award;
+  if(O) return { hours: O.hours, weekly: O.weekly, idx: O.idx };
+  if(state.type === "casual") return null;
+  if(basis() === "parttime"){
+    const h = parseFloat(d.ptHours), rate = isOfficePT() ? parseFloat(d.ptRate) : (currentRates() || {weekday:{}}).weekday.base;
+    return h > 0 ? { hours: h, weekly: rate > 0 ? r2(h * rate) : 0, idx: null } : null;
+  }
+  const sal = parseFloat(d.ftSalary), R = currentRates();
+  return { hours: A.hoursPerWeek, idx: null,
+           weekly: sal > 0 ? r2(sal / A.weeksPerYear) : (R && !isSalaried() ? R.weekly : 0) };
+}
+// default Hours of work wording; with ordinary or additional rows it lists the totals
+function autoHoursLines(){
+  const d = state.data, O = ordInfo(), X = extraInfo(), base = ordBase(), B = basis();
+  const roster = () => { const rp = lines(d.ptRoster); return ["Agreed pattern of hours:", ...(rp.length ? rp : ["[Agreed roster pattern]"])]; };
+  if(O || X){
+    const out = [], h = (base ? base.hours : 0) + (X ? X.hours : 0);
+    const xIdx = X ? X.rows.flatMap(r => xDayIdx(XDAYS.find(x => x[1] === r.label)[0])) : [];
+    const allIdx = base && base.idx ? [...base.idx, ...xIdx] : null;
+    const lbl = idx => idx && idx.length ? spanLabel(idx) + ": " : "";
+    out.push(`Total hours: ${lbl(allIdx)}${fmtHrs(h)} per week`);
+    if(base) out.push(`Ordinary hours: ${lbl(base.idx)}${fmtHrs(base.hours)} per week`);
+    if(X) out.push(`Additional hours: ${showXDays() ? lbl(xIdx) : ""}${fmtHrs(X.hours)} per week`);
+    if(B === "parttime" && !O) out.push(...roster());
+    return out;
+  }
+  if(state.type === "casual") return ["Upon agreement"];
+  if(B === "parttime") return [`${d.ptHours || "[Hours per week]"} hours per week.`, ...roster()];
+  if(isSalaried()) return [`${state.award.hoursPerWeek} ordinary hours per week`];
+  return [`${state.award.hoursPerWeek} ordinary hours per week, plus reasonable additional hours as required.`];
+}
+// default Salary details wording: how the full-time salary is made up
+function autoSalaryNote(){
+  if(basis() !== "fulltime" || state.type === "contractor") return "";
+  const d = state.data, X = extraInfo(), O = ordInfo(), A = state.award;
+  const xPart = X ? (showXDays() ? ": " + extraSentence(X) : "") : "";
+  if(isSalaried()){
+    const sal = parseFloat(d.ftSalary);
+    return X && sal > 0 ? `This is ${money0(sal)} for ${A.hoursPerWeek} ordinary hours per week plus ${money0(X.annual)} for `
+      + `${fmtN(X.hours)} additional ${X.hours === 1 ? "hour" : "hours"} per week${xPart}.` : "";
+  }
+  const R = currentRates();
+  const baseAnnual = d.ftSalary ? parseFloat(d.ftSalary) : O ? O.annual : (R ? R.annual : NaN);
+  let t = O ? `This is based on ${fmtN(O.hours)} ordinary hours per week`
+            : `This is based on ${A.hoursPerWeek} ordinary hours per week at ${R ? money(R.hourly) : "—"} per hour`;
+  if(!isNaN(baseAnnual) && (X || O)) t += ` (${money0(baseAnnual)} per annum)`;
+  if(X && !isNaN(baseAnnual)) t += `, plus ${fmtN(X.hours)} additional ${X.hours === 1 ? "hour" : "hours"} per week${xPart} `
+    + `(${money(X.weekly)} per week, ${money0(X.annual)} per annum)`;
+  return t + ".";
+}
+/* Hours of work and Salary details are filled in automatically, like Roster policy, and keep
+   following the form until edited by hand. <k>Auto remembers the last automatic text, so an
+   unedited box can be told apart from an edited one. Empty a box to restore the automatic text. */
+const AUTO_TEXT = { hoursWork: () => autoHoursLines().join("\n"), salaryNote: autoSalaryNote };
+function syncAutoTexts(){
+  const d = state.data;
+  // contracts saved before the casual box was merged into Hours of work
+  if(state.type === "casual" && !d.hoursWork && d.hoursCasual && d.hoursCasual !== "Upon agreement") d.hoursWork = d.hoursCasual;
+  Object.keys(AUTO_TEXT).forEach(k => {
+    if(state.type === "contractor") return;
+    const auto = AUTO_TEXT[k](), cur = String(d[k] || "").trim();
+    if(!cur || cur === String(d[k + "Auto"] || "").trim() || (k === "hoursWork" && /^\d+ ordinary hours per week/.test(cur) && !d[k + "Auto"])){
+      d[k] = auto;
+      const el = $(`[data-k="${k}"]`);
+      if(el && document.activeElement !== el) el.value = auto;
+    }
+    d[k + "Auto"] = auto;
+  });
+}
+// a line typed in a box: [Something] becomes a highlighted placeholder
+const phLine = x => x.replace(/\[([^\]]+)\]/g, (m, l) => ph("", l));
+// form-only summary of the week: ordinary + additional hours and pay
+function totalSummaryHTML(){
+  const base = ordBase(), X = extraInfo(), O = ordInfo();
+  if(!O && !X) return `<span class="ts-empty">Add ordinary or additional hours to see the weekly total.</span>`;
+  const hrs = (base ? base.hours : 0) + (X ? X.hours : 0), wk = r2((base ? base.weekly : 0) + (X ? X.weekly : 0));
+  const line = (l, h, w) => `<div class="ts-row"><span>${l}</span><span>${fmtHrs(h)}</span><span>${w ? money(w) + " / week" : "—"}</span></div>`;
+  return (base ? line("Ordinary" + (base.idx ? " · " + spanLabel(base.idx) : ""), base.hours, base.weekly) : "")
+    + (X ? line("Additional", X.hours, X.weekly) : "")
+    + `<div class="ts-row ts-tot"><span>Total</span><span>${fmtHrs(hrs)}</span><span>${wk ? money(wk) + " / week · " + money0(wk * state.award.weeksPerYear) + " / year" : "—"}</span></div>`
+    + ((O && O.missingRate) || (X && X.missingRate) ? `<div class="xh-warn">Enter a rate for every row — no base rate to calculate it from yet.</div>` : "");
 }
 
 /* ---------- field schema ---------- */
@@ -863,6 +1061,21 @@ function schema(){
   const fx = t === "fixedterm", B = basis();
   const casual = t==="casual", pt = B==="parttime", ft = B==="fulltime";
   const salaried = isSalaried(), officePT = isOfficePT(), noPay = salaried || officePT;
+  // Additional hours and its options: after the Ordinary hours rows on a custom pay point,
+  // otherwise in their usual place below the pay and roster fields
+  const extraFields = [
+      {k:"extraHours", l:"Additional hours", type:"hours", wide:true,
+        hint:"Regular hours on top of the ordinary week — above 38 hours, or Saturday / Sunday work. "
+          + "Leave the rate blank to use this employee’s rate for that day. The total is added to the salary in the letter"
+          + (weeklyOt() ? ". Full time: every hour past 38 in the week is overtime \u2014 the first 3 at the Saturday rate, the rest at the Sunday rate" : "")},
+      ...(extraRows().length && !weeklyOt() ? [{k:"extraOt", l:"Monday \u2013 Friday additional hours paid at", type:"select", wide:true,
+        opts:[{v:"",t:"Ordinary weekday rate"},
+              {v:"yes",t:"Overtime rate \u2014 " + (casual ? "175%, then 225%" : "150%, then 200%") + " after " + otHrs() + " hours each day"}],
+        hint:"Under the SCHADS Award, hours beyond the ordinary week are usually overtime. Applies to weekday rows with no rate typed in"}] : []),
+      ...(extraRows().length ? [{k:"showExtraDays", l:"Additional days in the letter", type:"select", wide:true,
+        opts:[{v:"yes",t:"Show each day, its hours and rate"},{v:"no",t:"Show the total hours only"}],
+        hint:"Either way the additional hours are still paid and counted in the salary"}] : [])
+  ];
   return [
     { n:1, t:"Letter details", sub:"Reference and date", open:true, fields:[
       {k:"docRef", l:"Document reference", ph:"HU043.01", half:true},
@@ -904,10 +1117,16 @@ function schema(){
       ...(isCustomPay() ? [
         {k:"cuLevel", l:"Level", ph:"e.g. 2", half:true, req:true},
         {k:"cuPayPoint", l:"Pay point", ph:"e.g. 3", half:true, req:true},
-        ...CU_RATES.map(([k, key, lbl], i)=>({k:key, l:lbl + " rate", type:"number", money:true, half:true, req: i===0,
-          ph: i===0 ? "" : "Calculated",
-          hint: i===0 ? (casual ? "Casual hourly rate, including the 25% loading" : "Ordinary hourly rate")
-                      : (i===1 ? "Leave any rate blank to calculate it from the weekday rate" : "")}))
+        // weekday, Saturday and Sunday rates come from the Ordinary hours rows below
+        ...CU_RATES.slice(3).map(([k, key, lbl], i)=>({k:key, l:otLbl(lbl) + " rate", type:"number", money:true, half:true,
+          ph:"Calculated", hint: i===0 ? "Leave any rate blank to calculate it from the weekday rate" : ""})),
+        {k:"ordHours", l:"Ordinary hours", type:"hours", wide:true, req:true,
+          hint:"The ordinary week, day by day or as a range, with its rate per hour"
+            + (casual ? " (casual rate, including the 25% loading)" : "")
+            + ". A weekday row's rate is required and sets the weekday rate; Saturday and Sunday rows set theirs. "
+            + "Public holiday, shift and overtime rates are set above, or calculated from the weekday rate when blank"},
+        // a custom pay point's additional hours sit straight after its ordinary hours
+        ...extraFields
       ] : []),
       {k:"superRate", l:"Superannuation rate", type:"number", step:"0.1", suffix:"%", half:true,
         hint:"Guarantee rate is 12% from 1 July 2025"},
@@ -919,14 +1138,16 @@ function schema(){
       ...(officePT ? [{k:"ptRate", l:"Hourly rate", type:"number", money:true, half:true, req:true,
         hint:"Base rate per hour. The letter adds super to show the total"}] : []),
       ...(pt ? [
-        {k:"ptHours", l:"Guaranteed hours per week", type:"number", step:"0.5", half:true, req:true},
+        ...(ordInfo() ? [] : [{k:"ptHours", l:"Guaranteed hours per week", type:"number", step:"0.5", half:true, req:true}]),
         {k:"ptRoster", l:"Agreed roster pattern", type:"textarea", wide:true, req:true,
           ph:"e.g. Mon, Wed, Fri 9:00am – 3:00pm", hint:"Part-time employees must have an agreed pattern of hours"}
       ] : []),
-      ...(casual ? [{k:"hoursCasual", l:"Hours of work", wide:true}] : []),
-      {k:"extraHours", l:"Additional hours", type:"extras", wide:true,
-        hint:"Regular hours on top of the ordinary week — above 38 hours, or Saturday / Sunday work. "
-          + "Leave the rate blank to use this employee’s rate for that day. The total is added to the salary in the letter"},
+      ...(isCustomPay() ? [] : extraFields),
+      {k:"totalSummary", l:"Total summary", type:"summary", wide:true},
+      ...(ft ? [{k:"salaryNote", l:"Salary details", type:"textarea", wide:true,
+        hint:"Shown under the annual salary in the letter. Fills in from the hours above \u2014 edit freely; empty the box to restore it"}] : []),
+      {k:"hoursWork", l:"Hours of work", type:"textarea", wide:true,
+        hint:"One point per line. Fills in from the hours above \u2014 edit freely; empty the box to restore it"},
       ...(casual && !isCustomPay() ? [{k:"incChoice", l:"Incentive loading", type:"select", half:true, dyn:"incChoice",
         hint:"Casual contracts only — lifts every rate: weekday, weekend, public holiday and shift. The letter shows the rates only, never the pay point"}] : []),
       ...(noPay ? [] : [{k:"showShiftRates", l:"Afternoon and night shift rates", type:"select", half:true,
@@ -999,6 +1220,7 @@ function schemaContractor(){
 function requiredMissing(){
   const out = [];
   schema().forEach(sec => sec.fields.forEach(f => {
+    if(f.k === "ordHours"){ if(!customRates()) out.push("Ordinary hours \u2014 weekday rate"); return; }
     if(f.req && !String(state.data[f.k]||"").trim()) out.push(f.l);
   }));
   return out;
@@ -1061,13 +1283,16 @@ function buildDoc(){
 
   // additional hours on top of the ordinary week — their pay is folded into the salary below
   const X = extraInfo();
-  const xLine = X ? `Additional hours: ${extraSentence(X)} — ${fmtHrs(X.hours)} per week in total, `
+  const xLine = X ? `Additional hours: ${showXDays() ? extraSentence(X) + " — " + fmtHrs(X.hours) + " per week in total" : fmtHrs(X.hours) + " per week"}, `
     + `adding ${money(X.weekly)} per week (${money0(X.annual)} per annum) plus superannuation.` : "";
   // weekly pay for a part-time employee: guaranteed hours at the ordinary rate plus additional hours
+  const O = ordInfo();
   const ptWeekly = rate => {
-    const h = parseFloat(d.ptHours);
-    if(!X || !(h > 0) || !(rate > 0)) return null;
-    const wk = r2(h * rate + X.weekly);
+    const h = O ? O.hours : parseFloat(d.ptHours);
+    if(!(X || O) || !(h > 0) || !(O || rate > 0)) return null;
+    const wk = r2((O ? O.weekly : h * rate) + (X ? X.weekly : 0));
+    if(!X) return P(`Total weekly pay: ${money(wk)} per week (${money0(wk * AWARD.weeksPerYear)} per annum) for `
+      + `${fmtHrs(h)} ordinary, plus superannuation.`, {b:true});
     return P(`Total weekly pay: ${money(wk)} per week (${money0(wk * AWARD.weeksPerYear)} per annum) for `
       + `${fmtHrs(h)} ordinary plus ${fmtHrs(X.hours)} additional, plus superannuation.`, {b:true});
   };
@@ -1078,8 +1303,7 @@ function buildDoc(){
     const tot = isNaN(sal) ? NaN : r2(sal + (X ? X.annual : 0));
     rows.push(["Base Salary", isNaN(sal) ? [P(ph("", "Annual salary"))] : [
       P(`Base ${money0(tot)} per annum plus ${supPct}% super`),
-      ...(X ? [P(`This is ${money0(sal)} for ${AWARD.hoursPerWeek} ordinary hours per week plus ${money0(X.annual)} for additional hours: `
-        + `${extraSentence(X)} (${fmtHrs(X.hours)} per week in total).`)] : []),
+      ...lines(d.salaryNote).map(x => P(phLine(x))),
       P(`Total package ${pkg(tot * (1 + supPct/100))} per annum`)
     ]]);
   } else if(officePT){
@@ -1109,25 +1333,24 @@ function buildDoc(){
   const payCell = [], rateLines = [];
   const INC = incentiveInfo();
   if(ft){
-    const baseAnnual = d.ftSalary ? parseFloat(d.ftSalary) : (R ? R.annual : NaN);
+    const baseAnnual = d.ftSalary ? parseFloat(d.ftSalary) : O ? O.annual : (R ? R.annual : NaN);
     // whole dollars added, so the total matches the two figures the letter shows
     const annual = isNaN(baseAnnual) ? ph("","Annual salary") : money0(Math.round(baseAnnual) + (X ? Math.round(X.annual) : 0));
     payCell.push(P(`Annual salary: ${annual} per annum, plus superannuation. Paid ${ph(d.payFrequency,"Payment frequency")}.`, {b:true}));
-    payCell.push(P(`This is based on ${AWARD.hoursPerWeek} ordinary hours per week at ${R?money(R.hourly):"—"} per hour`
-      + (X && !isNaN(baseAnnual)
-          ? ` (${money0(baseAnnual)} per annum), plus ${(Math.round(X.hours * 100) / 100)} additional ${X.hours === 1 ? "hour" : "hours"} per week: ${extraSentence(X)} `
-            + `(${money(X.weekly)} per week, ${money0(X.annual)} per annum).`
-          : `.`)));
+    // Salary details: the admin's wording, filled in from the hours until edited
+    lines(d.salaryNote).forEach(x => payCell.push(P(phLine(x))));
   } else if(pt){
     payCell.push(P(`Ordinary hourly rate: ${R?money(R.weekday.base):"—"} per hour, plus superannuation.`, {b:true}));
-    payCell.push(P(`Guaranteed minimum hours: ${ph(d.ptHours,"Hours per week")} hours per week.`));
-    if(X){
-      payCell.push(P(xLine));
-      const wk = ptWeekly(R ? R.weekday.base : NaN); if(wk) payCell.push(wk);
-    }
-  } else if(X){
-    payCell.push(P(`Agreed regular hours: ${extraSentence(X)} — ${fmtHrs(X.hours)} per week, `
-      + `${money(X.weekly)} per week (${money0(X.annual)} per annum) plus superannuation.`, {b:true}));
+    payCell.push(P(`Guaranteed minimum hours: ${O ? fmtN(O.hours) : ph(d.ptHours,"Hours per week")} hours per week.`));
+    if(X) payCell.push(P(xLine));
+    const wk = ptWeekly(R ? R.weekday.base : NaN); if(wk) payCell.push(wk);
+  } else if(X || O){
+    // casual: agreed regular hours, ordinary then additional
+    const hrs = (O ? O.hours : 0) + (X ? X.hours : 0), wk = r2((O ? O.weekly : 0) + (X ? X.weekly : 0));
+    const parts = [...(O ? O.rows.map(r => `${fmtHrs(r.hours)} ${r.label}`) : []),
+                   ...(X && showXDays() ? [extraSentence(X)] : [])];
+    payCell.push(P(`Agreed regular hours: ${parts.length ? parts.join("; ") + " — " : ""}${fmtHrs(hrs)} per week, `
+      + `${money(wk)} per week (${money0(wk * AWARD.weeksPerYear)} per annum) plus superannuation.`, {b:true}));
   }
   payCell.push(P(`Weekend, Public Holiday and Overtime Rates: Saturday, Sunday, public holiday penalties and overtime `
     + `will be paid strictly in accordance with the SCHADS Award and calculated based on the applicable Award rate for Level ${LPP}.`));
@@ -1166,26 +1389,9 @@ function buildDoc(){
 
   rows.push(["Allowance", [P(money(parseFloat(d.kmAllowance||0)) + " / Kilometre")]]);
 
-  if(casual){
-    rows.push(["Hours of work", [P(ph(d.hoursCasual,"Hours of work"))]]);
-  } else if(pt){
-    const rp = lines(d.ptRoster);
-    rows.push(["Hours of work", [
-      P(`${ph(d.ptHours,"Hours per week")} hours per week.`),
-      P("Agreed pattern of hours:"),
-      ...(rp.length? rp.map(x=>P(x,{tight:true})) : [P(ph("","Agreed roster pattern"))])
-    ]]);
-  } else if(salaried){
-    rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week`)]]);
-  } else {
-    rows.push(["Hours of work", [P(`${AWARD.hoursPerWeek} ordinary hours per week, plus reasonable additional hours as required.`)]]);
-  }
-  if(X){
-    // list the agreed additional days under Hours of work as well
-    const hw = rows[rows.length - 1][1];
-    hw.push(P(`Additional hours: ${X.rows.map(r => `${r.label} — ${fmtHrs(r.hours)}`).join(", ")} `
-      + `(${fmtHrs(X.hours)} per week in total).`));
-  }
+  // Hours of work: the admin's wording (one point per line), filled in from the hours until edited
+  const hwLines = lines(d.hoursWork);
+  rows.push(["Hours of work", hwLines.length ? hwLines.map(x => P(phLine(x), {tight:true})) : [P(ph("", "Hours of work"))]]);
 
   if(!salaried) rows.push(["Roster Policy", (lines(d.rosterPolicy).length? lines(d.rosterPolicy):[ph("","Roster policy")]).map(x=>P(x,{tight:true}))]);
   rows.push(["Payment Frequency", [P(ph(d.payFrequency,"Payment frequency"))]]);
@@ -1942,7 +2148,6 @@ function renderPDF(blocks){
       case "subject":
         y -= 4;
         para(rich(bl.t, "TB"), { size:BODY * 1.14, after:3 });
-        ops.push(`0.7 w 0 0 0 RG ${ML} ${(y + 5).toFixed(2)} m ${(ML + tw(bl.t.replace(/\u0001/g,""), FB(), BODY * 1.14)).toFixed(2)} ${(y + 5).toFixed(2)} l S`);
         y -= 6;
         break;
       case "table":
@@ -2174,7 +2379,7 @@ function renderDOCX(blocks){
         bl.ls.forEach((l,i)=> body.push(wP(l, {after: i===bl.ls.length-1 ? 180 : 0})));
         break;
       case "subject":
-        body.push(wP(bl.t, {b:true, u:true, sz:HP(1.1), before:120, after:150}));
+        body.push(wP(bl.t, {b:true, sz:HP(1.1), before:120, after:150}));
         break;
       case "table": {
         const W1 = 2700, W2 = 7150;
@@ -2292,6 +2497,7 @@ const openSecs = {};
 
 const choiceCustom = {};   // choice fields switched to "Other", so a cleared box stays open
 function renderForm(){
+  syncAutoTexts();
   const secs = schema();
   const html = [];
 
@@ -2358,8 +2564,10 @@ function fieldHTML(f){
     }
     ctl = `<select id="fld_${f.k}" data-k="${f.k}">` + opts.map(o=>
       `<option value="${esc(o.v)}"${String(v)===String(o.v)?" selected":""}>${esc(o.t)}</option>`).join("") + `</select>`;
-  } else if(f.type === "extras"){
-    ctl = extrasHTML();
+  } else if(f.type === "hours"){
+    ctl = hoursEditorHTML(HED[f.k]);
+  } else if(f.type === "summary"){
+    ctl = `<div class="ts" id="fld_totalSummary">${totalSummaryHTML()}</div>`;
   } else if(f.money){
     ctl = `<div class="pfx"><span>$</span><input id="fld_${f.k}" data-k="${f.k}" type="number" step="${f.step||"0.01"}" value="${esc(v)}" placeholder="${esc(f.ph||"")}"></div>`;
   } else {
@@ -2368,37 +2576,66 @@ function fieldHTML(f){
   return `<div class="${cls}">${lab}${ctl}${hint}</div>`;
 }
 
-/* Additional hours editor: one row per day, with hours per week and an optional rate */
-function extrasHTML(){
-  const rows = extraRows();
-  return `<div class="xh" id="fld_extraHours">`
+/* Hours editors (ordinary and additional): one row per day, with hours per week and an optional rate */
+const HED = {
+  extraHours: { key:"extraHours", days: XDAYS, get: extraRows, set: setExtraRows, ph: extraPlaceholder,
+                add: a => a.length ? "sunday" : "saturday", sum: extrasSummary },
+  ordHours:   { key:"ordHours", days: ODAYS, get: ordRows, set: setOrdRows, ph: ordPlaceholder,
+                add: a => a.length ? "saturday" : "monFri", sum: ordSummary }
+};
+/* A new hours row follows the one above it: the next day of the week (after a range such as
+   Monday – Friday, the day after it ends), with the same hours unless it follows a range.
+   The rate is copied only when
+   the new day is the same kind (weekday to weekday), since a Saturday or Sunday row's rate
+   sets that day's rate. With no rows yet, the editor's default day is used. */
+function nextHoursRow(c, a){
+  const prev = a[a.length - 1];
+  if(!prev) return { day: c.add(a), hours:"", rate:"" };
+  const find = k => c.days.filter(x => x[0] === k)[0];
+  const p = find(prev.day) || c.days[0], idx = p[3] || xDayIdx(p[0]);
+  const last = idx.length ? idx[idx.length - 1] : -1;
+  const nextKey = last < 0 ? p[0] : XDAYS[(last + 1) % 7][0];
+  const n = find(nextKey) || p;
+  return { day: n[0], hours: idx.length > 1 ? "" : (prev.hours || ""), rate: n[2] === p[2] ? (prev.rate || "") : "" };
+}
+function hoursEditorHTML(c){
+  const rows = c.get(), find = k => (c.days.filter(x => x[0] === k)[0] || c.days[0])[0];
+  return `<div class="xh" id="fld_${c.key}" data-hed="${c.key}">`
     + (rows.length ? `<div class="xh-row xh-head"><span>Day</span><span>Hours / week</span><span>Rate / hour</span><span></span></div>` : "")
     + rows.map((r, i) => {
         return `<div class="xh-row" data-xi="${i}">`
-          + `<select data-x="day">` + XDAYS.map(([v, t]) =>
-              `<option value="${v}"${xDay(r.day)[0] === v ? " selected" : ""}>${t}</option>`).join("") + `</select>`
+          + `<select data-x="day">` + c.days.map(([v, t]) =>
+              `<option value="${v}"${find(r.day) === v ? " selected" : ""}>${t}</option>`).join("") + `</select>`
           + `<input data-x="hours" type="number" step="0.5" min="0" value="${esc(r.hours || "")}" placeholder="e.g. 8">`
-          + `<div class="pfx"><span>$</span><input data-x="rate" type="number" step="0.01" min="0" value="${esc(r.rate || "")}" placeholder="${esc(extraPlaceholder(r.day))}"></div>`
+          + `<div class="pfx"><span>$</span><input data-x="rate" type="number" step="0.01" min="0" value="${esc(r.rate || "")}" placeholder="${esc(c.ph(r.day))}"></div>`
           + `<button class="btn btn-sm xh-del" type="button" data-xdel="${i}" title="Remove" aria-label="Remove row">×</button>`
           + `</div>`;
       }).join("")
-    + `<button class="btn btn-sm" type="button" id="xhAdd">+ Add hours</button>`
-    + `<div class="xh-sum" id="xhSum">${extrasSummary()}</div></div>`;
+    + `<button class="btn btn-sm xh-add" type="button">+ Add hours</button>`
+    + `<div class="xh-sum">${c.sum()}</div></div>`;
 }
-// a pay field changed: update default-rate placeholders and the total without re-rendering
+// a pay field changed: update default-rate placeholders and totals without re-rendering
 function refreshExtras(){
-  $$(".xh-row[data-xi]").forEach(row=>{
-    const day = row.querySelector("[data-x='day']"), rate = row.querySelector("[data-x='rate']");
-    if(!day || !rate) return;
-    rate.placeholder = extraPlaceholder(day.value);
+  $$("[data-hed]").forEach(box => {
+    const c = HED[box.dataset.hed];
+    box.querySelectorAll(".xh-row[data-xi]").forEach(row => {
+      const day = row.querySelector("[data-x='day']"), rate = row.querySelector("[data-x='rate']");
+      if(day && rate) rate.placeholder = c.ph(day.value);
+    });
+    const s = box.querySelector(".xh-sum"); if(s) s.innerHTML = c.sum();
   });
-  const s = $("#xhSum"); if(s) s.innerHTML = extrasSummary();
+  const ts = $("#fld_totalSummary"); if(ts) ts.innerHTML = totalSummaryHTML();
 }
 function extrasSummary(){
   const X = extraInfo();
   if(!X) return "";
   if(X.missingRate) return `<span class="xh-warn">Enter a rate for every row — no base rate to calculate it from yet.</span>`;
-  return `<b>${fmtHrs(X.hours)}</b> extra per week · <b>${money(X.weekly)}</b>/week · <b>${money0(X.annual)}</b>/year — added to the salary`;
+  return `<b>${fmtHrs(X.hours)}</b> extra per week (${partsBreakdown(X.rows)}) · <b>${money(X.weekly)}</b>/week · <b>${money0(X.annual)}</b>/year — added to the salary`;
+}
+function ordSummary(){
+  const O = ordInfo();
+  if(!O || O.missingRate) return "";
+  return `<b>${fmtHrs(O.hours)}</b> ordinary per week (${partsBreakdown(O.rows)}) · <b>${money(O.weekly)}</b>/week · <b>${money0(O.annual)}</b>/year`;
 }
 
 function secExtra(n){
@@ -2444,12 +2681,12 @@ function secExtra(n){
   }
   const R = currentRates();
   const CU = isCustomPay();
-  if(!R && CU) return `<div class="note note-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg><div>Enter the weekday rate to build the custom rate table.</div></div>`;
+  if(!R && CU) return `<div class="note note-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg><div>Add an ordinary hours row with a weekday rate to build the custom rate table.</div></div>`;
   if(!R) return `<div class="note note-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg><div>No rate found for that level and pay point. Check the <b>Rate table</b> tab.</div></div>`;
   const casual = state.type === "casual";
   const rows = [["Weekday", R.weekday],["Saturday", R.saturday],["Sunday", R.sunday],
                 ["Public holiday", R.publicHoliday],["Afternoon shift", R.afternoon],["Night shift", R.night],
-                ["Overtime — first 2 hrs", R.otFirst2],["Overtime — after 2 hrs", R.otAfter2]];
+                [otLbl("Overtime — first 2 hrs"), R.otFirst2],[otLbl("Overtime — after 2 hrs"), R.otAfter2]];
   const INC = incentiveInfo();
   const SEL = incSel();   // tiers are casual-only, so SEL.code is empty on permanent types
   return `<div class="rates">
@@ -2528,29 +2765,30 @@ function wireForm(){
     renderForm(); renderPreview();
     if(other){ const box = $(`[data-k="${k}"]`); if(box) box.focus(); }
   }));
-  const xa = $("#xhAdd"); if(xa) xa.onclick = ()=>{
-    const a = extraRows(); a.push({ day: a.length ? "sunday" : "saturday", hours:"", rate:"" });
-    setExtraRows(a); renderForm(); renderPreview();
-    const ins = $$(".xh-row[data-xi] [data-x='hours']"); if(ins.length) ins[ins.length-1].focus();
-  };
-  $$("[data-xdel]").forEach(b=> b.onclick = ()=>{
-    const a = extraRows(); a.splice(+b.dataset.xdel, 1);
-    setExtraRows(a); renderForm(); renderPreview();
-  });
-  $$(".xh-row[data-xi] [data-x]").forEach(el=>{
-    const ev = (el.tagName==="SELECT") ? "change" : "input";
-    el.addEventListener(ev, ()=>{
-      const a = extraRows(), i = +el.closest(".xh-row").dataset.xi;
-      if(!a[i]) return;
-      a[i][el.dataset.x] = el.value;
-      setExtraRows(a);
-      if(el.dataset.x === "day"){
-        // the default rate depends on the day, so refresh the placeholder
-        const rate = el.closest(".xh-row").querySelector("[data-x='rate']");
-        if(rate) rate.placeholder = extraPlaceholder(el.value);
-      }
-      const s = $("#xhSum"); if(s) s.innerHTML = extrasSummary();
-      renderPreview();
+  $$("[data-hed]").forEach(box=>{
+    const c = HED[box.dataset.hed];
+    box.querySelector(".xh-add").onclick = ()=>{
+      const a = c.get(); a.push(nextHoursRow(c, a));
+      c.set(a); renderForm(); renderPreview();
+      const ins = $$(`[data-hed="${c.key}"] .xh-row[data-xi] [data-x='hours']`); if(ins.length) ins[ins.length-1].focus();
+    };
+    box.querySelectorAll("[data-xdel]").forEach(b=> b.onclick = ()=>{
+      const a = c.get(); a.splice(+b.dataset.xdel, 1);
+      c.set(a); renderForm(); renderPreview();
+    });
+    box.querySelectorAll(".xh-row[data-xi] [data-x]").forEach(el=>{
+      const ev = (el.tagName==="SELECT") ? "change" : "input";
+      el.addEventListener(ev, ()=>{
+        const a = c.get(), i = +el.closest(".xh-row").dataset.xi;
+        if(!a[i]) return;
+        const first = c.key === "ordHours" && a.filter(r => parseFloat(r.hours) > 0).length === 0;
+        a[i][el.dataset.x] = el.value;
+        c.set(a);
+        // the first ordinary hours replace the guaranteed-hours field, so rebuild the form once
+        if(first && el.dataset.x === "hours" && parseFloat(el.value) > 0 && basis() === "parttime"){ renderForm(); renderPreview(); return; }
+        refreshExtras();
+        renderPreview();
+      });
     });
   });
   $$("[data-k]").forEach(el=>{
@@ -2601,6 +2839,8 @@ function unsupportedChars(){
 }
 
 function renderPreview(){
+  syncAutoTexts();
+  const ts = $("#fld_totalSummary"); if(ts) ts.innerHTML = totalSummaryHTML();
   const blocks = buildDoc();
   const html = renderHTML(blocks);
   const fam = FAM().css, fsz = (state.style.size || 10.5) + "pt";

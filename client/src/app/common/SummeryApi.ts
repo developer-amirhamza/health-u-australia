@@ -105,6 +105,7 @@ export const SummeryApi = {
     sendContractSignatureRequest: { url: "/api/contracts/send-signature-request", method: "post" },
     getContractByToken: { url: "/api/contracts/sign", method: "get" },
     submitEmployeeSignature: { url: "/api/contracts/sign", method: "post" },
+    sendEmployeeSignedCopy: { url: "/api/contracts/sign/send-copy", method: "post" },
 
     // ── CMS Content Management (admin-managed website content; public read access) ──
     getContent: { url: "/api/content", method: "get" },

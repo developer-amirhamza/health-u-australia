@@ -5,6 +5,7 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { SummeryApi } from 'app/common/SummeryApi'
 import { docStyles } from 'app/common/contractDocStyles'
+import { buildContractPdf, paginateContract } from 'app/common/contractPages'
 import Axios from 'utils/Axios'
 import SignaturePad from 'app/(main)/components/SignaturePad'
 
@@ -29,6 +30,12 @@ const SignContent = () => {
   const [accepted, setAccepted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [showErrors, setShowErrors] = useState(false)
+
+  // After signing: the signed document, laid out on A4 pages and emailed to
+  // the employee as a PDF.
+  const [signedHtml, setSignedHtml] = useState('')
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
+  const [copyMessage, setCopyMessage] = useState('')
 
   useEffect(() => {
     if (!token) {
@@ -67,7 +74,10 @@ const SignContent = () => {
         ...SummeryApi.submitEmployeeSignature,
         data: { token, employeeSignature: signature, employeeSignatureName: fullName.trim(), accepted },
       })
-      if (response.data?.success) setJustSigned(true)
+      if (response.data?.success) {
+        setJustSigned(true)
+        if (response.data.data?.documentHtml) setSignedHtml(response.data.data.documentHtml)
+      }
       else toast.error(response.data?.message || 'Could not submit your signature')
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Could not submit your signature')
@@ -75,6 +85,31 @@ const SignContent = () => {
       setSubmitting(false)
     }
   }
+
+  // The same A4 pages as the preview — see app/common/contractPages.
+  useEffect(() => {
+    if (!signedHtml || copyStatus !== 'idle') return
+    const sendCopy = async () => {
+      try {
+        setCopyStatus('sending')
+        const pdf = await buildContractPdf(await paginateContract(signedHtml))
+        const pdfBase64 = pdf.output('datauristring').split(',')[1]
+        const response = await Axios({ ...SummeryApi.sendEmployeeSignedCopy, data: { token, pdfBase64 } })
+        if (response.data?.success) {
+          setCopyStatus('sent')
+          setCopyMessage(response.data.message || 'A copy of your signed contract has been emailed to you.')
+        } else {
+          setCopyStatus('failed')
+          setCopyMessage(response.data?.message || '')
+        }
+      } catch (err: any) {
+        console.error(err)
+        setCopyStatus('failed')
+        setCopyMessage(err?.response?.data?.message || '')
+      }
+    }
+    sendCopy()
+  }, [signedHtml, copyStatus, token])
 
   if (loading) {
     return (
@@ -108,6 +143,17 @@ const SignContent = () => {
               ? 'Your signature has been submitted. Health U Australia has been notified.'
               : 'This contract has already been signed. No further action is needed.'}
           </p>
+          {justSigned && copyStatus === 'sending' && (
+            <p className="text-secondary-text/80 mt-3">Emailing you a copy of your signed contract…</p>
+          )}
+          {justSigned && copyStatus === 'sent' && (
+            <p className="text-secondary-text/80 mt-3">{copyMessage}</p>
+          )}
+          {justSigned && copyStatus === 'failed' && (
+            <p className="text-secondary-text/80 mt-3">
+              {copyMessage || 'We couldn\'t email you a copy right now.'} Please contact Health U Australia if you need a copy of your signed contract.
+            </p>
+          )}
         </div>
       </div>
     )

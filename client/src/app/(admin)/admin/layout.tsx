@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import AdminSidebar from './components/AdminSidebar'
 import AdminHeader from './components/AdminHeader'
 import IsAdmin from 'utils/IsAdmin'
+import { canAccessPath } from 'utils/adminAccess'
 import { AppDispatch, RootState } from 'app/redux/store'
 import { fetchUser } from 'app/redux/slices/userSlices'
 
@@ -69,7 +70,15 @@ const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 <div className="min-w-0 flex-1 h-screen flex flex-col">
                     <AdminHeader sidebar={() => setShowSidebar(!showSidebar)} />
                     <div className=" no-scrollbar overflow-y-auto">
-                        {children}
+                        {canAccessPath(user, pathname) ? children : (
+                            // a moderator on a section an admin hasn't granted them
+                            <div className="flex flex-col items-center justify-center text-center gap-2 px-6 py-24">
+                                <h1 className="font-serif text-2xl text-[#1a1a18]">No access to this section</h1>
+                                <p className="text-sm text-gray-600 max-w-md">
+                                    This section holds official records. Ask an admin to grant you access from the All Users page.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -58,9 +58,6 @@ const SignIn = () => {
                     toast.error('Your account role could not be verified. Please contact the site administrator.');
                     return;
                 }
-                if (normaliseRole(role) === ROLES.MODERATOR) {
-                    toast('This account has the Moderator role. Admin access requires an Admin or Owner role.');
-                }
                 router.push(portalPath(role));
             }
         } catch (error: any) {

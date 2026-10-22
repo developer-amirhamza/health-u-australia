@@ -7,7 +7,7 @@ import {
   deleteTrainingResource,
 } from '../controllers/trainingResource.controllers.js';
 import { auth } from '../middlewares/auth.js';
-import { admin } from '../middlewares/admin.js';
+import { admin, section } from '../middlewares/admin.js';
 
 const router = Router();
 
@@ -15,9 +15,9 @@ const router = Router();
 router.get('/public', getPublicTrainingResources);
 
 // Managing training resources is an admin-panel (CRUD) concern.
-router.get('/', auth, admin, getTrainingResources);
-router.post('/create', auth, admin, createTrainingResource);
-router.put('/update', auth, admin, updateTrainingResource);
-router.delete('/delete', auth, admin, deleteTrainingResource);
+router.get('/', auth, admin, section('training'), getTrainingResources);
+router.post('/create', auth, admin, section('training'), createTrainingResource);
+router.put('/update', auth, admin, section('training'), updateTrainingResource);
+router.delete('/delete', auth, admin, section('training'), deleteTrainingResource);
 
 export default router;

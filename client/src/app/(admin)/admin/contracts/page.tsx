@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { SummeryApi } from 'app/common/SummeryApi';
 import Axios from 'utils/Axios';
 import AxiosToastError from 'utils/AxiosToastError';
-import { docStyles } from 'app/common/contractDocStyles';
+import { ContractPages, buildContractPdf } from 'app/common/contractPages';
 
 interface ContractRow {
     id: string;
@@ -59,7 +59,8 @@ const AdminContractsPage = () => {
     const [sending, setSending] = useState(false);
     const [requestingSignature, setRequestingSignature] = useState(false);
     const [sendToEmail, setSendToEmail] = useState('');
-    const docRef = useRef<HTMLDivElement>(null);
+    // The A4 pages shown in the preview; the PDF is built from exactly these.
+    const [pages, setPages] = useState<string[] | null>(null);
 
     const fetchContracts = async () => {
         try {
@@ -83,6 +84,7 @@ const AdminContractsPage = () => {
             setDetailLoading(true);
             const response = await Axios({ ...SummeryApi.getContractById, params: { id } });
             if (response.data?.success) {
+                setPages(null);
                 setSelected(response.data.data);
                 setSendToEmail(response.data.data?.employeeEmail || '');
             } else toast.error(response.data?.message || 'Failed to load contract');
@@ -102,35 +104,7 @@ const AdminContractsPage = () => {
         } catch (error) { AxiosToastError(error); } finally { setActionLoading(null); }
     };
 
-    // Renders the visible `.hu-contract-doc` content (the modal below) into a
-    // multi-page PDF — the same html2canvas-pro + jsPDF approach used by the
-    // Service Agreement Tool, and for the same reason: the site's Tailwind v4
-    // palette resolves to oklch() colors that plain html2canvas can't parse.
-    const buildPdf = async () => {
-        if (!docRef.current) return null;
-        const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-            import('html2canvas-pro'),
-            import('jspdf'),
-        ]);
-        const canvas = await html2canvas(docRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = pageWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 0;
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-        return pdf;
-    };
+    const buildPdf = async () => (pages ? buildContractPdf(pages) : null);
 
     const handleDownloadPdf = async () => {
         if (!selected) return;
@@ -284,7 +258,7 @@ const AdminContractsPage = () => {
                                 <div className="flex flex-wrap items-end gap-3 mb-6 bg-gray-50 border border-gray-200 rounded p-3">
                                     <button
                                         type="button"
-                                        disabled={downloading}
+                                        disabled={downloading || !pages}
                                         onClick={handleDownloadPdf}
                                         className="text-white cursor-pointer text-sm font-semibold px-4 py-2 rounded-full bg-primary hover:bg-secondary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
@@ -311,7 +285,7 @@ const AdminContractsPage = () => {
                                         </div>
                                         <button
                                             type="button"
-                                            disabled={sending}
+                                            disabled={sending || !pages}
                                             onClick={handleSendEmail}
                                             className="text-white cursor-pointer text-sm font-semibold px-4 py-2 rounded-full bg-secondary hover:bg-primary transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
@@ -331,12 +305,7 @@ const AdminContractsPage = () => {
                                     </div>
                                 </div>
 
-                                <style jsx global>{docStyles}</style>
-                                <div className="hu-contract-doc">
-                                    <div ref={docRef} className="bg-white border border-gray-200 rounded p-8">
-                                        <div className="doc" dangerouslySetInnerHTML={{ __html: selected.documentHtml }} />
-                                    </div>
-                                </div>
+                                <ContractPages html={selected.documentHtml} onPages={setPages} height="70vh" />
                             </>
                         )}
                     </div>
