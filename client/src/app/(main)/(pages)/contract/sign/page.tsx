@@ -4,7 +4,8 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { SummeryApi } from 'app/common/SummeryApi'
-import { ContractPages, buildContractPdf, paginateContract } from 'app/common/contractPages'
+import { docStyles } from 'app/common/contractDocStyles'
+import { buildContractPdf, paginateContract } from 'app/common/contractPages'
 import Axios from 'utils/Axios'
 import SignaturePad from 'app/(main)/components/SignaturePad'
 
@@ -165,7 +166,12 @@ const SignContent = () => {
         Please read the contract below carefully, then add your signature at the bottom of this page.
       </p>
 
-      <ContractPages html={contract?.documentHtml || ''} />
+      <style jsx global>{docStyles}</style>
+      <div className="hu-contract-doc">
+        <div className="bg-white border border-neutral-200 rounded p-5 sm:p-8 overflow-x-auto">
+          <div className="doc" dangerouslySetInnerHTML={{ __html: contract?.documentHtml || '' }} />
+        </div>
+      </div>
 
       <div className="mt-8 bg-white border border-neutral-200 rounded p-5 sm:p-8 flex flex-col gap-5">
         <h2 className="text-lg font-bold text-secondary-text">Your signature</h2>

@@ -200,30 +200,86 @@ export const paginateContract = async (html: string): Promise<string[]> => {
   }
 }
 
-// Captures each page at A4 size into a PDF — one PDF page per preview page.
-// html2canvas-pro (not html2canvas): Tailwind v4's oklch() colors.
-export const buildContractPdf = async (pages: string[]) => {
-  const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-    import('html2canvas-pro'),
-    import('jspdf'),
-  ])
+// The parts of Tailwind's preflight the contract layout depends on. Pages are
+// measured on the site (preflight applied), so the PDF render needs them too.
+const PREFLIGHT = `
+*,::before,::after{box-sizing:border-box;margin:0;padding:0;border:0 solid}
+h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
+ol,ul{list-style:none}
+img{display:block;vertical-align:middle;max-width:100%;height:auto}
+table{text-indent:0;border-color:inherit;border-collapse:collapse}
+b,strong{font-weight:bolder}
+`
+
+const SCALE = 2
+
+// Renders one page as an SVG image, so the browser lays the text out itself
+// in an isolated document — no site CSS, no extensions, and no per-word
+// re-drawing as in html2canvas (which can run words together when its copy
+// of the page doesn't get the same font).
+const rasterizePage = (pageHtml: string) => new Promise<string>((resolve, reject) => {
+  const wrap = document.createElement('div')
+  wrap.className = 'hu-contract-doc'
+  wrap.style.cssText = `width:${PAGE_W}px;height:${PAGE_H}px;background:#fff`
+  wrap.innerHTML = `<style>${PREFLIGHT}${allStyles}</style>${pageHtml}`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${PAGE_W * SCALE}" height="${PAGE_H * SCALE}" viewBox="0 0 ${PAGE_W} ${PAGE_H}">`
+    + `<foreignObject x="0" y="0" width="${PAGE_W}" height="${PAGE_H}">${new XMLSerializer().serializeToString(wrap)}</foreignObject></svg>`
+  const img = new Image()
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = PAGE_W * SCALE
+      canvas.height = PAGE_H * SCALE
+      const ctx = canvas.getContext('2d')!
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      // Throws where the browser treats the canvas as tainted (older Safari).
+      resolve(canvas.toDataURL('image/jpeg', 0.95))
+    } catch (err) { reject(err) }
+  }
+  img.onerror = () => reject(new Error('Could not render the page image'))
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+})
+
+// Fallback where SVG rendering isn't allowed. html2canvas-pro (not
+// html2canvas): Tailwind v4's oklch() colors.
+const html2canvasPages = async (pages: string[]) => {
+  const { default: html2canvas } = await import('html2canvas-pro')
   const host = createHost()
   try {
     host.insertAdjacentHTML('beforeend', pages.map((p, i) => wrapPage(p, i, pages.length)).join(''))
     await settle(host)
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const els = Array.from(host.querySelectorAll<HTMLElement>('.hu-contract-page'))
-    for (let i = 0; i < els.length; i++) {
-      const canvas = await html2canvas(els[i], {
-        scale: 2, useCORS: true, backgroundColor: '#ffffff', width: PAGE_W, height: PAGE_H,
+    const images: string[] = []
+    for (const el of Array.from(host.querySelectorAll<HTMLElement>('.hu-contract-page'))) {
+      const canvas = await html2canvas(el, {
+        scale: SCALE, useCORS: true, backgroundColor: '#ffffff', width: PAGE_W, height: PAGE_H,
       })
-      if (i > 0) pdf.addPage()
-      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297)
+      images.push(canvas.toDataURL('image/jpeg', 0.95))
     }
-    return pdf
+    return images
   } finally {
     host.remove()
   }
+}
+
+// Captures each page at A4 size into a PDF — one PDF page per preview page.
+export const buildContractPdf = async (pages: string[]) => {
+  const { default: jsPDF } = await import('jspdf')
+  let images: string[]
+  try {
+    images = []
+    for (let i = 0; i < pages.length; i++) images.push(await rasterizePage(wrapPage(pages[i], i, pages.length)))
+  } catch (err) {
+    console.warn('Contract PDF: SVG rendering unavailable, using html2canvas', err)
+    images = await html2canvasPages(pages)
+  }
+  const pdf = new jsPDF('p', 'mm', 'a4')
+  images.forEach((img, i) => {
+    if (i > 0) pdf.addPage()
+    pdf.addImage(img, 'JPEG', 0, 0, 210, 297)
+  })
+  return pdf
 }
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2]
