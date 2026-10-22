@@ -9,6 +9,7 @@ import {
   sendContractSignatureRequest,
   getContractByToken,
   submitEmployeeSignature,
+  sendEmployeeSignedCopy,
 } from '../controllers/contract.controllers.js';
 import { auth } from '../middlewares/auth.js';
 import { admin, section, moderatorSection } from '../middlewares/admin.js';
@@ -25,6 +26,7 @@ router.post('/send-signature-request', auth, moderatorSection('contracts'), send
 // no account of their own. The token itself is the credential.
 router.get('/sign', getContractByToken);
 router.post('/sign', submitEmployeeSignature);
+router.post('/sign/send-copy', sendEmployeeSignedCopy);
 
 // Managing saved contracts is an admin-panel (CRUD) concern.
 router.get('/', auth, admin, section('contracts'), getContracts);

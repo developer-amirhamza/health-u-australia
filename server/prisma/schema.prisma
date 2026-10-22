@@ -244,6 +244,8 @@ model Contract {
   employeeSignedDate    String    @default("")
   signingToken          String?   @unique
   signingTokenExpiresAt DateTime?
+  // When the employee was emailed their signed copy — sent once only.
+  employeeCopySentAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -7,6 +7,7 @@ import { primaryClientUrl } from '../config/clientUrl.js';
 import contractPdfTemplate from '../utils/contractPdfTemplate.js';
 import contractSignatureRequestTemplate from '../utils/contractSignatureRequestTemplate.js';
 import contractSignedTemplate from '../utils/contractSignedTemplate.js';
+import contractSignedCopyTemplate from '../utils/contractSignedCopyTemplate.js';
 
 interface AuthRequest extends Request {
   userId?: string;
@@ -296,7 +297,7 @@ export const submitEmployeeSignature = async (req: Request, res: Response) => {
       day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Australia/Sydney',
     }).format(new Date());
 
-    await prisma.contract.update({
+    const signed = await prisma.contract.update({
       where: { id: contract!.id },
       data: {
         employeeSignature,
@@ -324,7 +325,53 @@ export const submitEmployeeSignature = async (req: Request, res: Response) => {
       }
     }
 
-    return errorHandler(res, 200, 'Thank you — your signature has been submitted', false, null);
+    // The signed document, so the signing page can build the employee's PDF copy.
+    return errorHandler(res, 200, 'Thank you — your signature has been submitted', false, {
+      documentHtml: signed.documentHtml,
+    });
+  } catch (error: any) {
+    return errorHandler(res, 500, error.message || 'Internal server error');
+  }
+};
+
+// PUBLIC (no auth) — right after signing, the signing page posts a PDF of the
+// signed contract (built client-side, like the admin "Send PDF") and it is
+// emailed to the employee. Only to the address on file, and only once.
+export const sendEmployeeSignedCopy = async (req: Request, res: Response) => {
+  try {
+    const { token, pdfBase64 } = req.body;
+    if (!pdfBase64) return errorHandler(res, 400, 'PDF data is required');
+
+    const { contract, error } = await findBySigningToken(token);
+    if (error) return errorHandler(res, error[0], error[1]);
+    if (!contract!.employeeSignature) return errorHandler(res, 400, 'This contract has not been signed yet');
+    if (!EMAIL_RE.test(contract!.employeeEmail)) return errorHandler(res, 400, 'No valid employee email on file');
+
+    const buffer = Buffer.from(String(pdfBase64), 'base64');
+    if (buffer.subarray(0, 5).toString() !== '%PDF-') return errorHandler(res, 400, 'Invalid PDF');
+
+    // Claim the one send atomically, so repeated calls can't resend it.
+    const claimed = await prisma.contract.updateMany({
+      where: { id: contract!.id, employeeCopySentAt: null },
+      data: { employeeCopySentAt: new Date() },
+    });
+    if (claimed.count === 0) return errorHandler(res, 400, 'Your signed copy has already been emailed');
+
+    const safeName = String(contract!.employeeName || 'Contract').trim().replace(/[^a-z0-9]+/gi, '-');
+    try {
+      await sendEmail({
+        sendTo: contract!.employeeEmail,
+        subject: 'Your Signed Contract - Health U Australia',
+        html: contractSignedCopyTemplate({ employeeName: escapeHtml(contract!.employeeName || 'there') }),
+        attachments: [{ filename: `Signed-Contract-${safeName}.pdf`, content: buffer }],
+      });
+    } catch (sendError) {
+      // Release the claim so the copy can be retried.
+      await prisma.contract.update({ where: { id: contract!.id }, data: { employeeCopySentAt: null } });
+      throw sendError;
+    }
+
+    return errorHandler(res, 200, `A copy of your signed contract has been emailed to ${contract!.employeeEmail}`, false, null);
   } catch (error: any) {
     return errorHandler(res, 500, error.message || 'Internal server error');
   }

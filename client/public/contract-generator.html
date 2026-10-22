@@ -210,7 +210,7 @@ table.rt td.tot{color:var(--brand-ink)}
 .doc .conf{font-weight:700;letter-spacing:.04em;font-size:9.5pt;text-transform:uppercase;margin-bottom:14px;color:#444}
 .doc .addr{margin-bottom:18px;line-height:1.4}
 .doc .addr div{margin:0}
-.doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px;text-decoration:underline}
+.doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px}
 .doc table.det{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:10pt}
 .doc table.det th,.doc table.det td{border:1px solid #b9bec9;padding:7px 9px;vertical-align:top;text-align:left}
 .doc table.det th{width:31%;background:#f2f6f6;font-weight:650}
@@ -2148,7 +2148,6 @@ function renderPDF(blocks){
       case "subject":
         y -= 4;
         para(rich(bl.t, "TB"), { size:BODY * 1.14, after:3 });
-        ops.push(`0.7 w 0 0 0 RG ${ML} ${(y + 5).toFixed(2)} m ${(ML + tw(bl.t.replace(/\u0001/g,""), FB(), BODY * 1.14)).toFixed(2)} ${(y + 5).toFixed(2)} l S`);
         y -= 6;
         break;
       case "table":
@@ -2380,7 +2379,7 @@ function renderDOCX(blocks){
         bl.ls.forEach((l,i)=> body.push(wP(l, {after: i===bl.ls.length-1 ? 180 : 0})));
         break;
       case "subject":
-        body.push(wP(bl.t, {b:true, u:true, sz:HP(1.1), before:120, after:150}));
+        body.push(wP(bl.t, {b:true, sz:HP(1.1), before:120, after:150}));
         break;
       case "table": {
         const W1 = 2700, W2 = 7150;

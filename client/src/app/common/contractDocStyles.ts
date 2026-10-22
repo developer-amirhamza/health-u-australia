@@ -18,7 +18,7 @@ export const docStyles = `
 .hu-contract-doc .doc .conf{font-weight:700;letter-spacing:.04em;font-size:9.5pt;text-transform:uppercase;margin-bottom:14px;color:#444}
 .hu-contract-doc .doc .addr{margin-bottom:18px;line-height:1.4}
 .hu-contract-doc .doc .addr div{margin:0}
-.hu-contract-doc .doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px;text-decoration:underline}
+.hu-contract-doc .doc h2.subj{font-size:12pt;font-weight:700;margin:16px 0 12px}
 .hu-contract-doc .doc table.det{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:10pt}
 .hu-contract-doc .doc table.det th,.hu-contract-doc .doc table.det td{border:1px solid #b9bec9;padding:7px 9px;vertical-align:top;text-align:left}
 .hu-contract-doc .doc table.det th{width:31%;background:#f2f6f6;font-weight:650}
