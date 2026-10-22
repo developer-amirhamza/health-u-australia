@@ -21,7 +21,7 @@ export const ADMIN_SECTIONS: { key: AdminSection; label: string; group: "Website
     key: "services", label: "Services", group: "Website", paths: [
       "/admin/community-participation", "/admin/capacity-building", "/admin/support-coordination",
       "/admin/assist-in-self-care", "/admin/assist-in-transport", "/admin/home-modification",
-      "/admin/non-ndis-service", "/admin/gardening-house-yard",
+      "/admin/non-ndis-service", "/admin/gardening-house-yard", "/admin/services",
     ],
   },
   { key: "silHouses", label: "SIL House", group: "Website", paths: ["/admin/sil-houses"] },
